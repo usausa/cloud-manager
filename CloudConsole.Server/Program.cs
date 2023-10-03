@@ -150,6 +150,18 @@ if (!File.Exists(connectionStringBuilder.DataSource))
     accessor.Create();
 }
 
+// Serilog
+if (!app.Environment.IsProduction())
+{
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.IncludeQueryInRequestPath = true;
+    });
+}
+
+// Forwarded headers
+app.UseForwardedHeaders();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
