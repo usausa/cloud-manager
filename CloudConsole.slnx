@@ -10,7 +10,6 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="LICENSE" />
-    <File Path="NuGet.Config" />
     <File Path="README.md" />
   </Folder>
 </Solution>
