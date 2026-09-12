@@ -38,5 +38,7 @@ global using Smart.Text;
 
 // ReSharper disable MissingBlankLines
 global using CloudManager;
+global using CloudManager.Models;
+global using CloudManager.Services.Aws;
 global using CloudManager.Host.Application;
 global using CloudManager.Host.Settings;

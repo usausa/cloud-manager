@@ -9,8 +9,10 @@ using System.Text.Unicode;
 
 using CloudManager.Host.Application.Telemetry;
 using CloudManager.Host.Components;
+using CloudManager.Host.Infrastructure.Aws;
 using CloudManager.Host.Infrastructure.ExceptionHandling;
 using CloudManager.Host.Infrastructure.HealthChecks;
+using CloudManager.Infrastructure.Aws;
 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
@@ -403,11 +405,23 @@ public static class ApplicationExtensions
         // Cache
         builder.Services.AddMemoryCache();
 
+        // AWS
+        builder.Services.AddScoped<AwsSession>();
+        builder.Services.AddScoped(static p =>
+        {
+            // プロファイルは画面で切り替えられるため、クライアント生成のたびにセッションから解決する
+            var session = p.GetRequiredService<AwsSession>();
+            return new AwsClientFactory(() => CredentialResolver.Resolve(session.ProfileName, session.Region?.SystemName));
+        });
+        builder.Services.AddAwsServices();
+
         // Setting
         builder.Services.AddOptions<ProfilerSetting>().BindConfiguration("Profiler").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<ProfilerSetting>>().Value);
         builder.Services.AddOptions<LogSetting>().BindConfiguration("Log").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<LogSetting>>().Value);
+        builder.Services.AddOptions<AwsSetting>().BindConfiguration("Aws").ValidateDataAnnotations().ValidateOnStart();
+        builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<AwsSetting>>().Value);
 
         return builder;
     }

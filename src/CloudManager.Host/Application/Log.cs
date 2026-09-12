@@ -22,6 +22,11 @@ internal static partial class Log
     [LoggerMessage(Level = LogLevel.Information, Message = "Telemetry: otelEndPoint=[{otelEndPoint}], prometheusUri=[{prometheusUri}]")]
     public static partial void InfoServiceSettingsTelemetry(this ILogger logger, string otelEndPoint, string prometheusUri);
 
+    // AWS
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "AWS profile load failed.")]
+    public static partial void WarnAwsProfileLoadFailed(this ILogger logger, Exception ex);
+
     // Error
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Unhandled exception.")]
