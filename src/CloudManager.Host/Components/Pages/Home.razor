@@ -1,18 +1,6 @@
 @page "/"
-@attribute [Authorize]
-@inherits AppComponentBase
 
-<PageTitle>Home</PageTitle>
+<PageTitle>CloudManager - Home</PageTitle>
 
 <MudText Typo="Typo.h4">Home</MudText>
 <MudText Class="mt-2">CloudManager</MudText>
-
-@if (featureEnabled)
-{
-    <MudChip T="string" Color="Color.Success" Class="mt-4">Feature: CustomOption 有効</MudChip>
-}
-
-@if (!String.IsNullOrEmpty(lastNotification))
-{
-    <MudAlert Severity="Severity.Info" Class="mt-4" Style="max-width: 400px;">@lastNotification</MudAlert>
-}

@@ -23,8 +23,6 @@ builder.ConfigureLogging();
 builder.ConfigureHttp();
 // API
 builder.ConfigureApi();
-// Authentication
-builder.ConfigureAuthentication();
 // Compress
 builder.ConfigureCompression();
 // OpenApi
@@ -61,13 +59,8 @@ app.UseCompression();
 // Logging
 app.UseLogging();
 
-// Authentication
-app.UseAuthentication();
-app.UseAuthorization();
+// Antiforgery
 app.UseAntiforgery();
-
-// Logging context
-app.UseLoggingContext();
 
 // End point
 app.MapEndpoints();

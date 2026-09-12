@@ -21,8 +21,6 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
-global using Microsoft.AspNetCore.Authentication;
-global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.Mvc;
@@ -40,9 +38,5 @@ global using Smart.Text;
 
 // ReSharper disable MissingBlankLines
 global using CloudManager;
-global using CloudManager.Domain;
-global using CloudManager.Models;
-global using CloudManager.Models.Entity;
-global using CloudManager.Services;
 global using CloudManager.Host.Application;
 global using CloudManager.Host.Settings;

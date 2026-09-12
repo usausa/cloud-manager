@@ -19,7 +19,6 @@
     <File Path="Analyzers.ruleset" />
     <File Path="CodeCoverage.runsettings" />
     <File Path="Database.sql" />
-    <File Path="Database.Sample.sql" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="global.json" />

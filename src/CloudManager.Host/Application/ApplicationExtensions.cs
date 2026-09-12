@@ -7,17 +7,11 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
-using CloudManager.Accessors;
 using CloudManager.Host.Application.Telemetry;
 using CloudManager.Host.Components;
-using CloudManager.Host.Endpoints;
 using CloudManager.Host.Infrastructure.ExceptionHandling;
 using CloudManager.Host.Infrastructure.HealthChecks;
-using CloudManager.Host.Infrastructure.Logging;
-using CloudManager.Infrastructure.Security;
-using CloudManager.Infrastructure.Storage;
 
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -94,7 +88,6 @@ public static class ApplicationExtensions
             options =>
             {
                 options.ReadFrom.Configuration(builder.Configuration);
-                options.Enrich.With(new CallbackEnricher("UserId", static () => LoggingContext.UserId));
             },
             writeToProviders: useOtlpExporter);
 
@@ -119,17 +112,6 @@ public static class ApplicationExtensions
                 static context => context.Request.Path.StartsWithSegments(ApiPathPrefix, StringComparison.OrdinalIgnoreCase),
                 static b => b.UseHttpLogging());
         }
-
-        return app;
-    }
-
-    public static WebApplication UseLoggingContext(this WebApplication app)
-    {
-        app.Use(static (context, next) =>
-        {
-            LoggingContext.UserId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return next(context);
-        });
 
         return app;
     }
@@ -203,68 +185,6 @@ public static class ApplicationExtensions
             });
 
         return app;
-    }
-
-    //--------------------------------------------------------------------------------
-    // Authentication
-    //--------------------------------------------------------------------------------
-
-    public static IHostApplicationBuilder ConfigureAuthentication(this IHostApplicationBuilder builder)
-    {
-        var setting = builder.Configuration.GetSection("Auth").Get<AuthSetting>()!;
-        var isDevelopment = builder.Environment.IsDevelopment();
-
-        builder.Services
-            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/login";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(setting.ExpireMinutes);
-                options.SlidingExpiration = true;
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = isDevelopment ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
-
-                // API returns status code instead of redirect
-                options.Events = new CookieAuthenticationEvents
-                {
-                    OnRedirectToLogin = static context =>
-                    {
-                        if (context.Request.Path.StartsWithSegments(ApiPathPrefix, StringComparison.OrdinalIgnoreCase))
-                        {
-                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        }
-                        else
-                        {
-                            context.Response.Redirect(context.RedirectUri);
-                        }
-
-                        return Task.CompletedTask;
-                    },
-                    OnRedirectToAccessDenied = static context =>
-                    {
-                        if (context.Request.Path.StartsWithSegments(ApiPathPrefix, StringComparison.OrdinalIgnoreCase))
-                        {
-                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        }
-                        else
-                        {
-                            context.Response.Redirect(context.RedirectUri);
-                        }
-
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
-        builder.Services.AddAuthorization(static options =>
-        {
-            options.AddPolicy(Policies.Administrator, static policy => policy.RequireRole(Roles.Administrator));
-        });
-
-        builder.Services.AddCascadingAuthenticationState();
-
-        return builder;
     }
 
     //--------------------------------------------------------------------------------
@@ -478,39 +398,16 @@ public static class ApplicationExtensions
         builder.Services.AddSingleton<IDialect>(new DelegateDialect(
             static ex => ex is SqliteException { SqliteErrorCode: 19 } or SqliteException { SqliteExtendedErrorCode: 1555 or 2067 },
             static x => Regex.Replace(x, "[%_]", "[$0]")));
-        builder.Services.AddDataAccessors(typeof(DataAccessor).Assembly);
+        builder.Services.AddDataAccessors(typeof(CloudManager.Extensions).Assembly);
 
         // Cache
         builder.Services.AddMemoryCache();
-
-        // Storage
-        builder.Services.AddOptions<FileStorageOptions>().BindConfiguration("Storage").ValidateDataAnnotations().ValidateOnStart();
-        builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<FileStorageOptions>>().Value);
-        builder.Services.AddSingleton<IStorage, FileStorage>();
-
-        // Security
-        builder.Services.AddSingleton(new DefaultPasswordProviderOptions());
-        builder.Services.AddSingleton<IPasswordProvider, DefaultPasswordProvider>();
-
-        // Service
-        builder.Services.AddCoreServices();
-
-        // Notification
-        builder.Services.AddSingleton<Infrastructure.Notifications.NotificationBus>();
-        builder.Services.AddHostedService<Workers.NotificationWorker>();
-
-        // Report
-        builder.Services.AddSingleton<Infrastructure.Reports.InvoiceReportBuilder>();
 
         // Setting
         builder.Services.AddOptions<ProfilerSetting>().BindConfiguration("Profiler").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<ProfilerSetting>>().Value);
         builder.Services.AddOptions<LogSetting>().BindConfiguration("Log").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<LogSetting>>().Value);
-        builder.Services.AddOptions<AuthSetting>().BindConfiguration("Auth").ValidateDataAnnotations().ValidateOnStart();
-        builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<AuthSetting>>().Value);
-        builder.Services.AddOptions<WorkerSetting>().BindConfiguration("Worker").ValidateDataAnnotations().ValidateOnStart();
-        builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<WorkerSetting>>().Value);
 
         return builder;
     }
@@ -566,14 +463,6 @@ public static class ApplicationExtensions
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
 
-        // Auth
-        app.MapAuthEndpoints();
-
-        // API
-        app.MapDataEndpoints();
-        app.MapFileEndpoints();
-        app.MapReportEndpoints();
-
         // Health
         app.MapHealthChecks(HealthEndpointPath);
         app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
@@ -593,14 +482,7 @@ public static class ApplicationExtensions
         // Prepare instrument
         app.Services.GetRequiredService<ApplicationInstrument>();
 
-        // Prepare storage
-        Directory.CreateDirectory(app.Services.GetRequiredService<FileStorageOptions>().Root);
-
-        // Prepare database
-        app.Services.GetRequiredService<DataService>().CreateTable();
-
-        var setting = app.Services.GetRequiredService<AuthSetting>();
-        return app.Services.GetRequiredService<AccountService>().InitializeAsync(setting.InitialId, setting.InitialPassword, Roles.Administrator);
+        return ValueTask.CompletedTask;
     }
 
     //--------------------------------------------------------------------------------

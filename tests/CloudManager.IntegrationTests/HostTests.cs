@@ -23,7 +23,7 @@ public sealed class HostTests : IClassFixture<TestApplicationFactory>
     }
 
     [Fact]
-    public async Task RootWithoutAuthShowsLoginPage()
+    public async Task RootShowsHomePage()
     {
         // Arrange
         var client = factory.CreateClient();
@@ -34,19 +34,19 @@ public sealed class HostTests : IClassFixture<TestApplicationFactory>
 
         // Assert
         response.EnsureSuccessStatusCode();
-        Assert.Contains("login", content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("CloudManager", content, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task ApiWithoutAuthReturnsUnauthorized()
+    public async Task UnknownPageReturnsNotFound()
     {
         // Arrange
         var client = factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync(new Uri("/api/data/", UriKind.Relative), TestContext.Current.CancellationToken);
+        var response = await client.GetAsync(new Uri("/unknown", UriKind.Relative), TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

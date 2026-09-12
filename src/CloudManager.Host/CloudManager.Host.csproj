@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
@@ -23,7 +22,6 @@
     <PackageReference Include="MiniDataProfiler.Listener.OpenTelemetry" Version="1.7.0" />
     <PackageReference Include="MudBlazor" Version="9.9.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="14.7.1" />
-    <PackageReference Include="OysterReport" Version="1.9.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.18.0-beta.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
@@ -37,7 +35,6 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Usa.Smart.Core" Version="2.19.0" />
     <PackageReference Include="Usa.Smart.Data.Accessor.Extensions.DependencyInjection" Version="3.0.0-beta7" />
-    <PackageReference Include="Usa.Smart.Mapper" Version="1.0.0-beta9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,12 +43,6 @@
 
   <ItemGroup>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Assets\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

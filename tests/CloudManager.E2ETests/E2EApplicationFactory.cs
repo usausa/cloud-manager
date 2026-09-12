@@ -24,7 +24,6 @@ public sealed class E2EApplicationFactory : WebApplicationFactory<Program>
         builder.UseSetting("http_ports", string.Empty);
         builder.UseSetting("ConnectionStrings:Default", $"Data Source={databaseFile};Cache=Shared;Pooling=False");
         builder.UseSetting("Prometheus:Uri", string.Empty);
-        builder.UseSetting("Worker:Enable", "false");
         builder.UseSetting("Profiler:SqlLog:Enable", "false");
         builder.UseSetting("Profiler:SqlTelemetry:Enable", "false");
         builder.UseSetting("Log:HttpLog", "false");

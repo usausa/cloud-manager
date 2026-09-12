@@ -13,7 +13,7 @@ public sealed class NavMenuTests : MudBlazorTestBase
         var cut = Render<NavMenu>();
 
         // Assert
-        var links = cut.FindAll("a");
-        Assert.Equal(3, links.Count);
+        var link = Assert.Single(cut.FindAll("a"));
+        Assert.Equal("Home", link.TextContent.Trim());
     }
 }
