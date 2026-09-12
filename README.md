@@ -1,1 +1,1 @@
-# CloudConsole project
+# cloud-manager
