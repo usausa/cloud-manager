@@ -22,6 +22,22 @@ internal static partial class Log
     [LoggerMessage(Level = LogLevel.Information, Message = "Telemetry: otelEndPoint=[{otelEndPoint}], prometheusUri=[{prometheusUri}]")]
     public static partial void InfoServiceSettingsTelemetry(this ILogger logger, string otelEndPoint, string prometheusUri);
 
+    // Worker
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Worker start. worker=[{worker}]")]
+    public static partial void InfoWorkerStart(this ILogger logger, string worker);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Worker stop. worker=[{worker}]")]
+    public static partial void InfoWorkerStop(this ILogger logger, string worker);
+
+    // Job
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Job register failed. id=[{id}], name=[{name}], cron=[{cron}]")]
+    public static partial void WarnJobRegisterFailed(this ILogger logger, long id, string name, string cron, Exception ex);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Scheduler job error. job=[{job}]")]
+    public static partial void ErrorSchedulerJobError(this ILogger logger, string job, Exception ex);
+
     // AWS
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "AWS profile load failed.")]

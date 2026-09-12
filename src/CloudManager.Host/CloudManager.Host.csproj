@@ -20,6 +20,7 @@
     <PackageReference Include="MiniDataProfiler" Version="1.7.0" />
     <PackageReference Include="MiniDataProfiler.Listener.Logging" Version="1.7.0" />
     <PackageReference Include="MiniDataProfiler.Listener.OpenTelemetry" Version="1.7.0" />
+    <PackageReference Include="Mofucat.JobScheduler" Version="2.7.0" />
     <PackageReference Include="MudBlazor" Version="9.9.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="14.7.1" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />

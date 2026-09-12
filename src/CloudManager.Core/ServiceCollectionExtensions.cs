@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 public static partial class ServiceCollectionExtensions
 {
+    [ServiceRegistration(Lifetime.Singleton, "^Job.*Service$")]
+    public static partial IServiceCollection AddCoreServices(this IServiceCollection services);
+
     // AWS サービスは回線ごとのAwsClientFactoryに依存するためScoped
     [ServiceRegistration(Lifetime.Scoped, "Service$", Namespace = "CloudManager.Services.Aws")]
     public static partial IServiceCollection AddAwsServices(this IServiceCollection services);

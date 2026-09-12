@@ -34,3 +34,4 @@ global using Smart.Text;
 
 // ReSharper disable MissingBlankLines
 global using CloudManager.Models;
+global using CloudManager.Models.Entity;

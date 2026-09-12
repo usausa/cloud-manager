@@ -7,11 +7,14 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
+using CloudManager.Accessors;
 using CloudManager.Host.Application.Telemetry;
 using CloudManager.Host.Components;
 using CloudManager.Host.Infrastructure.Aws;
 using CloudManager.Host.Infrastructure.ExceptionHandling;
 using CloudManager.Host.Infrastructure.HealthChecks;
+using CloudManager.Host.Infrastructure.Jobs;
+using CloudManager.Host.Workers;
 using CloudManager.Infrastructure.Aws;
 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -25,6 +28,8 @@ using Microsoft.FeatureManagement;
 using MiniDataProfiler;
 using MiniDataProfiler.Listener.Logging;
 using MiniDataProfiler.Listener.OpenTelemetry;
+
+using Mofucat.JobScheduler;
 
 using MudBlazor;
 using MudBlazor.Services;
@@ -400,10 +405,18 @@ public static class ApplicationExtensions
         builder.Services.AddSingleton<IDialect>(new DelegateDialect(
             static ex => ex is SqliteException { SqliteErrorCode: 19 } or SqliteException { SqliteExtendedErrorCode: 1555 or 2067 },
             static x => Regex.Replace(x, "[%_]", "[$0]")));
-        builder.Services.AddDataAccessors(typeof(CloudManager.Extensions).Assembly);
+        builder.Services.AddDataAccessors(typeof(JobAccessor).Assembly);
 
         // Cache
         builder.Services.AddMemoryCache();
+
+        // Service
+        builder.Services.AddCoreServices();
+
+        // Job
+        builder.Services.AddSingleton<JobScheduler>();
+        builder.Services.AddSingleton<JobManager>();
+        builder.Services.AddHostedService<JobSchedulerWorker>();
 
         // AWS
         builder.Services.AddScoped<AwsSession>();
@@ -422,6 +435,8 @@ public static class ApplicationExtensions
         builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<LogSetting>>().Value);
         builder.Services.AddOptions<AwsSetting>().BindConfiguration("Aws").ValidateDataAnnotations().ValidateOnStart();
         builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<AwsSetting>>().Value);
+        builder.Services.AddOptions<JobExecutionOptions>().BindConfiguration("Job").ValidateDataAnnotations().ValidateOnStart();
+        builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<JobExecutionOptions>>().Value);
 
         return builder;
     }
@@ -495,6 +510,10 @@ public static class ApplicationExtensions
     {
         // Prepare instrument
         app.Services.GetRequiredService<ApplicationInstrument>();
+
+        // Prepare database
+        app.Services.GetRequiredService<JobService>().CreateTable();
+        app.Services.GetRequiredService<JobLogService>().CreateTable();
 
         return ValueTask.CompletedTask;
     }
