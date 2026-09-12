@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/Aspire/">
+    <Project Path="src/CloudManager.AppHost/CloudManager.AppHost.csproj" DefaultStartup="true" />
+  </Folder>
+  <Folder Name="/Application/">
+    <Project Path="src/CloudManager.Core/CloudManager.Core.csproj" />
+    <Project Path="src/CloudManager.Host/CloudManager.Host.csproj" />
+  </Folder>
+  <Folder Name="/Test/">
+    <Project Path="tests/CloudManager.UnitTests/CloudManager.UnitTests.csproj" />
+    <Project Path="tests/CloudManager.IntegrationTests/CloudManager.IntegrationTests.csproj" />
+    <Project Path="tests/CloudManager.E2ETests/CloudManager.E2ETests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="AGENTS.md" />
+    <File Path="Analyzers.ruleset" />
+    <File Path="CodeCoverage.runsettings" />
+    <File Path="Database.sql" />
+    <File Path="Database.Sample.sql" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="CloudManager.sln.DotSettings" />
+  </Folder>
+</Solution>
