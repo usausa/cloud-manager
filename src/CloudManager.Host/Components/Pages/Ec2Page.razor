@@ -17,14 +17,14 @@
 <MudPaper Class="pa-2 mb-2">
     <MudStack Row="true" Spacing="2">
         <MudSelect T="string" @bind-Value="filterState" Label="状態" Variant="Variant.Outlined" Margin="Margin.Dense"
-                   Style="max-width:160px" Clearable="true">
+                   Class="filter-select" Clearable="true">
             @foreach (var s in States)
             {
                 <MudSelectItem Value="@s">@s</MudSelectItem>
             }
         </MudSelect>
         <MudTextField @bind-Value="filterTag" Label="Tag K=V" Variant="Variant.Outlined" Margin="Margin.Dense"
-                      Style="max-width:240px" />
+                      Class="search-field" />
         <MudButton StartIcon="@Icons.Material.Filled.FilterList" Variant="Variant.Outlined" Size="Size.Small"
                    OnClick="LoadAsync" Disabled="IsRunning">絞り込み</MudButton>
     </MudStack>
@@ -84,10 +84,10 @@
         <MudText Typo="Typo.subtitle2">SSM 結果：@ssmResult.Status</MudText>
         <MudExpansionPanels>
             <MudExpansionPanel Text="stdout">
-                <pre style="white-space:pre-wrap;font-size:0.8rem">@ssmResult.StandardOutput</pre>
+                <pre class="console-output">@ssmResult.StandardOutput</pre>
             </MudExpansionPanel>
             <MudExpansionPanel Text="stderr">
-                <pre style="white-space:pre-wrap;font-size:0.8rem">@ssmResult.StandardError</pre>
+                <pre class="console-output">@ssmResult.StandardError</pre>
             </MudExpansionPanel>
         </MudExpansionPanels>
     </MudPaper>

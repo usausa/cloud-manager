@@ -4,12 +4,13 @@ using CloudManager.Host.Components.Dialogs;
 using CloudManager.Host.Infrastructure.Aws;
 using CloudManager.Host.Infrastructure.Components;
 using CloudManager.Host.Infrastructure.Jobs;
-using CloudManager.Host.Mappers;
 using CloudManager.Host.Models.Forms;
 
 using Microsoft.AspNetCore.Components;
 
 using MudBlazor;
+
+using Smart.Mapper;
 
 public sealed partial class JobsPage
 {
@@ -50,14 +51,14 @@ public sealed partial class JobsPage
 
         await RunAsync("追加中...", async (_, cancellationToken) =>
         {
-            await Manager.AddAsync(JobMapper.ToDefinition(form), cancellationToken);
+            await Manager.AddAsync(ToDefinition(form), cancellationToken);
             Snackbar.AddSuccess("ジョブを追加しました。");
         }, LoadAsync);
     }
 
     private async Task EditAsync(JobDefinition job)
     {
-        var form = await ShowEditDialog("ジョブ編集", JobMapper.ToForm(job));
+        var form = await ShowEditDialog("ジョブ編集", ToForm(job));
         if (form is null)
         {
             return;
@@ -65,7 +66,7 @@ public sealed partial class JobsPage
 
         await RunAsync("更新中...", async (_, cancellationToken) =>
         {
-            if (await Manager.UpdateAsync(JobMapper.ToDefinition(form), cancellationToken))
+            if (await Manager.UpdateAsync(ToDefinition(form), cancellationToken))
             {
                 Snackbar.AddSuccess("ジョブを更新しました。");
             }
@@ -130,6 +131,63 @@ public sealed partial class JobsPage
         var result = await reference.Result;
         return (result is { Canceled: false }) ? (JobForm)result.Data! : null;
     }
+
+    // 共通項目は生成マッパで写し、操作ごとのパラメータはフォームの該当項目へ展開する
+    [Mapper]
+    [AfterMap(nameof(ExpandParameters))]
+    private static partial JobForm ToForm(JobDefinition job);
+
+    private static void ExpandParameters(JobDefinition job, JobForm form)
+    {
+        switch (job.Parameters)
+        {
+            case Ec2InstanceParameters p:
+                form.InstanceId = p.InstanceId;
+                break;
+            case RdsInstanceParameters p:
+                form.DbInstanceId = p.DbInstanceId;
+                break;
+            case EcsDesiredCountParameters p:
+                form.Cluster = p.Cluster;
+                form.ServiceName = p.ServiceName;
+                form.DesiredCount = p.DesiredCount;
+                break;
+            case LambdaInvokeParameters p:
+                form.FunctionName = p.FunctionName;
+                form.Payload = p.Payload;
+                form.InvocationType = p.InvocationType;
+                break;
+            case CloudFrontInvalidateParameters p:
+                form.DistributionId = p.DistributionId;
+                form.Paths = p.Paths;
+                break;
+        }
+    }
+
+    private static JobDefinition ToDefinition(JobForm form) => new(
+        form.Id,
+        form.Name,
+        String.IsNullOrWhiteSpace(form.Description) ? null : form.Description,
+        form.ProfileName,
+        form.RegionName,
+        form.ServiceType,
+        form.Operation,
+        ToParameters(form),
+        form.CronExpression,
+        form.CronTimeZone,
+        form.IsEnabled,
+        form.CreatedAt,
+        form.CreatedAt);
+
+    private static JobParameters ToParameters(JobForm form) => form.Operation switch
+    {
+        JobOperation.Ec2Start or JobOperation.Ec2Stop or JobOperation.Ec2Reboot => new Ec2InstanceParameters(form.InstanceId),
+        JobOperation.RdsStart or JobOperation.RdsStop => new RdsInstanceParameters(form.DbInstanceId),
+        JobOperation.EcsUpdateDesiredCount => new EcsDesiredCountParameters(form.Cluster, form.ServiceName, form.DesiredCount),
+        JobOperation.LambdaInvoke => new LambdaInvokeParameters(form.FunctionName, String.IsNullOrWhiteSpace(form.Payload) ? null : form.Payload, form.InvocationType),
+        JobOperation.CloudFrontInvalidate => new CloudFrontInvalidateParameters(form.DistributionId, form.Paths),
+        _ => throw new InvalidOperationException($"Unsupported operation. operation=[{form.Operation}]")
+    };
 
     private sealed record JobRow(JobDefinition Job, DateTimeOffset? NextExecution);
 }

@@ -1,10 +1,13 @@
 namespace CloudManager.Services;
 
+using System.Text.Json;
+
 using CloudManager.Accessors;
-using CloudManager.Mappers;
 using CloudManager.Models.Jobs;
 
-public sealed class JobService
+using Smart.Mapper;
+
+public sealed partial class JobService
 {
     private readonly JobAccessor jobAccessor;
 
@@ -24,20 +27,20 @@ public sealed class JobService
     public async ValueTask<List<JobDefinition>> QueryAllAsync(CancellationToken cancellationToken = default)
     {
         var entities = await jobAccessor.QueryAllAsync(cancellationToken);
-        return entities.Select(JobDefinitionMapper.ToModel).ToList();
+        return entities.Select(ToModel).ToList();
     }
 
     public async ValueTask<JobDefinition?> QueryAsync(long id, CancellationToken cancellationToken = default)
     {
         var entity = await jobAccessor.QueryAsync(id, cancellationToken);
-        return entity is null ? null : JobDefinitionMapper.ToModel(entity);
+        return entity is null ? null : ToModel(entity);
     }
 
     // 作成日時・更新日時はここで採番する
     public ValueTask<long> InsertAsync(JobDefinition job, CancellationToken cancellationToken = default)
     {
         var now = timeProvider.GetLocalNow().DateTime;
-        var entity = JobDefinitionMapper.ToEntity(job);
+        var entity = ToEntity(job);
         return jobAccessor.InsertAsync(
             entity.Name,
             entity.Description,
@@ -56,7 +59,7 @@ public sealed class JobService
 
     public async ValueTask<bool> UpdateAsync(JobDefinition job, CancellationToken cancellationToken = default)
     {
-        var entity = JobDefinitionMapper.ToEntity(job);
+        var entity = ToEntity(job);
         var rows = await jobAccessor.UpdateAsync(
             entity.Id,
             entity.Name,
@@ -79,4 +82,20 @@ public sealed class JobService
         var rows = await jobAccessor.DeleteAsync(id, cancellationToken);
         return rows > 0;
     }
+
+    // パラメータはJSON、列挙は名前で保存する
+    [Mapper]
+    [MapProperty(nameof(JobDefinition.Parameters), nameof(JobDefinitionEntity.ParametersJson), Converter = nameof(DeserializeParameters))]
+    private static partial JobDefinition ToModel(JobDefinitionEntity entity);
+
+    [Mapper]
+    [MapProperty(nameof(JobDefinitionEntity.ParametersJson), nameof(JobDefinition.Parameters), Converter = nameof(SerializeParameters))]
+    private static partial JobDefinitionEntity ToEntity(JobDefinition job);
+
+    private static JobParameters DeserializeParameters(string json) =>
+        JsonSerializer.Deserialize<JobParameters>(json) ??
+        throw new InvalidOperationException("Failed to deserialize parameters.");
+
+    private static string SerializeParameters(JobParameters parameters) =>
+        JsonSerializer.Serialize(parameters);
 }

@@ -10,7 +10,7 @@
     <MudSpacer />
     <MudTextField @bind-Value="pathPrefix" Placeholder="パスプレフィックス (/app/prod)" Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.FilterList" IconSize="Size.Small"
-                  Immediate="false" Clearable="true" Margin="Margin.Dense" Style="max-width:260px" />
+                  Immediate="false" Clearable="true" Margin="Margin.Dense" Class="search-field" />
     <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
                OnClick="OpenAddDialogAsync" Disabled="IsRunning">追加</MudButton>
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"

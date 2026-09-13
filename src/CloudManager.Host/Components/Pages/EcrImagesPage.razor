@@ -19,7 +19,7 @@
 {
     <MudExpansionPanels Class="mb-2">
         <MudExpansionPanel Text="ライフサイクルポリシー">
-            <pre style="font-size:0.75rem;white-space:pre-wrap;word-break:break-all">@lifecyclePolicy</pre>
+            <pre class="policy-text">@lifecyclePolicy</pre>
         </MudExpansionPanel>
     </MudExpansionPanels>
 }
@@ -35,7 +35,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>@(context.Tag ?? "(untagged)")</MudTd>
-        <MudTd Style="font-family:monospace;font-size:0.75rem">@(context.Digest.Length > 20 ? context.Digest[..20] + "…" : context.Digest)</MudTd>
+        <MudTd Class="digest">@(context.Digest.Length > 20 ? context.Digest[..20] + "…" : context.Digest)</MudTd>
         <MudTd>@(context.PushedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
         <MudTd>@((context.SizeBytes / 1024.0 / 1024.0).ToString("F2"))</MudTd>
         <MudTd>

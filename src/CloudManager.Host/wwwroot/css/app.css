@@ -17,6 +17,88 @@ body {
     align-items: center;
 }
 
+/* Page layout */
+.page-card {
+    max-width: 400px;
+}
+
+.settings-card {
+    max-width: 480px;
+}
+
+.progress-card {
+    min-width: 320px;
+}
+
+.filter-select {
+    max-width: 160px;
+}
+
+.search-field {
+    max-width: 240px;
+}
+
+.search-field-wide {
+    max-width: 360px;
+}
+
+.selector-field {
+    max-width: 300px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+/* Text */
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+.break-all {
+    word-break: break-all;
+}
+
+.log-text {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.console-output {
+    white-space: pre-wrap;
+    font-size: 0.8rem;
+}
+
+.policy-text {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 0.75rem;
+}
+
+.digest {
+    font-family: monospace;
+    font-size: 0.75rem;
+}
+
+.target-text {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Preview */
+.preview-image {
+    max-width: 100%;
+    max-height: 600px;
+}
+
+.preview-text {
+    white-space: pre-wrap;
+    max-height: 600px;
+    overflow: auto;
+}
+
 /* Error banner */
 .error-banner {
     border-left: 4px solid var(--mud-palette-error);

@@ -4,7 +4,7 @@
         <MudProgressLinear Value="@(Ratio * 100)" Color="Color.Primary" />
     </div>
     <MudOverlay Visible="true" DarkBackground="true" ZIndex="9998">
-        <MudPaper Class="pa-4" Elevation="4" Style="min-width: 320px;">
+        <MudPaper Class="progress-card pa-4" Elevation="4">
             <MudText Typo="Typo.body1" Align="Align.Center">@Message</MudText>
             <MudProgressLinear Value="@(Ratio * 100)" Color="Color.Primary" Class="mt-2" />
             <MudText Typo="Typo.body2" Align="Align.Center" Class="mt-1">@($"{Ratio * 100:F0}%")</MudText>

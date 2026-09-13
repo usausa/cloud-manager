@@ -8,7 +8,7 @@
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
     <MudText Typo="Typo.h5">EBS ボリューム</MudText>
     <MudSpacer />
-    <MudSelect T="string" @bind-Value="stateFilter" Label="状態" Dense="true" Margin="Margin.Dense" Style="max-width:160px">
+    <MudSelect T="string" @bind-Value="stateFilter" Label="状態" Dense="true" Margin="Margin.Dense" Class="filter-select">
         <MudSelectItem Value='@("")'>すべて</MudSelectItem>
         <MudSelectItem Value='"available"'>available</MudSelectItem>
         <MudSelectItem Value='"in-use"'>in-use</MudSelectItem>

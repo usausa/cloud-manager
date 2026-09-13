@@ -9,11 +9,11 @@
         }
         else if (previewType == "image" && imageData is not null)
         {
-            <img src="@imageData" style="max-width:100%; max-height:600px;" alt="preview" />
+            <img src="@imageData" class="preview-image" alt="preview" />
         }
         else if (previewType == "text" && textContent is not null)
         {
-            <pre style="white-space:pre-wrap; max-height:600px; overflow:auto;">@textContent</pre>
+            <pre class="preview-text">@textContent</pre>
         }
         else
         {

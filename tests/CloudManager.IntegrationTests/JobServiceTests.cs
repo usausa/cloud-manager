@@ -29,6 +29,39 @@ public sealed class JobServiceTests : IClassFixture<TestApplicationFactory>
         default,
         default);
 
+    public static TheoryData<JobServiceType, JobOperation, JobParameters> Parameters =>
+    [
+        (JobServiceType.Ec2, JobOperation.Ec2Start, new Ec2InstanceParameters("i-0123456789abcdef0")),
+        (JobServiceType.Rds, JobOperation.RdsStop, new RdsInstanceParameters("db-1")),
+        (JobServiceType.Ecs, JobOperation.EcsUpdateDesiredCount, new EcsDesiredCountParameters("cluster", "service", 2)),
+        (JobServiceType.Lambda, JobOperation.LambdaInvoke, new LambdaInvokeParameters("function", "{\"key\":\"value\"}", "Event")),
+        (JobServiceType.Lambda, JobOperation.LambdaInvoke, new LambdaInvokeParameters("function", null, "RequestResponse")),
+        (JobServiceType.CloudFront, JobOperation.CloudFrontInvalidate, new CloudFrontInvalidateParameters("E123", "/*"))
+    ];
+
+    // 操作ごとのパラメータがJSONで往復すること
+    [Theory]
+    [MemberData(nameof(Parameters))]
+    public async Task ParametersRoundTrip(JobServiceType serviceType, JobOperation operation, JobParameters parameters)
+    {
+        // Arrange
+        _ = factory.CreateClient();
+        var service = factory.Services.GetRequiredService<JobService>();
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var job = CreateJob("parameters") with { ServiceType = serviceType, Operation = operation, Parameters = parameters };
+
+        // Act
+        var id = await service.InsertAsync(job, cancellationToken);
+        var restored = await service.QueryAsync(id, cancellationToken);
+        await service.DeleteAsync(id, cancellationToken);
+
+        // Assert
+        Assert.NotNull(restored);
+        Assert.Equal(serviceType, restored.ServiceType);
+        Assert.Equal(operation, restored.Operation);
+        Assert.Equal(parameters, restored.Parameters);
+    }
+
     // SQLite への保存と読み出しが往復すること(日時・JSON・列挙の変換を含む)
     [Fact]
     public async Task JobDefinitionRoundTrip()

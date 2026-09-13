@@ -5,13 +5,13 @@
 
 <MudText Typo="Typo.h5" Class="mb-2">設定</MudText>
 
-<MudPaper Class="pa-2 mb-2" Style="max-width: 480px;">
+<MudPaper Class="settings-card pa-2 mb-2">
     <MudText Typo="Typo.subtitle2" Class="mb-1">現在の設定</MudText>
     <MudText Typo="Typo.body2">プロファイル: <strong>@Session.ProfileName</strong></MudText>
     <MudText Typo="Typo.body2">リージョン: <strong>@(Session.Region?.SystemName ?? "未設定")</strong></MudText>
 </MudPaper>
 
-<MudPaper Class="pa-2" Style="max-width: 480px;">
+<MudPaper Class="settings-card pa-2">
     @if (Session.AvailableProfiles.Count == 0)
     {
         <MudAlert Severity="Severity.Warning" Class="mb-2">~/.aws にプロファイルが見つかりません。</MudAlert>

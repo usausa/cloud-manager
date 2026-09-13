@@ -37,7 +37,7 @@
     <MudTabPanel Text="サービス">
         <MudStack Row="true" Class="mb-1 mt-1">
             <MudSelect T="string" Value="selectedCluster" Label="クラスター" Variant="Variant.Outlined"
-                       Margin="Margin.Dense" Style="max-width:300px"
+                       Margin="Margin.Dense" Class="selector-field"
                        ValueChanged="LoadServicesAsync">
                 @foreach (var c in clusters)
                 {
