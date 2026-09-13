@@ -22,11 +22,11 @@ public sealed partial class Route53Page
 
     protected override Task OnInitializedAsync() => LoadAsync();
 
-    private async Task LoadAsync()
+    private Task LoadAsync()
     {
         selectedZone = null;
         recordSets = [];
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             hostedZones = await Service.ListHostedZonesAsync();
         });

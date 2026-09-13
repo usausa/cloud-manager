@@ -1,12 +1,8 @@
 namespace CloudManager.Host.Components.Pages;
 
-using CloudManager.Host.Components.Dialogs;
 using CloudManager.Host.Infrastructure.Aws;
-using CloudManager.Host.Infrastructure.Components;
 
 using Microsoft.AspNetCore.Components;
-
-using MudBlazor;
 
 public sealed partial class CostPage
 {
@@ -40,19 +36,19 @@ public sealed partial class CostPage
         rdsRegion = Session.Region?.SystemName ?? "us-east-1";
     }
 
-    private async Task EstimateEc2Async()
+    private Task EstimateEc2Async()
     {
         ec2Result = null;
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             ec2Result = await Service.EstimateEc2Async(ec2InstanceType, ec2Region, ec2Hours);
         });
     }
 
-    private async Task EstimateRdsAsync()
+    private Task EstimateRdsAsync()
     {
         rdsResult = null;
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             rdsResult = await Service.EstimateRdsAsync(rdsEngine, rdsInstanceClass, rdsRegion, rdsHours);
         });

@@ -1,11 +1,8 @@
 namespace CloudManager.Host.Components.Pages;
 
-using CloudManager.Host.Components.Dialogs;
 using CloudManager.Host.Infrastructure.Components;
 
 using Microsoft.AspNetCore.Components;
-
-using MudBlazor;
 
 public sealed partial class CognitoPage
 {
@@ -31,11 +28,11 @@ public sealed partial class CognitoPage
 
     protected override Task OnInitializedAsync() => LoadAsync();
 
-    private async Task LoadAsync()
+    private Task LoadAsync()
     {
         selectedPool = null;
         users = [];
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             pools = await Service.ListUserPoolsAsync();
         });

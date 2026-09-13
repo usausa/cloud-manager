@@ -31,21 +31,19 @@ public sealed partial class SsmParameterPage
         p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
         p.Type.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-    private async Task ShowValueAsync(ParameterInfo param)
-    {
-        await RunAsync("取得中...", async (_, cancellationToken) =>
+    private Task ShowValueAsync(ParameterInfo param) =>
+        RunAsync("取得中...", async (_, _) =>
         {
             var isSecure = param.Type == "SecureString";
             var result = await Service.GetParameterAsync(param.Name, isSecure);
-            var parameters = new DialogParameters<SsmParameterValueDialog>
+            var dialogParameters = new DialogParameters<SsmParameterValueDialog>
             {
                 { x => x.ParameterName, result.Name },
                 { x => x.ParameterValue, result.Value },
                 { x => x.ParameterType, result.Type }
             };
-            await DialogService.ShowAsync<SsmParameterValueDialog>("パラメータ値", parameters);
+            await DialogService.ShowAsync<SsmParameterValueDialog>("パラメータ値", dialogParameters);
         });
-    }
 
     private async Task OpenAddDialogAsync()
     {
@@ -88,15 +86,13 @@ public sealed partial class SsmParameterPage
         await SaveParameterAsync(editedParams);
     }
 
-    private async Task SaveParameterAsync(SsmParameterEditParams p)
-    {
-        await RunAsync("保存中...", async (_, cancellationToken) =>
+    private Task SaveParameterAsync(SsmParameterEditParams p) =>
+        RunAsync("保存中...", async (_, cancellationToken) =>
         {
             await Service.PutParameterAsync(p.Name, p.Value, p.Type, p.Overwrite, cancellationToken);
             Snackbar.AddSuccess($"パラメータ保存完了: {p.Name}");
             await LoadAsync();
         });
-    }
 
     private async Task DeleteAsync(ParameterInfo param)
     {

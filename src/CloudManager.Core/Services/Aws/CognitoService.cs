@@ -32,8 +32,7 @@ public sealed class CognitoService
                 results.Add(new UserPoolInfo(
                     pool.Id ?? string.Empty,
                     pool.Name ?? string.Empty,
-                    pool.CreationDate,
-                    pool.LambdaConfig is not null ? 0 : 0));
+                    pool.CreationDate));
             }
 
             nextToken = response.NextToken;

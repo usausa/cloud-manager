@@ -1,7 +1,6 @@
 namespace CloudManager.Host.Components.Pages;
 
 using CloudManager.Host.Infrastructure.Aws;
-using CloudManager.Host.Infrastructure.Components;
 
 using Microsoft.AspNetCore.Components;
 

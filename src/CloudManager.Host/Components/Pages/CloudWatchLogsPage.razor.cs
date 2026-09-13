@@ -1,11 +1,6 @@
 namespace CloudManager.Host.Components.Pages;
 
-using CloudManager.Host.Components.Dialogs;
-using CloudManager.Host.Infrastructure.Components;
-
 using Microsoft.AspNetCore.Components;
-
-using MudBlazor;
 
 public sealed partial class CloudWatchLogsPage
 {
@@ -43,13 +38,13 @@ public sealed partial class CloudWatchLogsPage
 
     protected override Task OnInitializedAsync() => LoadAsync();
 
-    private async Task LoadAsync()
+    private Task LoadAsync()
     {
         selectedGroup = null;
         selectedStream = null;
         logStreams = [];
         logEvents = [];
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             logGroups = await Service.ListLogGroupsAsync(groupPrefix);
         });
@@ -122,16 +117,17 @@ public sealed partial class CloudWatchLogsPage
         }
     }
 
-    private async Task RunInsightsQueryAsync()
+    private Task RunInsightsQueryAsync()
     {
         if (selectedGroup is null)
         {
-            return;
+            return Task.CompletedTask;
         }
+
         insightStatus = "Running";
         insightResults = [];
         insightColumns = [];
-        await RunAsync("クエリ実行中...", async (_, cancellationToken) =>
+        return RunAsync("クエリ実行中...", async (_, cancellationToken) =>
         {
             var start = insightStart ?? DateTime.UtcNow.AddDays(-1);
             var end = insightEnd?.AddDays(1) ?? DateTime.UtcNow;

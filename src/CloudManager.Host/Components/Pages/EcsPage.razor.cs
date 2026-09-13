@@ -28,9 +28,15 @@ public sealed partial class EcsPage
             clusters = await Service.ListClustersAsync();
         });
 
-    private async Task LoadServicesAsync(string clusterName)
+    private async Task LoadServicesAsync(string? clusterName)
     {
         selectedCluster = clusterName;
+        services = [];
+        if (String.IsNullOrEmpty(clusterName))
+        {
+            return;
+        }
+
         isSvcLoading = true;
         try
         {

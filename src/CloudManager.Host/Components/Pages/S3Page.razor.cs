@@ -1,7 +1,6 @@
 namespace CloudManager.Host.Components.Pages;
 
 using CloudManager.Host.Components.Dialogs;
-using CloudManager.Host.Infrastructure.Components;
 
 using Microsoft.AspNetCore.Components;
 
@@ -19,13 +18,11 @@ public sealed partial class S3Page
         return LoadBucketsAsync();
     }
 
-    private async Task LoadBucketsAsync()
-    {
-        await LoadAsync(async () =>
+    private Task LoadBucketsAsync() =>
+        LoadAsync(async () =>
         {
             buckets = await Service.ListBucketsAsync();
         });
-    }
 
     private async Task ShowPublicAccessAsync(S3BucketInfo bucket)
     {

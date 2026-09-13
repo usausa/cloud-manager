@@ -22,11 +22,11 @@ public sealed partial class SnsPage
 
     protected override Task OnInitializedAsync() => LoadAsync();
 
-    private async Task LoadAsync()
+    private Task LoadAsync()
     {
         selectedTopic = null;
         subscriptions = [];
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             topics = await Service.ListTopicsAsync();
         });

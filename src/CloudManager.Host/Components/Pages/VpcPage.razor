@@ -14,7 +14,9 @@
 
 <MudTabs Outlined="true" Class="mt-1">
     <MudTabPanel Text="VPC">
-        <MudTable T="VpcInfo" Items="vpcs" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading">
+        <MudText Typo="Typo.body2" Class="mb-1 mud-text-secondary">行を選択するとサブネット、セキュリティグループ、ルートテーブル、ゲートウェイを表示します。</MudText>
+        <MudTable T="VpcInfo" Items="vpcs" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading"
+                  SelectedItem="selectedVpc" SelectedItemChanged="OnVpcSelectedAsync">
             <HeaderContent>
                 <MudTh>VPC ID</MudTh>
                 <MudTh>CIDR</MudTh>
@@ -33,7 +35,7 @@
     </MudTabPanel>
 
     <MudTabPanel Text="サブネット">
-        <MudTable T="VpcSubnetInfo" Items="subnets" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading" RowsPerPage="50">
+        <MudTable T="VpcSubnetInfo" Items="subnets" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@isDetailLoading" RowsPerPage="50">
             <HeaderContent>
                 <MudTh>サブネット ID</MudTh>
                 <MudTh>CIDR</MudTh>
@@ -47,11 +49,14 @@
                 <MudTd>@context.Name</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>
+            <NoRecordsContent>
+                <MudText>@(selectedVpc is null ? "VPC を選択してください。" : "サブネットがありません。")</MudText>
+            </NoRecordsContent>
         </MudTable>
     </MudTabPanel>
 
     <MudTabPanel Text="セキュリティグループ">
-        <MudTable T="VpcSecurityGroupInfo" Items="securityGroups" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading" RowsPerPage="50">
+        <MudTable T="VpcSecurityGroupInfo" Items="securityGroups" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@isDetailLoading" RowsPerPage="50">
             <HeaderContent>
                 <MudTh>ID</MudTh>
                 <MudTh>名前</MudTh>
@@ -63,6 +68,71 @@
                 <MudTd>@context.Description</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>
+            <NoRecordsContent>
+                <MudText>@(selectedVpc is null ? "VPC を選択してください。" : "セキュリティグループがありません。")</MudText>
+            </NoRecordsContent>
+        </MudTable>
+    </MudTabPanel>
+    <MudTabPanel Text="ルートテーブル">
+        <MudTable T="VpcRouteTableInfo" Items="routeTables" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@isDetailLoading" RowsPerPage="50">
+            <HeaderContent>
+                <MudTh>ルートテーブル ID</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Main</MudTh>
+                <MudTh>ルート数</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.RouteTableId</MudTd>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@(context.IsMain ? "Yes" : "No")</MudTd>
+                <MudTd>@context.RouteCount</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+            <NoRecordsContent>
+                <MudText>@(selectedVpc is null ? "VPC を選択してください。" : "ルートテーブルがありません。")</MudText>
+            </NoRecordsContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="インターネットゲートウェイ">
+        <MudTable T="VpcIgwInfo" Items="internetGateways" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@isDetailLoading" RowsPerPage="50">
+            <HeaderContent>
+                <MudTh>IGW ID</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>状態</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.InternetGatewayId</MudTd>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.State</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+            <NoRecordsContent>
+                <MudText>@(selectedVpc is null ? "VPC を選択してください。" : "インターネットゲートウェイがありません。")</MudText>
+            </NoRecordsContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="NAT ゲートウェイ">
+        <MudTable T="VpcNatGwInfo" Items="natGateways" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@isDetailLoading" RowsPerPage="50">
+            <HeaderContent>
+                <MudTh>NAT GW ID</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>サブネット ID</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>パブリック IP</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.NatGatewayId</MudTd>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.SubnetId</MudTd>
+                <MudTd>@context.State</MudTd>
+                <MudTd>@context.PublicIp</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+            <NoRecordsContent>
+                <MudText>@(selectedVpc is null ? "VPC を選択してください。" : "NAT ゲートウェイがありません。")</MudText>
+            </NoRecordsContent>
         </MudTable>
     </MudTabPanel>
 </MudTabs>

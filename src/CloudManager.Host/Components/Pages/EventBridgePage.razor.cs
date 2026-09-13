@@ -1,11 +1,8 @@
 namespace CloudManager.Host.Components.Pages;
 
-using CloudManager.Host.Components.Dialogs;
 using CloudManager.Host.Infrastructure.Components;
 
 using Microsoft.AspNetCore.Components;
-
-using MudBlazor;
 
 public sealed partial class EventBridgePage
 {
@@ -29,23 +26,19 @@ public sealed partial class EventBridgePage
             rules = await Service.ListRulesAsync();
         });
 
-    private async Task EnableAsync(EventBridgeRuleInfo rule)
-    {
-        await RunAsync("有効化中...", async (_, cancellationToken) =>
+    private Task EnableAsync(EventBridgeRuleInfo rule) =>
+        RunAsync("有効化中...", async (_, cancellationToken) =>
         {
             await Service.EnableRuleAsync(rule.Name, cancellationToken: cancellationToken);
             Snackbar.AddSuccess($"ルールを有効化しました: {rule.Name}");
             await LoadAsync();
         });
-    }
 
-    private async Task DisableAsync(EventBridgeRuleInfo rule)
-    {
-        await RunAsync("無効化中...", async (_, cancellationToken) =>
+    private Task DisableAsync(EventBridgeRuleInfo rule) =>
+        RunAsync("無効化中...", async (_, cancellationToken) =>
         {
             await Service.DisableRuleAsync(rule.Name, cancellationToken: cancellationToken);
             Snackbar.AddSuccess($"ルールを無効化しました: {rule.Name}");
             await LoadAsync();
         });
-    }
 }

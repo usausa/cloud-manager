@@ -1,7 +1,5 @@
 namespace CloudManager.Host.Components.Dialogs;
 
-using CloudManager.Host.Infrastructure.Components;
-
 using Microsoft.AspNetCore.Components;
 
 using MudBlazor;
@@ -34,12 +32,13 @@ public sealed partial class S3PreviewDialog
 
     private string? textContent;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         if (ObjectInfo is null)
         {
-            return;
+            return Task.CompletedTask;
         }
+
         var ext = Path.GetExtension(ObjectInfo.Key);
         if (ImageExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase) && ObjectInfo.Size <= MaxImageBytes)
         {
@@ -51,10 +50,10 @@ public sealed partial class S3PreviewDialog
         }
         else
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             var bytes = await Service.DownloadBytesAsync(BucketName, ObjectInfo.Key, null, CancellationToken);
             if (previewType == "image")

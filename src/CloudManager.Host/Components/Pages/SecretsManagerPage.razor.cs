@@ -29,9 +29,8 @@ public sealed partial class SecretsManagerPage
         s.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
         s.Arn.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-    private async Task ShowValueAsync(SecretInfo secret)
-    {
-        await RunAsync("取得中...", async (_, cancellationToken) =>
+    private Task ShowValueAsync(SecretInfo secret) =>
+        RunAsync("取得中...", async (_, _) =>
         {
             var value = await Service.GetSecretValueAsync(secret.Arn);
             var parameters = new DialogParameters<SecretValueDialog>
@@ -42,7 +41,6 @@ public sealed partial class SecretsManagerPage
             };
             await DialogService.ShowAsync<SecretValueDialog>("シークレット値", parameters);
         });
-    }
 
     private async Task RotateAsync(SecretInfo secret)
     {

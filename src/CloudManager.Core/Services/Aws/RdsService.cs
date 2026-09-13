@@ -110,7 +110,7 @@ public sealed class RdsService
                     snap.Status,
                     snap.Engine,
                     snap.EngineVersion,
-                    snap.SnapshotCreateTime == default ? null : snap.SnapshotCreateTime,
+                    snap.SnapshotCreateTime,
                     snap.AllocatedStorage.GetValueOrDefault()));
             }
 

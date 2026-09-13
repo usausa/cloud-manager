@@ -47,9 +47,8 @@ public sealed partial class SqsPage
         });
     }
 
-    private async Task ReceiveMessagesAsync(SqsQueueInfo queue)
-    {
-        await RunAsync("受信中...", async (_, cancellationToken) =>
+    private Task ReceiveMessagesAsync(SqsQueueInfo queue) =>
+        RunAsync("受信中...", async (_, cancellationToken) =>
         {
             var messages = await Service.ReceiveMessagesAsync(queue.QueueUrl, maxMessages: 10, cancellationToken);
             var parameters = new DialogParameters<SqsMessagesDialog>
@@ -59,7 +58,6 @@ public sealed partial class SqsPage
             };
             await DialogService.ShowAsync<SqsMessagesDialog>("受信メッセージ", parameters);
         });
-    }
 
     private async Task PurgeAsync(SqsQueueInfo queue)
     {

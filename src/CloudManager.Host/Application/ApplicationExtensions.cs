@@ -176,11 +176,7 @@ public static class ApplicationExtensions
                 b.UseExceptionHandler();
                 b.Use(static (context, next) =>
                 {
-                    var feature = context.Features.Get<IStatusCodePagesFeature>();
-                    if (feature is not null)
-                    {
-                        feature.Enabled = false;
-                    }
+                    context.Features.Get<IStatusCodePagesFeature>()?.Enabled = false;
 
                     return next(context);
                 });

@@ -1,7 +1,5 @@
 namespace CloudManager.Host.Components.Dialogs;
 
-using CloudManager.Host.Infrastructure.Components;
-
 using Microsoft.AspNetCore.Components;
 
 using MudBlazor;

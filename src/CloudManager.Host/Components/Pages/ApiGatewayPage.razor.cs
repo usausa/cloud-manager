@@ -22,11 +22,11 @@ public sealed partial class ApiGatewayPage
 
     protected override Task OnInitializedAsync() => LoadAsync();
 
-    private async Task LoadAsync()
+    private Task LoadAsync()
     {
         selectedApi = null;
         stages = [];
-        await LoadAsync(async () =>
+        return LoadAsync(async () =>
         {
             apis = await Service.ListRestApisAsync();
         });

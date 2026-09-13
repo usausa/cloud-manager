@@ -29,13 +29,11 @@ public sealed partial class S3ObjectsPage
         return LoadObjectsAsync();
     }
 
-    private async Task LoadObjectsAsync()
-    {
-        await LoadAsync(async () =>
+    private Task LoadObjectsAsync() =>
+        LoadAsync(async () =>
         {
             objects = await Service.ListObjectsAsync(BucketName, prefixFilter);
         });
-    }
 
     private async Task UploadAsync()
     {
@@ -54,7 +52,7 @@ public sealed partial class S3ObjectsPage
 
         await RunAsync("アップロード中...", async (progress, cancellationToken) =>
         {
-            using var stream = uploadParams.File.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024, cancellationToken);
+            await using var stream = uploadParams.File.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024, cancellationToken);
             await Service.UploadStreamAsync(BucketName, uploadParams.Key, stream, uploadParams.File.Size, progress, cancellationToken);
             Snackbar.AddSuccess($"アップロード完了: {uploadParams.Key}");
             await LoadObjectsAsync();
