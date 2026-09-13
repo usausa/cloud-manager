@@ -1,0 +1,27 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>TTL 設定 - @TableName</TitleContent>
+    <DialogContent>
+        @if (IsLoading) { <MudProgressCircular Indeterminate="true" /> }
+        else if (ttlInfo is not null)
+        {
+            <MudStack Spacing="2">
+                <MudText>現在の状態: @(ttlInfo.Enabled ? $"有効（属性: {ttlInfo.AttributeName}）" : "無効")</MudText>
+                <MudSwitch @bind-Value="enable" Label="TTL を有効にする" Color="Color.Primary" />
+                @if (enable)
+                {
+                    <MudTextField @bind-Value="attributeName" Label="TTL 属性名" Required="true" />
+                }
+            </MudStack>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveAsync" Disabled="isSaving">保存</MudButton>
+    </DialogActions>
+</MudDialog>

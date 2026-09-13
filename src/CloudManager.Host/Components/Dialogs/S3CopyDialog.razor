@@ -1,0 +1,15 @@
+<MudDialog>
+    <TitleContent>コピー / 移動 - @SrcKey</TitleContent>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudTextField @bind-Value="dstBucket" Label="コピー先バケット" Required="true" FullWidth="true" />
+            <MudTextField @bind-Value="dstKey" Label="コピー先キー" Required="true" FullWidth="true" />
+            <MudSwitch @bind-Value="move" Label="移動（コピー後削除）" Color="Color.Warning" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="@(move ? Color.Warning : Color.Primary)" OnClick="Submit"
+                   Disabled="@(!IsValid)">@(move ? "移動" : "コピー")</MudButton>
+    </DialogActions>
+</MudDialog>

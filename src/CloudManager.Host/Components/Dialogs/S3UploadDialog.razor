@@ -1,0 +1,17 @@
+<MudDialog>
+    <TitleContent><MudText Typo="Typo.h6">S3 アップロード - @BucketName</MudText></TitleContent>
+    <DialogContent>
+        <InputFile id="file-input" OnChange="OnFileChanged" style="display:none" />
+        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+            <MudTextField Value="@(selectedFile?.Name ?? string.Empty)" Label="ファイル" Variant="Variant.Outlined"
+                          Margin="Margin.Dense" ReadOnly="true" Style="flex:1" />
+            <MudButton HtmlTag="label" for="file-input" Variant="Variant.Outlined" Size="Size.Small">選択</MudButton>
+        </MudStack>
+        <MudTextField @bind-Value="key" Label="S3 キー" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit"
+                   Disabled="@(selectedFile is null || String.IsNullOrWhiteSpace(key))">アップロード</MudButton>
+    </DialogActions>
+</MudDialog>

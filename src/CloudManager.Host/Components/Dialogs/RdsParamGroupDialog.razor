@@ -1,0 +1,38 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>パラメータ - @GroupName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else
+        {
+            <MudTextField @bind-Value="search" Label="検索" Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Class="mb-2" Style="max-width:300px" />
+            <MudTable T="RdsParameterInfo" Items="Filtered" Dense="true" Hover="true" Bordered="true" RowsPerPage="50">
+                <HeaderContent>
+                    <MudTh>名前</MudTh>
+                    <MudTh>値</MudTh>
+                    <MudTh>ソース</MudTh>
+                    <MudTh>変更可</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd>@(context.Value ?? "-")</MudTd>
+                    <MudTd>@context.Source</MudTd>
+                    <MudTd>@(context.IsModifiable ? "✓" : "")</MudTd>
+                </RowTemplate>
+                <PagerContent><MudTablePager /></PagerContent>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

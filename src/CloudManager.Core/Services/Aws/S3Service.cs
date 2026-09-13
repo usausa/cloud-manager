@@ -116,19 +116,39 @@ public sealed class S3Service
         return ms.ToArray();
     }
 
-    // ローカルファイルを S3 にアップロードする(TransferUtility + 進捗)。
-    public async ValueTask UploadFileAsync(string bucketName, string key, string filePath, IProgress<ProgressUpdate>? progress, CancellationToken cancellationToken)
+    // オブジェクトのメタデータを取得する。存在しない場合は null
+    public async ValueTask<S3ObjectHead?> HeadObjectAsync(string bucketName, string key, CancellationToken cancellationToken = default)
     {
-        var fileInfo = new FileInfo(filePath);
-        await using var stream = fileInfo.OpenRead();
-        await UploadStreamAsync(bucketName, key, stream, fileInfo.Length, progress, cancellationToken);
+        using var s3 = factory.CreateS3Client();
+        try
+        {
+            var response = await s3.GetObjectMetadataAsync(
+                new GetObjectMetadataRequest
+                {
+                    BucketName = bucketName,
+                    Key = key
+                },
+                cancellationToken);
+            return new S3ObjectHead(response.ContentLength, response.Headers.ContentType ?? "application/octet-stream");
+        }
+        catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
-    // S3 からローカルファイルにダウンロードする(進捗付き)。
-    public async ValueTask DownloadFileAsync(string bucketName, string key, string filePath, IProgress<ProgressUpdate>? progress, CancellationToken cancellationToken)
+    // オブジェクトを出力ストリームへそのまま流す(ダウンロード配信用)。
+    public async ValueTask DownloadToStreamAsync(string bucketName, string key, Stream destination, CancellationToken cancellationToken = default)
     {
-        var bytes = await DownloadBytesAsync(bucketName, key, progress, cancellationToken);
-        await File.WriteAllBytesAsync(filePath, bytes, cancellationToken);
+        using var s3 = factory.CreateS3Client();
+        using var response = await s3.GetObjectAsync(
+            new GetObjectRequest
+            {
+                BucketName = bucketName,
+                Key = key
+            },
+            cancellationToken);
+        await response.ResponseStream.CopyToAsync(destination, cancellationToken);
     }
 
     // オブジェクトを削除する。

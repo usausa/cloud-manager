@@ -1,0 +1,41 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>ライフサイクルルール - @BucketName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (rules.Count == 0)
+        {
+            <MudText>ライフサイクルルールが設定されていません。</MudText>
+        }
+        else
+        {
+            <MudTable T="S3LifecycleRuleInfo" Items="rules" Dense="true" Hover="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>プレフィックス</MudTh>
+                    <MudTh>状態</MudTh>
+                    <MudTh>移行</MudTh>
+                    <MudTh>有効期限</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Id</MudTd>
+                    <MudTd>@(String.IsNullOrEmpty(context.Prefix) ? "(なし)" : context.Prefix)</MudTd>
+                    <MudTd>@context.Status</MudTd>
+                    <MudTd>@(context.Transitions.Count > 0 ? string.Join(", ", context.Transitions) : "-")</MudTd>
+                    <MudTd>@(context.Expiration ?? "-")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

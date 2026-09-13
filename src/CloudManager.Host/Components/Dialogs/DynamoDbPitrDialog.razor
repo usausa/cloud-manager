@@ -1,0 +1,28 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>PITR 設定 - @TableName</TitleContent>
+    <DialogContent>
+        @if (IsLoading) { <MudProgressCircular Indeterminate="true" /> }
+        else if (pitrInfo is not null)
+        {
+            <MudStack Spacing="2">
+                <MudText>現在の状態: @(pitrInfo.Enabled ? "有効" : "無効")</MudText>
+                @if (pitrInfo.Enabled)
+                {
+                    <MudText>最古の復元ポイント: @(pitrInfo.EarliestRestoreDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudText>
+                    <MudText>最新の復元ポイント: @(pitrInfo.LatestRestoreDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudText>
+                }
+                <MudSwitch @bind-Value="enable" Label="PITR を有効にする" Color="Color.Primary" />
+            </MudStack>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveAsync" Disabled="isSaving">保存</MudButton>
+    </DialogActions>
+</MudDialog>

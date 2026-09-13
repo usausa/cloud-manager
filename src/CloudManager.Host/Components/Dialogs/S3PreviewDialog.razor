@@ -1,0 +1,30 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>プレビュー - @ObjectInfo?.Key</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (previewType == "image" && imageData is not null)
+        {
+            <img src="@imageData" style="max-width:100%; max-height:600px;" alt="preview" />
+        }
+        else if (previewType == "text" && textContent is not null)
+        {
+            <pre style="white-space:pre-wrap; max-height:600px; overflow:auto;">@textContent</pre>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info">このファイルはプレビューできません。</MudAlert>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,0 +1,40 @@
+@page "/s3"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - S3</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">S3 バケット</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadBucketsAsync">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="S3BucketInfo" Items="buckets" Dense="true" Hover="true" Loading="@IsLoading" RowsPerPage="50">
+    <HeaderContent>
+        <MudTh>バケット名</MudTh>
+        <MudTh>作成日</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.BucketName</MudTd>
+        <MudTd>@context.CreationDate.ToLocalTime().ToString("yyyy-MM-dd")</MudTd>
+        <MudTd>
+            <MudTooltip Text="オブジェクト一覧">
+                <MudIconButton Icon="@Icons.Material.Filled.FolderOpen" Size="Size.Small"
+                               Href="@($"s3/{context.BucketName}")" />
+            </MudTooltip>
+            <MudTooltip Text="公開設定">
+                <MudIconButton Icon="@Icons.Material.Filled.Security" Size="Size.Small"
+                               OnClick="@(() => ShowPublicAccessAsync(context))" />
+            </MudTooltip>
+            <MudTooltip Text="ライフサイクル">
+                <MudIconButton Icon="@Icons.Material.Filled.Loop" Size="Size.Small"
+                               OnClick="@(() => ShowLifecycleAsync(context))" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

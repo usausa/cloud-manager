@@ -1,0 +1,66 @@
+@page "/s3/{BucketName}"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - S3 (@BucketName)</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" Href="/s3" />
+    <MudText Typo="Typo.h5">S3 オブジェクト</MudText>
+    <MudText Typo="Typo.subtitle1" Class="ml-1 mud-text-secondary">@BucketName</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Upload" Variant="Variant.Outlined" Size="Size.Medium"
+               Disabled="IsRunning" OnClick="UploadAsync">アップロード</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Medium"
+               Disabled="IsRunning" OnClick="LoadObjectsAsync">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudPaper Class="pa-2 mb-2">
+    <MudTextField @bind-Value="prefixFilter" Label="プレフィックス" Variant="Variant.Outlined" Margin="Margin.Dense"
+                  Style="max-width:360px"
+                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                  OnAdornmentClick="LoadObjectsAsync" />
+</MudPaper>
+
+<MudTable T="S3ObjectInfo" Items="objects" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="50">
+    <HeaderContent>
+        <MudTh>キー</MudTh>
+        <MudTh>サイズ</MudTh>
+        <MudTh>最終更新</MudTh>
+        <MudTh>ストレージクラス</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Key</MudTd>
+        <MudTd>@FormatSize(context.Size)</MudTd>
+        <MudTd>@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd>@context.StorageClass</MudTd>
+        <MudTd>
+            <MudTooltip Text="ダウンロード">
+                <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Medium"
+                               Disabled="IsRunning" Href="@DownloadUrl(context)" />
+            </MudTooltip>
+            <MudTooltip Text="プレビュー">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Medium"
+                               Disabled="IsRunning" OnClick="() => PreviewAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="バージョン">
+                <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Medium"
+                               Disabled="IsRunning" OnClick="() => ShowVersionsAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="コピー / 移動">
+                <MudIconButton Icon="@Icons.Material.Filled.FileCopy" Size="Size.Medium"
+                               Disabled="IsRunning" OnClick="() => CopyMoveAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="削除">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Error"
+                               Disabled="IsRunning" OnClick="() => DeleteObjectAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

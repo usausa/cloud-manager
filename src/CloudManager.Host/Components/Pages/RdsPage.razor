@@ -1,0 +1,162 @@
+@page "/rds"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - RDS</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">RDS</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTabs Outlined="true" Class="mt-1">
+    <MudTabPanel Text="インスタンス">
+        <MudTable T="RdsInstanceInfo" Items="instances" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>ID</MudTh>
+                <MudTh>エンジン</MudTh>
+                <MudTh>バージョン</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>クラス</MudTh>
+                <MudTh>エンドポイント</MudTh>
+                <MudTh>MultiAZ</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.DbInstanceIdentifier</MudTd>
+                <MudTd>@context.Engine</MudTd>
+                <MudTd>@context.EngineVersion</MudTd>
+                <MudTd><MudChip T="string" Color="@RdsStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+                <MudTd>@context.DbInstanceClass</MudTd>
+                <MudTd>@(context.Endpoint ?? "-")</MudTd>
+                <MudTd>@(context.MultiAz ? "Yes" : "No")</MudTd>
+                <MudTd>
+                    <MudTooltip Text="Start">
+                        <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => StartAsync(context)" />
+                    </MudTooltip>
+                    <MudTooltip Text="Stop">
+                        <MudIconButton Icon="@Icons.Material.Filled.Stop" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => StopAsync(context)" />
+                    </MudTooltip>
+                    <MudTooltip Text="Snapshot">
+                        <MudIconButton Icon="@Icons.Material.Filled.CameraAlt" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => CreateSnapshotAsync(context)" />
+                    </MudTooltip>
+                    @if (context.MultiAz)
+                    {
+                        <MudTooltip Text="Failover">
+                            <MudIconButton Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Small"
+                                           Disabled="IsRunning" OnClick="() => FailoverAsync(context)" Color="Color.Warning" />
+                        </MudTooltip>
+                    }
+                    <MudTooltip Text="イベント">
+                        <MudIconButton Icon="@Icons.Material.Filled.EventNote" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => ShowEventsAsync(context)" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="スナップショット">
+        <MudStack Row="true" Class="mb-1 mt-1">
+            <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                       OnClick="LoadSnapshotsAsync" Disabled="IsRunning">スナップショット更新</MudButton>
+        </MudStack>
+        <MudTable T="RdsSnapshotInfo" Items="snapshots" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@isSnapLoading" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>スナップショット ID</MudTh>
+                <MudTh>DB ID</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>エンジン</MudTh>
+                <MudTh>サイズ (GB)</MudTh>
+                <MudTh>作成日時</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.SnapshotIdentifier</MudTd>
+                <MudTd>@context.DbInstanceIdentifier</MudTd>
+                <MudTd><MudChip T="string" Color="@SnapStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+                <MudTd>@context.Engine @context.EngineVersion</MudTd>
+                <MudTd>@context.AllocatedStorage</MudTd>
+                <MudTd>@(context.CreatedTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+                <MudTd>
+                    <MudTooltip Text="Restore">
+                        <MudIconButton Icon="@Icons.Material.Filled.RestorePage" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => RestoreSnapshotAsync(context)" />
+                    </MudTooltip>
+                    <MudTooltip Text="Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                                       Disabled="IsRunning" OnClick="() => DeleteSnapshotAsync(context)" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="パラメータグループ">
+        <MudStack Row="true" Class="mb-1 mt-1">
+            <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                       OnClick="LoadParamGroupsAsync" Disabled="IsRunning">更新</MudButton>
+        </MudStack>
+        <MudTable T="RdsParamGroupInfo" Items="paramGroups" Dense="true" Hover="true" Bordered="true" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>名前</MudTh>
+                <MudTh>ファミリー</MudTh>
+                <MudTh>説明</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Family</MudTd>
+                <MudTd>@context.Description</MudTd>
+                <MudTd>
+                    <MudTooltip Text="パラメータ表示">
+                        <MudIconButton Icon="@Icons.Material.Filled.List" Size="Size.Small"
+                                       OnClick="() => ShowParamsAsync(context)" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="Aurora クラスタ">
+        <MudStack Row="true" Class="mb-1 mt-1">
+            <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                       OnClick="LoadClustersAsync" Disabled="IsRunning">更新</MudButton>
+        </MudStack>
+        <MudTable T="AuroraClusterInfo" Items="clusters" Dense="true" Hover="true" Bordered="true" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>クラスタ ID</MudTh>
+                <MudTh>エンジン</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>メンバー</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.ClusterId</MudTd>
+                <MudTd>@context.Engine</MudTd>
+                <MudTd><MudChip T="string" Color="@RdsStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+                <MudTd>@string.Join(", ", context.Members.Select(m => $"{m.Id}({m.Role})"))</MudTd>
+                <MudTd>
+                    <MudTooltip Text="Failover">
+                        <MudIconButton Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Small" Color="Color.Warning"
+                                       OnClick="() => FailoverClusterAsync(context)" Disabled="IsRunning" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+</MudTabs>

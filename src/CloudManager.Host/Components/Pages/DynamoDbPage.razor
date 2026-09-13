@@ -1,0 +1,49 @@
+@page "/dynamodb"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - DynamoDB</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">DynamoDB</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="DynamoDbTableInfo" Items="tables" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25">
+    <HeaderContent>
+        <MudTh>テーブル名</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>アイテム数</MudTh>
+        <MudTh>サイズ (bytes)</MudTh>
+        <MudTh>Billing</MudTh>
+        <MudTh>GSI 数</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.TableName</MudTd>
+        <MudTd><MudChip T="string" Color="@DdbStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+        <MudTd>@context.ItemCount</MudTd>
+        <MudTd>@context.TableSizeBytes</MudTd>
+        <MudTd>@context.BillingMode</MudTd>
+        <MudTd>@context.GsiCount</MudTd>
+        <MudTd>
+            <MudTooltip Text="Scan（上位100件）">
+                <MudIconButton Icon="@Icons.Material.Filled.TableRows" Size="Size.Small"
+                               OnClick="() => ScanAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="TTL">
+                <MudIconButton Icon="@Icons.Material.Filled.Timer" Size="Size.Small"
+                               OnClick="() => ShowTtlAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="PITR">
+                <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small"
+                               OnClick="() => ShowPitrAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

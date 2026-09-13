@@ -1,0 +1,51 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>バージョン履歴 - @Key</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (versions.Count == 0)
+        {
+            <MudText>バージョンが見つかりません。</MudText>
+        }
+        else
+        {
+            <MudTable T="S3VersionInfo" Items="versions" Dense="true" Hover="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>バージョン ID</MudTh>
+                    <MudTh>最終更新</MudTh>
+                    <MudTh>サイズ</MudTh>
+                    <MudTh>最新</MudTh>
+                    <MudTh>削除マーカー</MudTh>
+                    <MudTh>操作</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.VersionId</MudTd>
+                    <MudTd>@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+                    <MudTd>@(context.IsDeleteMarker ? "-" : FormatSize(context.Size))</MudTd>
+                    <MudTd>@(context.IsLatest ? "✓" : "")</MudTd>
+                    <MudTd>@(context.IsDeleteMarker ? "✓" : "")</MudTd>
+                    <MudTd>
+                        @if (!context.IsDeleteMarker && !context.IsLatest)
+                        {
+                            <MudTooltip Text="復元">
+                                <MudIconButton Icon="@Icons.Material.Filled.Restore" Size="Size.Small"
+                                               OnClick="@(() => RestoreAsync(context))" Disabled="isRestoring" />
+                            </MudTooltip>
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

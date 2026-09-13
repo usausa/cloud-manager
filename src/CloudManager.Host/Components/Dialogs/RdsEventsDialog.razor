@@ -1,0 +1,38 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>イベント - @SourceIdentifier</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (events.Count == 0)
+        {
+            <MudText>イベントがありません（過去 7 日間）。</MudText>
+        }
+        else
+        {
+            <MudTable T="RdsEventInfo" Items="events" Dense="true" Hover="true" Bordered="true" RowsPerPage="50">
+                <HeaderContent>
+                    <MudTh>日時</MudTh>
+                    <MudTh>カテゴリ</MudTh>
+                    <MudTh>メッセージ</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+                    <MudTd>@context.Categories</MudTd>
+                    <MudTd>@context.Message</MudTd>
+                </RowTemplate>
+                <PagerContent><MudTablePager /></PagerContent>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

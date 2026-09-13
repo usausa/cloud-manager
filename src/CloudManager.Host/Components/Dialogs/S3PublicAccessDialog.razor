@@ -1,0 +1,42 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>公開設定 - @BucketName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (report is not null)
+        {
+            @if (report.Verdict == "Public")
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-2">このバケットはパブリックにアクセス可能です。</MudAlert>
+            }
+            else if (report.Verdict == "Mixed")
+            {
+                <MudAlert Severity="Severity.Warning" Class="mb-2">一部の設定が公開状態になっています。</MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Success" Class="mb-2">このバケットはプライベートです。</MudAlert>
+            }
+            <MudSimpleTable Dense="true">
+                <tbody>
+                    <tr><td>BlockPublicAcls</td><td>@report.BlockPublicAcls</td></tr>
+                    <tr><td>IgnorePublicAcls</td><td>@report.IgnorePublicAcls</td></tr>
+                    <tr><td>BlockPublicPolicy</td><td>@report.BlockPublicPolicy</td></tr>
+                    <tr><td>RestrictPublicBuckets</td><td>@report.RestrictPublicBuckets</td></tr>
+                    <tr><td>BucketPolicy IsPublic</td><td>@(report.IsBucketPolicyPublic.HasValue ? report.IsBucketPolicyPublic.Value.ToString() : "N/A")</td></tr>
+                </tbody>
+            </MudSimpleTable>
+        }
+        else if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

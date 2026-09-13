@@ -10,6 +10,7 @@ using System.Text.Unicode;
 using CloudManager.Accessors;
 using CloudManager.Host.Application.Telemetry;
 using CloudManager.Host.Components;
+using CloudManager.Host.Endpoints;
 using CloudManager.Host.Infrastructure.Aws;
 using CloudManager.Host.Infrastructure.ExceptionHandling;
 using CloudManager.Host.Infrastructure.HealthChecks;
@@ -505,6 +506,9 @@ public static class ApplicationExtensions
         // Blazor
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
+
+        // API
+        app.MapS3Endpoints();
 
         // Health
         app.MapHealthChecks(HealthEndpointPath);
