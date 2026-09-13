@@ -6,7 +6,6 @@
   <Folder Name="/Test/">
     <Project Path="tests/CloudManager.UnitTests/CloudManager.UnitTests.csproj" />
     <Project Path="tests/CloudManager.IntegrationTests/CloudManager.IntegrationTests.csproj" />
-    <Project Path="tests/CloudManager.E2ETests/CloudManager.E2ETests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

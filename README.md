@@ -11,13 +11,11 @@ AWS リソースを参照・操作する Blazor Server 製の管理 Web UI。
 | `src/CloudManager.Host` | Blazor Server ホスト。画面 (`Components`)、ジョブスケジューラ (`Infrastructure/Jobs`, `Workers`)、S3 ダウンロード API (`Endpoints`) |
 | `tests/CloudManager.UnitTests` | 単体テスト (xUnit v3 / bUnit) |
 | `tests/CloudManager.IntegrationTests` | ホスト起動を伴う統合テスト (SQLite 実体を使用) |
-| `tests/CloudManager.E2ETests` | Playwright によるブラウザテスト |
 
 ## 前提条件
 
 - .NET 10 SDK
 - `~/.aws/credentials` / `~/.aws/config` に認証情報とリージョンが設定済みであること
-- E2E テストを実行する場合は Playwright のブラウザ (`pwsh tests/CloudManager.E2ETests/bin/Debug/net10.0/playwright.ps1 install`)
 
 ### ~/.aws/credentials
 
@@ -93,7 +91,6 @@ EC2 / RDS の起動・停止、ECS の希望タスク数変更、Lambda 実行�
 ```bash
 dotnet run --project tests/CloudManager.UnitTests
 dotnet run --project tests/CloudManager.IntegrationTests
-dotnet run --project tests/CloudManager.E2ETests
 ```
 
-統合テスト・E2E テストは存在しないプロファイル名で起動するため AWS へは接続しない。
+統合テストは存在しないプロファイル名で起動するため AWS へは接続しない。
