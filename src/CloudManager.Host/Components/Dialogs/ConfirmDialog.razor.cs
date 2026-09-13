@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 using MudBlazor;
 
-// 危険な操作の確認。強制フラグと、識別子の再入力による確認に対応する
+// Confirmation for dangerous operations with force flag and identifier re-entry
 public sealed partial class ConfirmDialog
 {
     private bool force;

@@ -15,7 +15,7 @@ public sealed class RdsService
         this.factory = factory;
     }
 
-    // RDS インスタンスを全件取得する(ページング対応)。
+    // Lists all RDS instances (paged)
     public async ValueTask<List<RdsInstanceInfo>> ListInstancesAsync(string? engine)
     {
         using var rds = factory.CreateRdsClient();
@@ -29,7 +29,7 @@ public sealed class RdsService
 
             foreach (var db in response.DBInstances ?? [])
             {
-                if (!string.IsNullOrWhiteSpace(engine) &&
+                if (!String.IsNullOrWhiteSpace(engine) &&
                     !db.Engine.StartsWith(engine, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
@@ -48,12 +48,12 @@ public sealed class RdsService
 
             marker = response.Marker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
 
         return result;
     }
 
-    // RDS インスタンスを起動する。wait 時は available になるまでポーリング。
+    // Starts an RDS instance, polling until available when wait is set
     public async ValueTask StartInstanceAsync(string id, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
@@ -69,7 +69,7 @@ public sealed class RdsService
         await WaitForStatusAsync(rds, id, "available", timeoutSeconds, progress, cancellationToken);
     }
 
-    // RDS インスタンスを停止する。wait 時は stopped になるまでポーリング。
+    // Stops an RDS instance, polling until stopped when wait is set
     public async ValueTask StopInstanceAsync(string id, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
@@ -85,7 +85,7 @@ public sealed class RdsService
         await WaitForStatusAsync(rds, id, "stopped", timeoutSeconds, progress, cancellationToken);
     }
 
-    // スナップショットを全件取得する。id 指定時は対象インスタンスのみ。
+    // Lists snapshots, limited to one instance when id is given
     public async ValueTask<List<RdsSnapshotInfo>> ListSnapshotsAsync(string? dbInstanceId)
     {
         using var rds = factory.CreateRdsClient();
@@ -95,7 +95,7 @@ public sealed class RdsService
         do
         {
             var request = new DescribeDBSnapshotsRequest { Marker = marker };
-            if (!string.IsNullOrWhiteSpace(dbInstanceId))
+            if (!String.IsNullOrWhiteSpace(dbInstanceId))
             {
                 request.DBInstanceIdentifier = dbInstanceId;
             }
@@ -116,12 +116,12 @@ public sealed class RdsService
 
             marker = response.Marker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
 
         return result;
     }
 
-    // スナップショットを作成する。wait 時は available になるまでポーリング。
+    // Creates a snapshot, polling until available when wait is set
     public async ValueTask CreateSnapshotAsync(string dbInstanceId, string snapshotId, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
@@ -141,7 +141,7 @@ public sealed class RdsService
         await WaitForSnapshotStatusAsync(rds, snapshotId, "available", timeoutSeconds, progress, cancellationToken);
     }
 
-    // スナップショットからインスタンスを復元する。wait 時は available になるまでポーリング。
+    // Restores an instance from a snapshot, polling until available when wait is set
     public async ValueTask RestoreSnapshotAsync(string snapshotId, string newDbInstanceId, string? instanceClass, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
@@ -150,7 +150,7 @@ public sealed class RdsService
             DBSnapshotIdentifier = snapshotId,
             DBInstanceIdentifier = newDbInstanceId
         };
-        if (!string.IsNullOrWhiteSpace(instanceClass))
+        if (!String.IsNullOrWhiteSpace(instanceClass))
         {
             request.DBInstanceClass = instanceClass;
         }
@@ -167,7 +167,7 @@ public sealed class RdsService
         await WaitForStatusAsync(rds, newDbInstanceId, "available", timeoutSeconds, progress, cancellationToken);
     }
 
-    // スナップショットを削除する。
+    // Deletes a snapshot
     public async ValueTask DeleteSnapshotAsync(string snapshotId, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
@@ -194,7 +194,7 @@ public sealed class RdsService
 
             progress.Report(new ProgressUpdate(Math.Min(elapsed / timeoutSeconds, 0.99), $"[{status}]"));
 
-            if (string.Equals(status, targetStatus, StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(status, targetStatus, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
@@ -221,7 +221,7 @@ public sealed class RdsService
 
             progress.Report(new ProgressUpdate(Math.Min(elapsed / timeoutSeconds, 0.99), $"[{status}]"));
 
-            if (string.Equals(status, targetStatus, StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(status, targetStatus, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }

@@ -60,7 +60,7 @@
                     <MudTd>@context.Name</MudTd>
                     <MudTd>@context.Type</MudTd>
                     <MudTd>@(context.Ttl?.ToString() ?? "-")</MudTd>
-                    <MudTd>@string.Join(", ", context.Records)</MudTd>
+                    <MudTd>@String.Join(", ", context.Records)</MudTd>
                     <MudTd>
                         <MudTooltip Text="削除">
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"

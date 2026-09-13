@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 using MudBlazor;
 
-// CloudWatch メトリクスを折れ線で表示する
+// Shows CloudWatch metrics as a line chart
 public sealed partial class MetricsChart
 {
     private readonly LineChartOptions chartOptions = new() { YAxisTicks = 5 };
@@ -31,13 +31,14 @@ public sealed partial class MetricsChart
             return;
         }
 
-        // 全シリーズ共通の時刻をX軸にし、欠けている点は0で埋める
+        // Use the union of timestamps as the X axis and fill missing points with 0
         var timestamps = Series
             .SelectMany(static x => x.Points.Select(static p => p.Timestamp))
             .Distinct()
             .Order()
             .ToList();
 
+#pragma warning disable IDE0028
         labels = timestamps
             .Select(static x => x.ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture))
             .ToArray();
@@ -53,5 +54,6 @@ public sealed partial class MetricsChart
                 };
             })
             .ToList();
+#pragma warning restore IDE0028
     }
 }

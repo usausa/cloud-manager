@@ -44,7 +44,7 @@ public sealed partial class VpcPage
         natGateways = [];
     }
 
-    // 選択した VPC の詳細(サブネット、セキュリティグループ、ルートテーブル、IGW、NAT GW)を読み込む
+    // Load the details of the selected VPC
     private async Task OnVpcSelectedAsync(VpcInfo? vpc)
     {
         selectedVpc = vpc;

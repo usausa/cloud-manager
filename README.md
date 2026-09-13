@@ -1,42 +1,42 @@
 # CloudManager
 
-A web console for browsing and operating AWS resources from your local AWS profiles.
-Switch between profiles and regions, inspect EC2 / RDS / S3 and other services, run day-to-day operations, and schedule recurring jobs with cron.
+ローカルの AWS プロファイルを使って AWS リソースを閲覧・操作する Web コンソールです。
+プロファイルとリージョンを切り替えながら、EC2 / RDS / S3 などのサービスを確認し、日常的な操作を実行し、cron で定期ジョブをスケジュールできます。
 
 ![Dashboard](docs/images/dashboard.png)
 
-## ✨ Features
+## ✨ 機能
 
-| Service | View | Operations |
+| サービス | 一覧 | 操作 |
 | --- | --- | --- |
-| EC2 | ✅ | Start / Stop / Reboot / Terminate / SSM Run Command |
-| EBS | ✅ | Attach / Detach / Create snapshot |
-| ECS | ✅ | Change desired count / Force new deployment / List tasks |
-| Lambda | ✅ | Invoke / Environment variables / Aliases / Concurrency / DLQ |
-| ECR | ✅ | List images / Delete image |
-| S3 | ✅ | Upload / Download / Delete / Preview / Copy & move / Versions / Lifecycle / Public access |
-| RDS | ✅ | Start / Stop / Reboot / Snapshots (create, restore, delete) / Parameter groups / Events / Aurora failover |
+| EC2 | ✅ | 起動 / 停止 / 再起動 / 終了 / SSM Run Command |
+| EBS | ✅ | アタッチ / デタッチ / スナップショット作成 |
+| ECS | ✅ | 希望タスク数の変更 / 強制再デプロイ / タスク一覧 |
+| Lambda | ✅ | 呼び出し / 環境変数 / エイリアス / 同時実行数 / DLQ |
+| ECR | ✅ | イメージ一覧 / イメージ削除 |
+| S3 | ✅ | アップロード / ダウンロード / 削除 / プレビュー / コピー・移動 / バージョン / ライフサイクル / パブリックアクセス |
+| RDS | ✅ | 起動 / 停止 / 再起動 / スナップショット(作成・復元・削除) / パラメータグループ / イベント / Aurora フェイルオーバー |
 | DynamoDB | ✅ | Scan / PITR / TTL |
-| VPC | ✅ | Subnets / Security groups / Route tables / Internet gateways / NAT gateways |
-| Elastic IP | ✅ | Associate / Disassociate |
-| CloudFront | ✅ | Invalidate cache |
-| ELB | ✅ | Target health |
-| Route 53 | ✅ | Add / Update / Delete records |
-| ACM | ✅ | Certificate details |
-| API Gateway | ✅ | Deploy |
-| EventBridge | ✅ | Enable / Disable rules |
-| SQS | ✅ | Send / Receive / Purge |
-| SNS | ✅ | Publish |
-| CloudWatch | ✅ | Metrics / Alarms |
-| CloudWatch Logs | ✅ | Log events / Logs Insights |
-| SSM Parameter Store | ✅ | View / Edit values |
-| Secrets Manager | ✅ | View values |
-| Cognito | ✅ | Reset password |
-| Cost | — | Estimates from the Pricing API |
+| VPC | ✅ | サブネット / セキュリティグループ / ルートテーブル / インターネットゲートウェイ / NAT ゲートウェイ |
+| Elastic IP | ✅ | 関連付け / 関連付け解除 |
+| CloudFront | ✅ | キャッシュ無効化 |
+| ELB | ✅ | ターゲットヘルス |
+| Route 53 | ✅ | レコードの追加 / 更新 / 削除 |
+| ACM | ✅ | 証明書の詳細 |
+| API Gateway | ✅ | デプロイ |
+| EventBridge | ✅ | ルールの有効化 / 無効化 |
+| SQS | ✅ | 送信 / 受信 / パージ |
+| SNS | ✅ | 発行 |
+| CloudWatch | ✅ | メトリクス / アラーム |
+| CloudWatch Logs | ✅ | ログイベント / Logs Insights |
+| SSM Parameter Store | ✅ | 値の参照 / 編集 |
+| Secrets Manager | ✅ | 値の参照 |
+| Cognito | ✅ | パスワードリセット |
+| Cost | — | Pricing API による見積もり |
 
-## 🔐 Requirements
+## 🔐 前提条件
 
-CloudManager uses the AWS profiles on the machine it runs on. Configure `~/.aws/credentials` and `~/.aws/config` before use.
+CloudManager は実行するマシン上の AWS プロファイルを使用します。利用前に `~/.aws/credentials` と `~/.aws/config` を設定してください。
 
 ```ini
 # ~/.aws/credentials
@@ -51,38 +51,38 @@ aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 region = ap-northeast-1
 ```
 
-## 🧭 Usage
+## 🧭 使い方
 
-### 🔄 Profile and region
+### 🔄 プロファイルとリージョン
 
-The dashboard shows the active profile and region. Open **Settings** to switch to any profile found in `~/.aws`; the change applies immediately to every page.
+ダッシュボードには現在のプロファイルとリージョンが表示されます。**設定** を開くと `~/.aws` にあるプロファイルへ切り替えられ、変更はすぐにすべてのページへ反映されます。
 
-### 🖥️ Browsing and operating resources
+### 🖥️ リソースの閲覧と操作
 
-Each service has its own page reachable from the navigation menu or the dashboard. Lists can be filtered and refreshed, and row actions open dialogs for operations.
-Destructive operations (terminate, delete, force failover, ...) ask for confirmation and, where appropriate, require the resource identifier to be typed in. Long-running operations show progress while the service reaches the target state.
+各サービスには専用のページがあり、ナビゲーションメニューまたはダッシュボードから開けます。一覧は絞り込みと再読み込みができ、行の操作からダイアログを開いて各種操作を実行します。
+破壊的な操作(終了、削除、強制フェイルオーバーなど)では確認を求め、必要に応じてリソース識別子の入力を要求します。時間のかかる操作は、リソースが目的の状態になるまで進捗を表示します。
 
 ### 📦 S3
 
-Buckets and objects can be browsed by prefix. Objects can be uploaded from the browser, downloaded, previewed (images and text), copied or moved, and their versions restored. Bucket-level lifecycle rules and public access settings are available from the bucket list.
+バケットとオブジェクトはプレフィックス単位で辿れます。オブジェクトはブラウザからのアップロード、ダウンロード、プレビュー(画像・テキスト)、コピー・移動ができ、バージョンの復元も可能です。バケット単位のライフサイクルルールとパブリックアクセス設定はバケット一覧から操作できます。
 
-### ⏰ Scheduled jobs
+### ⏰ 定期ジョブ
 
-**Jobs** lets you schedule recurring operations with a cron expression:
+**ジョブ一覧** では cron 式で定期的な操作をスケジュールできます。
 
-- Start / Stop / Reboot an EC2 instance
-- Start / Stop an RDS instance
-- Change the desired count of an ECS service
-- Invoke a Lambda function
-- Invalidate a CloudFront distribution
+- EC2 インスタンスの起動 / 停止 / 再起動
+- RDS インスタンスの起動 / 停止
+- ECS サービスの希望タスク数の変更
+- Lambda 関数の呼び出し
+- CloudFront ディストリビューションのキャッシュ無効化
 
-Each job runs with its own profile and region, and the cron expression can be evaluated in UTC or local time. Jobs can also be executed immediately, and every run is recorded in **Job History** with its result and error details.
+各ジョブは固有のプロファイルとリージョンで実行され、cron 式は UTC またはローカル時刻で評価できます。ジョブは即時実行もでき、すべての実行は結果とエラー詳細とともに **実行履歴** に記録されます。
 
-## ⚙️ Configuration
+## ⚙️ 設定
 
-| Key | Description |
+| キー | 説明 |
 | --- | --- |
-| `Aws:DefaultProfile` | Profile selected at startup |
-| `Aws:DefaultRegion` | Region selected at startup |
-| `Job:LogRetentionCountPerJob` | Number of history entries kept per job |
-| `ConnectionStrings:Default` | SQLite database that stores job definitions and history (created automatically) |
+| `Aws:DefaultProfile` | 起動時に選択されるプロファイル |
+| `Aws:DefaultRegion` | 起動時に選択されるリージョン |
+| `Job:LogRetentionCountPerJob` | ジョブごとに保持する実行履歴の件数 |
+| `ConnectionStrings:Default` | ジョブ定義と実行履歴を保存する SQLite データベース(自動作成) |

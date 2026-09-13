@@ -59,7 +59,7 @@ public sealed partial class S3ObjectsPage
         });
     }
 
-    // ダウンロードはブラウザに任せる(ストリーム配信 API)。HTTP リクエストは画面のセッションを持たないためプロファイルを付与する
+    // The download API has no circuit session, so the profile is passed in the URL
     private string DownloadUrl(S3ObjectInfo obj) =>
         $"api/s3/download/{Uri.EscapeDataString(BucketName)}?key={Uri.EscapeDataString(obj.Key)}&profile={Uri.EscapeDataString(Session.ProfileName)}&region={Uri.EscapeDataString(Session.Region?.SystemName ?? string.Empty)}";
 

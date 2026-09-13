@@ -4,7 +4,7 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 
-// ~/.aws/credentials / ~/.aws/config からプロファイルを解決し AWSCredentials と RegionEndpoint を返す。
+// Resolves a profile from ~/.aws into credentials and region
 public static class CredentialResolver
 {
     public static (AWSCredentials Credentials, RegionEndpoint Region) Resolve(string? profileName, string? regionName)
@@ -18,7 +18,7 @@ public static class CredentialResolver
         }
 
         RegionEndpoint region;
-        if (!string.IsNullOrWhiteSpace(regionName))
+        if (!String.IsNullOrWhiteSpace(regionName))
         {
             region = RegionEndpoint.GetBySystemName(regionName);
         }

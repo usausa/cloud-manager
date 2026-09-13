@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 using MudBlazor;
 
-// AWS を操作するページの共通基底。読み込み/実行中の状態とエラー表示を一箇所にまとめる
+// Base class for AWS pages, centralizing loading, running and error state
 public abstract class AwsComponentBase : AppComponentBase
 {
     private CancellationTokenSource? cancellation;
@@ -27,7 +27,7 @@ public abstract class AwsComponentBase : AppComponentBase
 
     protected string? ErrorMessage { get; set; }
 
-    // 回線が切れたら実行中の操作を打ち切る
+    // Cancel running operations when the circuit is disposed
     protected CancellationToken CancellationToken => (cancellation ??= new CancellationTokenSource()).Token;
 
     protected override void Dispose(bool disposing)
@@ -42,7 +42,7 @@ public abstract class AwsComponentBase : AppComponentBase
         base.Dispose(disposing);
     }
 
-    // 一覧取得。失敗はバナーに表示する
+    // Loads data, showing failures in the banner
     protected async Task LoadAsync(Func<Task> load)
     {
         IsLoading = true;
@@ -61,7 +61,7 @@ public abstract class AwsComponentBase : AppComponentBase
         }
     }
 
-    // 操作の実行。進捗オーバーレイを表示し、失敗はバナーとスナックバーに表示する
+    // Runs an operation with a progress overlay and reports failures
     protected async Task RunAsync(string message, Func<IProgress<ProgressUpdate>, CancellationToken, Task> operation, Func<Task>? reload = null)
     {
         IsRunning = true;

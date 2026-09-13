@@ -23,7 +23,7 @@ public sealed class CloudWatchLogsService
         do
         {
             var request = new DescribeLogGroupsRequest { NextToken = nextToken };
-            if (!string.IsNullOrWhiteSpace(prefix))
+            if (!String.IsNullOrWhiteSpace(prefix))
             {
                 request.LogGroupNamePrefix = prefix;
             }
@@ -38,7 +38,7 @@ public sealed class CloudWatchLogsService
             }
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 
@@ -113,7 +113,7 @@ public sealed class CloudWatchLogsService
                 LogGroupName = logGroup,
                 StartTime = lastTimestampMs.HasValue ? lastTimestampMs.Value + 1 : DateTimeOffset.UtcNow.AddMinutes(-1).ToUnixTimeMilliseconds()
             };
-            if (!string.IsNullOrWhiteSpace(streamPrefix))
+            if (!String.IsNullOrWhiteSpace(streamPrefix))
             {
                 request.LogStreamNamePrefix = streamPrefix;
             }
@@ -144,7 +144,7 @@ public sealed class CloudWatchLogsService
                 }
                 nextToken = response.NextToken;
             }
-            while (!string.IsNullOrEmpty(nextToken));
+            while (!String.IsNullOrEmpty(nextToken));
             await Task.Delay(5000, ct).ConfigureAwait(false);
         }
     }

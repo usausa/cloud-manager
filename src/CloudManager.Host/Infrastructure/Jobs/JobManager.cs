@@ -4,7 +4,7 @@ using CloudManager.Models.Jobs;
 
 using Mofucat.JobScheduler;
 
-// ジョブ定義の追加/更新/削除をDBとスケジューラの両方へ反映する
+// Applies job definition changes to both the database and the scheduler
 public sealed class JobManager
 {
     private readonly ILogger<JobManager> log;
@@ -27,7 +27,7 @@ public sealed class JobManager
         this.scheduler = scheduler;
     }
 
-    // 起動時に有効なジョブをスケジューラへ登録する。壊れた定義があっても他は登録する
+    // Registers enabled jobs at startup, skipping broken definitions
     public async ValueTask LoadAllAsync(CancellationToken cancellationToken)
     {
         var jobs = await jobService.QueryAllAsync(cancellationToken);
@@ -80,7 +80,7 @@ public sealed class JobManager
     {
         if (job.CronTimeZone == JobCronTimeZone.Local)
         {
-            // ローカル cron はスケジューラ上は毎分トリガなので自前で計算する
+            // Local cron jobs are triggered every minute, so calculate the next run here
             var localNow = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, TimeZoneInfo.Local);
             return CronExpression.Parse(job.CronExpression).GetNextOccurrence(localNow);
         }

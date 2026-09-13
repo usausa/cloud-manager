@@ -20,7 +20,7 @@ public sealed partial class RdsEventsDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            // 直近7日間
+            // Last 7 days
             var end = DateTime.UtcNow;
             var start = end.AddDays(-7);
             events = await Service.ListEventsAsync(SourceIdentifier, "db-instance", start, end);

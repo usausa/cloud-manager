@@ -14,7 +14,7 @@ public sealed class DynamoDbService
         this.factory = factory;
     }
 
-    // DynamoDB テーブル一覧を取得する(ページング対応)。
+    // Lists DynamoDB tables (paged)
     public async ValueTask<List<DynamoDbTableInfo>> ListTablesAsync()
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
@@ -49,12 +49,12 @@ public sealed class DynamoDbService
 
             lastEvaluatedTableName = listResponse.LastEvaluatedTableName;
         }
-        while (!string.IsNullOrEmpty(lastEvaluatedTableName));
+        while (!String.IsNullOrEmpty(lastEvaluatedTableName));
 
         return result;
     }
 
-    // テーブルのアイテムを Scan で取得する(最大 limit 件)。
+    // Scans table items (up to limit)
     public async ValueTask<List<DynamoDbItemInfo>> ScanAsync(string tableName, int limit = 100, CancellationToken cancellationToken = default)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
@@ -65,12 +65,14 @@ public sealed class DynamoDbService
                 Limit = limit
             },
             cancellationToken);
+#pragma warning disable IDE0028
         return (response.Items ?? [])
             .Select(item => new DynamoDbItemInfo(item.ToDictionary(kv => kv.Key, kv => AttributeValueToString(kv.Value))))
             .ToList();
+#pragma warning restore IDE0028
     }
 
-    // TTL 設定を取得する。
+    // Gets the TTL setting
     public async ValueTask<DynamoDbTtlInfo> GetTtlAsync(string tableName)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
@@ -79,7 +81,7 @@ public sealed class DynamoDbService
         return new DynamoDbTtlInfo(tableName, enabled, response.TimeToLiveDescription?.AttributeName);
     }
 
-    // TTL を有効化または無効化する。
+    // Enables or disables TTL
     public async ValueTask UpdateTtlAsync(string tableName, bool enable, string attributeName, CancellationToken cancellationToken = default)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
@@ -96,7 +98,7 @@ public sealed class DynamoDbService
             cancellationToken);
     }
 
-    // PITR(ポイントインタイムリカバリ)設定を取得する。
+    // Gets the point-in-time recovery setting
     public async ValueTask<DynamoDbPitrInfo> GetPitrAsync(string tableName)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
@@ -106,7 +108,7 @@ public sealed class DynamoDbService
         return new DynamoDbPitrInfo(tableName, enabled, pitr?.EarliestRestorableDateTime, pitr?.LatestRestorableDateTime);
     }
 
-    // PITR を有効化または無効化する。
+    // Enables or disables point-in-time recovery
     public async ValueTask UpdatePitrAsync(string tableName, bool enable, CancellationToken cancellationToken = default)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
@@ -143,12 +145,12 @@ public sealed class DynamoDbService
 
         if (v.SS?.Count > 0)
         {
-            return $"[{string.Join(", ", v.SS)}]";
+            return $"[{String.Join(", ", v.SS)}]";
         }
 
         if (v.NS?.Count > 0)
         {
-            return $"[{string.Join(", ", v.NS)}]";
+            return $"[{String.Join(", ", v.NS)}]";
         }
 
         if (v.L?.Count > 0)

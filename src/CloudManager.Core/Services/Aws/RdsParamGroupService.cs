@@ -5,7 +5,7 @@ using Amazon.RDS.Model;
 using CloudManager.Infrastructure.Aws;
 using CloudManager.Models.Aws.Rds;
 
-// RDS パラメータグループ操作
+// RDS parameter group operations
 public sealed class RdsParamGroupService
 {
     private readonly AwsClientFactory factory;
@@ -30,7 +30,7 @@ public sealed class RdsParamGroupService
             }
             marker = response.Marker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return result;
     }
 
@@ -55,7 +55,7 @@ public sealed class RdsParamGroupService
             }
             marker = response.Marker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return result;
     }
 }

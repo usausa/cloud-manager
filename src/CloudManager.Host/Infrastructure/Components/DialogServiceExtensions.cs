@@ -35,7 +35,7 @@ public static class DialogServiceExtensions
         return (bool?)result!.Data == true;
     }
 
-    // 危険な操作の確認。キャンセル時はnull
+    // Confirms a dangerous operation, returning null when cancelled
     public static async ValueTask<ConfirmResult?> ShowOperationConfirm(
         this IDialogService dialog,
         string title,

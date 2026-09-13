@@ -2,7 +2,7 @@ namespace CloudManager.Models.Jobs;
 
 using System.Text.Json.Serialization;
 
-// 操作ごとのパラメータ。DBにはJSONで保存するため型判別子付きで直列化する
+// Per-operation parameters, serialized as JSON with a type discriminator
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$kind")]
 [JsonDerivedType(typeof(Ec2InstanceParameters), nameof(Ec2InstanceParameters))]
 [JsonDerivedType(typeof(RdsInstanceParameters), nameof(RdsInstanceParameters))]

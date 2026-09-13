@@ -116,7 +116,7 @@ public static class ApplicationExtensions
 
     public static IHostApplicationBuilder ConfigureHttp(this IHostApplicationBuilder builder)
     {
-        // Add services to the container.
+        // Add services to the container
         builder.Services.AddHttpContextAccessor();
 
         // XForward
@@ -165,7 +165,7 @@ public static class ApplicationExtensions
 
     public static WebApplication UseErrorHandler(this WebApplication app)
     {
-        // Page: not found page (UseWhen のブランチ内では再ルーティングされないためアプリ直下に置く)
+        // Page: not found (re-execution does not work inside a UseWhen branch)
         app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
         // API: ProblemDetails, status code as is
@@ -214,26 +214,6 @@ public static class ApplicationExtensions
     }
 
     //--------------------------------------------------------------------------------
-    // OpenApi
-    //--------------------------------------------------------------------------------
-
-    public static IHostApplicationBuilder ConfigureOpenApi(this IHostApplicationBuilder builder)
-    {
-        builder.Services.AddOpenApi(static options =>
-        {
-            options.AddDocumentTransformer(static (document, _, _) =>
-            {
-                document.Info.Title = "CloudManager API";
-                document.Info.Version = "v1";
-                document.Info.Description = "CloudManager API.";
-                return Task.CompletedTask;
-            });
-        });
-
-        return builder;
-    }
-
-    //--------------------------------------------------------------------------------
     // Blazor
     //--------------------------------------------------------------------------------
 
@@ -255,7 +235,7 @@ public static class ApplicationExtensions
             options.SnackbarConfiguration.NewestOnTop = false;
             options.SnackbarConfiguration.ShowCloseIcon = true;
             options.SnackbarConfiguration.VisibleStateDuration = 5000;
-            options.SnackbarConfiguration.SnackbarVariant = MudBlazor.Variant.Filled;
+            options.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
         });
 
         return builder;
@@ -318,7 +298,7 @@ public static class ApplicationExtensions
         builder.Services.AddScoped<AwsSession>();
         builder.Services.AddScoped(static p =>
         {
-            // プロファイルは画面で切り替えられるため、クライアント生成のたびにセッションから解決する
+            // Resolved from the session per client because the profile can be switched in the UI
             var session = p.GetRequiredService<AwsSession>();
             return new AwsClientFactory(() => CredentialResolver.Resolve(session.ProfileName, session.Region?.SystemName));
         });
@@ -358,25 +338,6 @@ public static class ApplicationExtensions
 
     public static WebApplication MapEndpoints(this WebApplication app)
     {
-        // Develop
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapOpenApi();
-            // [MEMO] Add yaml support
-            app.MapOpenApi("/openapi/{documentName}.yaml");
-
-            // NSwag UI (SwaggerUI / ReDoc) using MapOpenApi generated specification
-            app.UseSwaggerUi(static options =>
-            {
-                options.DocumentPath = "/openapi/v1.json";
-            });
-            app.UseReDoc(static options =>
-            {
-                options.Path = "/redoc";
-                options.DocumentPath = "/openapi/v1.json";
-            });
-        }
-
         // Static assets
         app.MapStaticAssets();
 
@@ -414,7 +375,7 @@ public static class ApplicationExtensions
     // Profiler
     //--------------------------------------------------------------------------------
 
-    // SQLトレースをログへ出力する(設定で有効化)
+    // Writes SQL traces to the log when enabled by settings
     private static LoggingListener? CreateProfileListener(IServiceProvider provider, ProfilerSetting setting)
     {
         if (!setting.SqlLog.Enable)

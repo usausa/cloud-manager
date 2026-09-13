@@ -22,7 +22,7 @@ public sealed class SsmParameterService
         do
         {
             var request = new DescribeParametersRequest { NextToken = nextToken };
-            if (!string.IsNullOrWhiteSpace(pathPrefix))
+            if (!String.IsNullOrWhiteSpace(pathPrefix))
             {
                 request.ParameterFilters =
                 [
@@ -45,7 +45,7 @@ public sealed class SsmParameterService
             }
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 

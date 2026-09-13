@@ -35,7 +35,7 @@ public sealed class Route53Service
 
             marker = response.IsTruncated.GetValueOrDefault() ? response.NextMarker : null;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return results;
     }
 
@@ -81,10 +81,11 @@ public sealed class Route53Service
         string name,
         string type,
         int ttl,
-        IReadOnlyList<string> values,
+        IEnumerable<string> values,
         CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateRoute53Client();
+#pragma warning disable IDE0028
         await client.ChangeResourceRecordSetsAsync(
             new ChangeResourceRecordSetsRequest
             {
@@ -108,6 +109,7 @@ public sealed class Route53Service
                 }
             },
             cancellationToken);
+#pragma warning restore IDE0028
     }
 
     public async ValueTask DeleteRecordAsync(
@@ -115,10 +117,11 @@ public sealed class Route53Service
         string name,
         string type,
         int ttl,
-        IReadOnlyList<string> values,
+        IEnumerable<string> values,
         CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateRoute53Client();
+#pragma warning disable IDE0028
         await client.ChangeResourceRecordSetsAsync(
             new ChangeResourceRecordSetsRequest
             {
@@ -142,5 +145,6 @@ public sealed class Route53Service
                 }
             },
             cancellationToken);
+#pragma warning restore IDE0028
     }
 }

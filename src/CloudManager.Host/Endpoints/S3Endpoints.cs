@@ -21,7 +21,7 @@ public static class S3Endpoints
     // Handler
     //--------------------------------------------------------------------------------
 
-    // ブラウザの直接ダウンロード用。HTTP リクエストは画面のセッションを持たないため、プロファイル/リージョンはクエリで受け取る
+    // Direct browser download; profile and region are taken from the query
     private static async ValueTask<IResult> HandleDownloadAsync(
         string bucket,
         string? key,

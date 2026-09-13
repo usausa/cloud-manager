@@ -43,7 +43,7 @@ public sealed class EventBridgeService
             }
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 

@@ -1,6 +1,6 @@
 namespace CloudManager.Models.Jobs;
 
-// JobExecutionLog.Status の値
+// Values of JobExecutionLog.Status
 public static class JobExecutionStatus
 {
     public const string Running = nameof(Running);

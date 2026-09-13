@@ -17,7 +17,7 @@ public sealed class CostService
         this.factory = factory;
     }
 
-    // EC2 OnDemand 時間単価を取得して月額を計算する。
+    // Gets the EC2 on-demand hourly price and calculates the monthly cost
     public async ValueTask<CostEstimateResult> EstimateEc2Async(string instanceType, string region, int hours)
     {
         using var pricing = factory.CreatePricingClient();
@@ -37,7 +37,7 @@ public sealed class CostService
         return new CostEstimateResult("EC2", $"{instanceType} Linux OnDemand ({region})", hourlyUsd, monthlyUsd, hours);
     }
 
-    // RDS PostgreSQL OnDemand 時間単価を取得して月額を計算する。
+    // Gets the RDS PostgreSQL on-demand hourly price and calculates the monthly cost
     public async ValueTask<CostEstimateResult> EstimateRdsAsync(string engine, string instanceClass, string region, int hours)
     {
         using var pricing = factory.CreatePricingClient();
@@ -84,7 +84,7 @@ public sealed class CostService
             foreach (var dimension in priceDimensions.EnumerateObject())
             {
                 var pricePerUnit = dimension.Value.GetProperty("pricePerUnit").GetProperty("USD").GetString();
-                if (decimal.TryParse(pricePerUnit, CultureInfo.InvariantCulture, out var price) && price > 0)
+                if (Decimal.TryParse(pricePerUnit, CultureInfo.InvariantCulture, out var price) && price > 0)
                 {
                     return price;
                 }

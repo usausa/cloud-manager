@@ -37,7 +37,7 @@ public sealed class CognitoService
 
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 
@@ -67,7 +67,7 @@ public sealed class CognitoService
 
             paginationToken = response.PaginationToken;
         }
-        while (!string.IsNullOrEmpty(paginationToken));
+        while (!String.IsNullOrEmpty(paginationToken));
         return results;
     }
 

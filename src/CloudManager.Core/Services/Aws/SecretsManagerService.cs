@@ -32,7 +32,7 @@ public sealed class SecretsManagerService
             }
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 

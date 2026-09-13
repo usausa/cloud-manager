@@ -14,7 +14,7 @@ public sealed class CloudWatchService
         this.factory = factory;
     }
 
-    // 単一メトリクスの統計値を取得する。
+    // Gets statistics for a single metric
     public async ValueTask<List<CloudWatchDataPoint>> GetMetricStatisticsAsync(
         string namespaceName,
         string metricName,
@@ -26,7 +26,7 @@ public sealed class CloudWatchService
     {
         using var cw = factory.CreateCloudWatchClient();
         var dimensions = new List<Dimension>();
-        if (!string.IsNullOrWhiteSpace(dimension))
+        if (!String.IsNullOrWhiteSpace(dimension))
         {
             var parts = dimension.Split('=', 2);
             if (parts.Length == 2)
@@ -47,6 +47,7 @@ public sealed class CloudWatchService
                 Statistics = [statistic]
             });
 
+#pragma warning disable IDE0028
         return response.Datapoints
             .OrderBy(d => d.Timestamp)
             .Select(d =>
@@ -61,9 +62,10 @@ public sealed class CloudWatchService
                 return new CloudWatchDataPoint(d.Timestamp ?? default, value, d.Unit ?? string.Empty);
             })
             .ToList();
+#pragma warning restore IDE0028
     }
 
-    // CloudWatch アラーム一覧を取得する。
+    // Lists CloudWatch alarms
     public async ValueTask<List<CloudWatchAlarmInfo>> ListAlarmsAsync(CancellationToken cancellationToken = default)
     {
         using var cw = factory.CreateCloudWatchClient();

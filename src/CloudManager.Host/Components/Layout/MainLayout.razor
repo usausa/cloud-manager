@@ -14,7 +14,7 @@
     <MudDrawer @bind-Open="drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
-    @* MudMainContent 自体に pa-* を付けると AppBar 分の上余白が打ち消されるため内側で余白を取る *@
+    @* Padding on MudMainContent would cancel the AppBar offset, so pad the inner div *@
     <MudMainContent>
         <div class="pa-2">
             <ErrorBoundary @ref="errorBoundary">

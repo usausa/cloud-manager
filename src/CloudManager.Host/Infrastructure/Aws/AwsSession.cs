@@ -5,7 +5,7 @@ using Amazon.Runtime.CredentialManagement;
 
 using CloudManager.Infrastructure.Aws;
 
-// 回線ごとに現在のプロファイル名とリージョンを保持する
+// Holds the current profile name and region per circuit
 public sealed class AwsSession
 {
     public string ProfileName { get; private set; }
@@ -14,7 +14,7 @@ public sealed class AwsSession
 
     public IReadOnlyList<string> AvailableProfiles { get; }
 
-    // 現在のプロファイルが ~/.aws に存在するか。存在しなければAWS呼び出しは資格情報エラーになる
+    // Whether the current profile exists in ~/.aws; AWS calls fail without it
     public bool IsProfileAvailable => AvailableProfiles.Contains(ProfileName, StringComparer.Ordinal);
 
     public AwsSession(ILogger<AwsSession> log, AwsSetting setting)
@@ -28,7 +28,7 @@ public sealed class AwsSession
         AvailableProfiles = LoadProfiles(log);
     }
 
-    // プロファイルとリージョンを切り替える。解決できない場合は例外
+    // Switches the profile and region, throwing when they cannot be resolved
     public void SetProfile(string profileName, string? regionName)
     {
         var (_, region) = CredentialResolver.Resolve(profileName, regionName);
@@ -40,11 +40,13 @@ public sealed class AwsSession
     {
         try
         {
+#pragma warning disable IDE0028
             return new CredentialProfileStoreChain().ListProfiles().Select(static x => x.Name).ToList();
+#pragma warning restore IDE0028
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // 資格情報ファイルが壊れていても画面は出す
+            // Keep the UI working even if the credentials file is broken
             log.WarnAwsProfileLoadFailed(ex);
             return [];
         }

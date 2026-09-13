@@ -27,7 +27,7 @@ public sealed class SqsService
             urls.AddRange(listResponse.QueueUrls ?? []);
             nextToken = listResponse.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
 
         var result = new List<SqsQueueInfo>();
 
@@ -41,10 +41,10 @@ public sealed class SqsService
                 });
 
             var name = url.Split('/').LastOrDefault() ?? url;
-            _ = int.TryParse(attrResponse.Attributes.GetValueOrDefault("ApproximateNumberOfMessages", "0"), out var messages);
-            _ = int.TryParse(attrResponse.Attributes.GetValueOrDefault("ApproximateNumberOfMessagesNotVisible", "0"), out var notVisible);
-            _ = int.TryParse(attrResponse.Attributes.GetValueOrDefault("DelaySeconds", "0"), out var delay);
-            _ = int.TryParse(attrResponse.Attributes.GetValueOrDefault("VisibilityTimeout", "30"), out var visibility);
+            _ = Int32.TryParse(attrResponse.Attributes.GetValueOrDefault("ApproximateNumberOfMessages", "0"), out var messages);
+            _ = Int32.TryParse(attrResponse.Attributes.GetValueOrDefault("ApproximateNumberOfMessagesNotVisible", "0"), out var notVisible);
+            _ = Int32.TryParse(attrResponse.Attributes.GetValueOrDefault("DelaySeconds", "0"), out var delay);
+            _ = Int32.TryParse(attrResponse.Attributes.GetValueOrDefault("VisibilityTimeout", "30"), out var visibility);
 
             result.Add(new SqsQueueInfo(new Uri(url), name, messages, notVisible, delay, visibility));
         }
@@ -88,6 +88,7 @@ public sealed class SqsService
             },
             cancellationToken);
 
+#pragma warning disable IDE0028
         return (response.Messages ?? [])
             .Select(m => new SqsMessageInfo(
                 m.MessageId,
@@ -95,6 +96,7 @@ public sealed class SqsService
                 m.Body,
                 m.Attributes.GetValueOrDefault("ApproximateFirstReceiveTimestamp")))
             .ToList();
+#pragma warning restore IDE0028
     }
 
     public async ValueTask PurgeQueueAsync(Uri queueUrl, CancellationToken cancellationToken = default)

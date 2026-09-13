@@ -27,7 +27,9 @@ public sealed partial class JobService
     public async ValueTask<List<JobDefinition>> QueryAllAsync(CancellationToken cancellationToken = default)
     {
         var entities = await jobAccessor.QueryAllAsync(cancellationToken);
+#pragma warning disable IDE0028
         return entities.Select(ToModel).ToList();
+#pragma warning restore IDE0028
     }
 
     public async ValueTask<JobDefinition?> QueryAsync(long id, CancellationToken cancellationToken = default)
@@ -36,7 +38,7 @@ public sealed partial class JobService
         return entity is null ? null : ToModel(entity);
     }
 
-    // 作成日時・更新日時はここで採番する
+    // Created and updated timestamps are assigned here
     public ValueTask<long> InsertAsync(JobDefinition job, CancellationToken cancellationToken = default)
     {
         var now = timeProvider.GetLocalNow().DateTime;
@@ -83,7 +85,7 @@ public sealed partial class JobService
         return rows > 0;
     }
 
-    // パラメータはJSON、列挙は名前で保存する
+    // Parameters are stored as JSON and enums by name
     [Mapper]
     [MapProperty(nameof(JobDefinition.Parameters), nameof(JobDefinitionEntity.ParametersJson), Converter = nameof(DeserializeParameters))]
     private static partial JobDefinition ToModel(JobDefinitionEntity entity);

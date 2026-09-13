@@ -21,7 +21,7 @@ public sealed partial class JobEditDialog
     [CascadingParameter]
     public required IMudDialogInstance MudDialog { get; set; }
 
-    // サービスを変えたら操作はそのサービスの先頭に合わせる
+    // Reset the operation to the first one of the selected service
     private void OnServiceTypeChanged(JobServiceType serviceType)
     {
         Form.ServiceType = serviceType;

@@ -6,7 +6,7 @@ using Amazon.RDS.Model;
 using CloudManager.Infrastructure.Aws;
 using CloudManager.Models.Aws.Rds;
 
-// RDS イベント操作
+// RDS event operations
 public sealed class RdsEventService
 {
     private readonly AwsClientFactory factory;
@@ -38,12 +38,12 @@ public sealed class RdsEventService
                 result.Add(new RdsEventInfo(
                     e.SourceIdentifier ?? string.Empty,
                     e.Message ?? string.Empty,
-                    string.Join(", ", e.EventCategories ?? []),
+                    String.Join(", ", e.EventCategories ?? []),
                     e.Date.GetValueOrDefault()));
             }
             marker = response.Marker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return result;
     }
 }

@@ -148,7 +148,7 @@
                 <MudTd>@context.ClusterId</MudTd>
                 <MudTd>@context.Engine</MudTd>
                 <MudTd><MudChip T="string" Color="@RdsStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
-                <MudTd>@string.Join(", ", context.Members.Select(m => $"{m.Id}({m.Role})"))</MudTd>
+                <MudTd>@String.Join(", ", context.Members.Select(m => $"{m.Id}({m.Role})"))</MudTd>
                 <MudTd>
                     <MudTooltip Text="Failover">
                         <MudIconButton Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Small" Color="Color.Warning"

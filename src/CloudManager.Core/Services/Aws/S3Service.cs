@@ -16,17 +16,19 @@ public sealed class S3Service
         this.factory = factory;
     }
 
-    // バケット一覧を取得する。
+    // Lists buckets
     public async ValueTask<List<S3BucketInfo>> ListBucketsAsync()
     {
         using var s3 = factory.CreateS3Client();
         var response = await s3.ListBucketsAsync();
+#pragma warning disable IDE0028
         return response.Buckets
             .Select(b => new S3BucketInfo(b.BucketName, b.CreationDate.GetValueOrDefault()))
             .ToList();
+#pragma warning restore IDE0028
     }
 
-    // 指定バケットのオブジェクト一覧を取得する(ページング対応)。
+    // Lists objects in a bucket (paged)
     public async ValueTask<List<S3ObjectInfo>> ListObjectsAsync(string bucketName, string? prefix)
     {
         using var s3 = factory.CreateS3Client();
@@ -40,7 +42,7 @@ public sealed class S3Service
                 BucketName = bucketName,
                 ContinuationToken = continuationToken
             };
-            if (!string.IsNullOrWhiteSpace(prefix))
+            if (!String.IsNullOrWhiteSpace(prefix))
             {
                 request.Prefix = prefix;
             }
@@ -63,7 +65,7 @@ public sealed class S3Service
         return result;
     }
 
-    // ストリームを S3 にアップロードする(TransferUtility + 進捗)。
+    // Uploads a stream with TransferUtility, reporting progress
     public async ValueTask UploadStreamAsync(string bucketName, string key, Stream stream, long totalBytes, IProgress<ProgressUpdate>? progress, CancellationToken cancellationToken)
     {
         using var s3 = factory.CreateS3Client();
@@ -87,7 +89,7 @@ public sealed class S3Service
             cancellationToken);
     }
 
-    // S3 からバイト配列としてダウンロードする(進捗付き)。
+    // Downloads an object as a byte array, reporting progress
     public async ValueTask<byte[]> DownloadBytesAsync(string bucketName, string key, IProgress<ProgressUpdate>? progress, CancellationToken cancellationToken)
     {
         using var s3 = factory.CreateS3Client();
@@ -116,7 +118,7 @@ public sealed class S3Service
         return ms.ToArray();
     }
 
-    // オブジェクトのメタデータを取得する。存在しない場合は null
+    // Gets object metadata, or null when the object does not exist
     public async ValueTask<S3ObjectHead?> HeadObjectAsync(string bucketName, string key, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -137,7 +139,7 @@ public sealed class S3Service
         }
     }
 
-    // オブジェクトを出力ストリームへそのまま流す(ダウンロード配信用)。
+    // Copies an object to the output stream for download delivery
     public async ValueTask DownloadToStreamAsync(string bucketName, string key, Stream destination, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -151,7 +153,7 @@ public sealed class S3Service
         await response.ResponseStream.CopyToAsync(destination, cancellationToken);
     }
 
-    // オブジェクトを削除する。
+    // Deletes an object
     public async ValueTask DeleteObjectAsync(string bucketName, string key, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -164,7 +166,7 @@ public sealed class S3Service
             cancellationToken);
     }
 
-    // 複数オブジェクトを一括削除する。
+    // Deletes multiple objects at once
     public async ValueTask DeleteObjectsAsync(string bucketName, IEnumerable<string> keys, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -182,7 +184,7 @@ public sealed class S3Service
         }
     }
 
-    // 指定プレフィックス配下のオブジェクトを全件削除する(進捗付き)。
+    // Deletes all objects under a prefix, reporting progress
     public async ValueTask DeleteObjectsByPrefixAsync(string bucketName, string prefix, IProgress<ProgressUpdate>? progress, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -220,7 +222,7 @@ public sealed class S3Service
         while (continuationToken is not null);
     }
 
-    // バケットの公開設定を確認する。
+    // Checks the public access settings of a bucket
     public async ValueTask<S3PublicAccessReport> GetBucketPublicAccessAsync(string bucketName)
     {
         using var s3 = factory.CreateS3Client();
@@ -254,7 +256,7 @@ public sealed class S3Service
             verdict);
     }
 
-    // バージョン一覧を取得する。
+    // Lists object versions
     public async ValueTask<List<S3VersionInfo>> ListVersionsAsync(string bucketName, string key)
     {
         using var s3 = factory.CreateS3Client();
@@ -292,10 +294,12 @@ public sealed class S3Service
             }
         }
         while (true);
-        return [.. result.OrderByDescending(v => v.LastModified)];
+#pragma warning disable IDE0028
+        return result.OrderByDescending(v => v.LastModified).ToList();
+#pragma warning restore IDE0028
     }
 
-    // バージョンを復元する(CopyObject で同一キーに上書き)。
+    // Restores a version by copying it over the same key
     public async ValueTask RestoreVersionAsync(string bucketName, string key, string versionId, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -311,7 +315,7 @@ public sealed class S3Service
             cancellationToken);
     }
 
-    // オブジェクトをコピーする。
+    // Copies an object
     public async ValueTask CopyObjectAsync(string srcBucket, string srcKey, string dstBucket, string dstKey, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
@@ -326,20 +330,21 @@ public sealed class S3Service
             cancellationToken);
     }
 
-    // オブジェクトを移動する(コピー後削除)。
+    // Moves an object by copying and deleting
     public async ValueTask MoveObjectAsync(string srcBucket, string srcKey, string dstBucket, string dstKey, CancellationToken cancellationToken = default)
     {
         await CopyObjectAsync(srcBucket, srcKey, dstBucket, dstKey, cancellationToken);
         await DeleteObjectAsync(srcBucket, srcKey, cancellationToken);
     }
 
-    // ライフサイクルルール一覧を取得する。
+    // Lists lifecycle rules
     public async ValueTask<List<S3LifecycleRuleInfo>> GetLifecycleAsync(string bucketName)
     {
         using var s3 = factory.CreateS3Client();
         try
         {
             var response = await s3.GetLifecycleConfigurationAsync(bucketName);
+#pragma warning disable IDE0028
             return response.Configuration.Rules
                 .Select(r => new S3LifecycleRuleInfo(
                     r.Id ?? string.Empty,
@@ -349,6 +354,7 @@ public sealed class S3Service
                     r.Expiration != null ? $"{r.Expiration.Days}d" : null,
                     r.NoncurrentVersionExpiration != null ? $"{r.NoncurrentVersionExpiration.NoncurrentDays}d" : null))
                 .ToList();
+#pragma warning restore IDE0028
         }
         catch (AmazonS3Exception ex) when (ex.ErrorCode == "NoSuchLifecycleConfiguration")
         {
@@ -356,7 +362,7 @@ public sealed class S3Service
         }
     }
 
-    // デリミタ付きでオブジェクト一覧を取得する(フォルダビュー用)。
+    // Lists objects with a delimiter for the folder view
     public async ValueTask<S3Listing> ListObjectsWithDelimiterAsync(string bucketName, string prefix)
     {
         using var s3 = factory.CreateS3Client();

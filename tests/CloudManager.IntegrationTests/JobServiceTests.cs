@@ -39,7 +39,7 @@ public sealed class JobServiceTests : IClassFixture<TestApplicationFactory>
         (JobServiceType.CloudFront, JobOperation.CloudFrontInvalidate, new CloudFrontInvalidateParameters("E123", "/*"))
     ];
 
-    // 操作ごとのパラメータがJSONで往復すること
+    // Operation parameters round-trip through JSON
     [Theory]
     [MemberData(nameof(Parameters))]
     public async Task ParametersRoundTrip(JobServiceType serviceType, JobOperation operation, JobParameters parameters)
@@ -62,7 +62,7 @@ public sealed class JobServiceTests : IClassFixture<TestApplicationFactory>
         Assert.Equal(parameters, restored.Parameters);
     }
 
-    // SQLite への保存と読み出しが往復すること(日時・JSON・列挙の変換を含む)
+    // Definitions round-trip through SQLite including date, JSON and enum conversion
     [Fact]
     public async Task JobDefinitionRoundTrip()
     {

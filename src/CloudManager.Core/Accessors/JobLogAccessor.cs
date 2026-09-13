@@ -18,7 +18,7 @@ public sealed partial class JobLogAccessor
     [Execute]
     public partial ValueTask<int> UpdateAsync(long id, DateTime finishedAt, string status, string? message, string? errorDetail, CancellationToken cancellationToken);
 
-    // ジョブごとに直近retainCount件だけ残して削除する
+    // Keep only the latest retainCount logs per job
     [Execute]
     public partial ValueTask<int> TrimAsync(long jobId, int retainCount, CancellationToken cancellationToken);
 }

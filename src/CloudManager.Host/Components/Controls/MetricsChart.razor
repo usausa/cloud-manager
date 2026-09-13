@@ -4,7 +4,7 @@
 }
 else
 {
-    <MudText Typo="Typo.subtitle2" Class="mb-1">@Title @(Unit is not null ? $"({Unit})" : String.Empty)</MudText>
+    <MudText Typo="Typo.subtitle2" Class="mb-1">@Title @(Unit is not null ? $"({Unit})" : string.Empty)</MudText>
     <MudChart T="double" ChartType="ChartType.Line"
               ChartSeries="chartSeries"
               ChartLabels="labels"

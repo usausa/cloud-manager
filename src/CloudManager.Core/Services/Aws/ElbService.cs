@@ -36,7 +36,7 @@ public sealed class ElbService
             }
             marker = response.NextMarker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return results;
     }
 
@@ -48,7 +48,7 @@ public sealed class ElbService
         do
         {
             var request = new DescribeTargetGroupsRequest { Marker = marker };
-            if (!string.IsNullOrWhiteSpace(loadBalancerArn))
+            if (!String.IsNullOrWhiteSpace(loadBalancerArn))
             {
                 request.LoadBalancerArn = loadBalancerArn;
             }
@@ -65,7 +65,7 @@ public sealed class ElbService
             }
             marker = response.NextMarker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return results;
     }
 
@@ -76,11 +76,13 @@ public sealed class ElbService
         {
             TargetGroupArn = targetGroupArn
         });
+#pragma warning disable IDE0028
         return (response.TargetHealthDescriptions ?? []).Select(t => new TargetHealthInfo(
             t.Target?.Id ?? string.Empty,
             t.Target?.Port.GetValueOrDefault() ?? 0,
             t.TargetHealth?.State?.Value ?? string.Empty,
             t.TargetHealth?.Reason?.Value,
             t.TargetHealth?.Description)).ToList();
+#pragma warning restore IDE0028
     }
 }

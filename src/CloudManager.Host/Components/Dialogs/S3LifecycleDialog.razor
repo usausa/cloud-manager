@@ -25,7 +25,7 @@
                     <MudTd>@context.Id</MudTd>
                     <MudTd>@(String.IsNullOrEmpty(context.Prefix) ? "(なし)" : context.Prefix)</MudTd>
                     <MudTd>@context.Status</MudTd>
-                    <MudTd>@(context.Transitions.Count > 0 ? string.Join(", ", context.Transitions) : "-")</MudTd>
+                    <MudTd>@(context.Transitions.Count > 0 ? String.Join(", ", context.Transitions) : "-")</MudTd>
                     <MudTd>@(context.Expiration ?? "-")</MudTd>
                 </RowTemplate>
             </MudTable>

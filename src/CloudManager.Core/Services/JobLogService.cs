@@ -26,7 +26,7 @@ public sealed class JobLogService
     public ValueTask<List<JobExecutionLogEntity>> QueryRecentAsync(int limit, CancellationToken cancellationToken = default) =>
         jobLogAccessor.QueryRecentAsync(limit, cancellationToken);
 
-    // 実行開始を記録し、ログIDを返す
+    // Records the start of an execution and returns the log id
     public ValueTask<long> StartAsync(long jobId, string jobName, CancellationToken cancellationToken = default) =>
         jobLogAccessor.InsertAsync(jobId, jobName, timeProvider.GetLocalNow().DateTime, JobExecutionStatus.Running, cancellationToken);
 

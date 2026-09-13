@@ -2,7 +2,7 @@ namespace CloudManager.Host.Infrastructure.Filters;
 
 using Amazon.Runtime;
 
-// AWS 呼び出しの失敗を ProblemDetails に変換する
+// Converts AWS call failures to ProblemDetails
 public sealed class AwsExceptionFilter : IEndpointFilter
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
@@ -20,7 +20,7 @@ public sealed class AwsExceptionFilter : IEndpointFilter
         }
         catch (InvalidOperationException ex)
         {
-            // プロファイル/リージョン未解決
+            // Unresolved profile or region
             return TypedResults.Problem(statusCode: StatusCodes.Status400BadRequest, title: ex.Message);
         }
     }

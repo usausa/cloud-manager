@@ -4,7 +4,7 @@ using CloudManager.Host.Infrastructure.Jobs;
 
 using Mofucat.JobScheduler;
 
-// スケジューラの起動/停止と、起動時のジョブ登録
+// Starts and stops the scheduler and registers jobs at startup
 public sealed class JobSchedulerWorker : IHostedService
 {
     private readonly ILogger<JobSchedulerWorker> log;

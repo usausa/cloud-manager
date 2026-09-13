@@ -1,6 +1,6 @@
 namespace CloudManager.Models.Jobs;
 
-// サービス別に選択できる操作と表示名
+// Selectable operations and display names per service
 public static class JobOperationCatalog
 {
     public static IReadOnlyList<JobOperation> ForService(JobServiceType type) => type switch

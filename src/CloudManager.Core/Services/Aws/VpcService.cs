@@ -14,12 +14,13 @@ public sealed class VpcService
         this.factory = factory;
     }
 
-    // VPC 一覧を取得する。
+    // Lists VPCs
     public async ValueTask<List<VpcInfo>> ListVpcsAsync()
     {
         using var ec2 = factory.CreateEc2Client();
         var response = await ec2.DescribeVpcsAsync(
             new DescribeVpcsRequest());
+#pragma warning disable IDE0028
         return (response.Vpcs ?? [])
             .Select(v => new VpcInfo(
                 v.VpcId,
@@ -28,9 +29,10 @@ public sealed class VpcService
                 v.IsDefault.GetValueOrDefault(),
                 v.State.Value))
             .ToList();
+#pragma warning restore IDE0028
     }
 
-    // 指定 VPC の詳細を取得する。
+    // Gets the details of a VPC
     public async ValueTask<VpcDetail> GetVpcDetailAsync(string vpcId)
     {
         using var ec2 = factory.CreateEc2Client();

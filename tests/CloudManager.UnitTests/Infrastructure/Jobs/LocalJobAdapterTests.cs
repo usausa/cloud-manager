@@ -8,7 +8,7 @@ public sealed class LocalJobAdapterTests
 {
     private static readonly TimeSpan Jst = TimeSpan.FromHours(9);
 
-    // cron はローカル時刻のフィールドで評価される
+    // Cron is evaluated against local time fields
     [Theory]
     [InlineData("0 9 * * *", 9, 0, true)]
     [InlineData("0 9 * * *", 9, 1, false)]

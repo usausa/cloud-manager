@@ -2,7 +2,7 @@ namespace CloudManager.Models.Jobs;
 
 public sealed class JobOperationCatalogTests
 {
-    // 全操作がいずれかのサービスに属し、重複しないこと
+    // Every operation belongs to exactly one service
     [Fact]
     public void EveryOperationBelongsToExactlyOneService()
     {

@@ -6,7 +6,7 @@ using CloudManager.Infrastructure.Aws;
 using CloudManager.Models.Jobs;
 using CloudManager.Services.Aws;
 
-// ジョブ定義に対応するAWS操作を実行し、結果を実行履歴に記録する
+// Executes the AWS operation of a job definition and records the result
 public sealed class JobExecutionService
 {
     private readonly ILogger<JobExecutionService> log;
@@ -25,7 +25,7 @@ public sealed class JobExecutionService
         this.jobLogService = jobLogService;
     }
 
-    // 実行結果のステータス(JobExecutionStatus)を返す
+    // Returns the resulting JobExecutionStatus
     public async ValueTask<string> ExecuteAsync(JobDefinition job, CancellationToken cancellationToken)
     {
         log.InfoJobStart(job.Id, job.Name, job.Operation);
@@ -36,7 +36,7 @@ public sealed class JobExecutionService
         string? errorDetail = null;
         try
         {
-            // ジョブは画面のセッションとは独立に、定義されたプロファイルで実行する
+            // Jobs run with the profile of the definition, independent of the UI session
             var factory = AwsClientFactory.Create(job.ProfileName, job.RegionName);
             message = await DispatchAsync(factory, job, cancellationToken);
             status = JobExecutionStatus.Success;
@@ -60,7 +60,7 @@ public sealed class JobExecutionService
             log.WarnJobFailed(job.Id, job.Name, ex.Message, ex);
         }
 
-        // 停止中でも結果は残す
+        // Record the result even while shutting down
         await jobLogService.FinishAsync(logId, status, message, errorDetail, CancellationToken.None);
         await jobLogService.TrimAsync(job.Id, options.LogRetentionCountPerJob, CancellationToken.None);
 
@@ -132,7 +132,7 @@ public sealed class JobExecutionService
         }
     }
 
-    // ジョブ実行では進捗を使わない
+    // Progress is not used for job execution
     private sealed class NullProgress : IProgress<ProgressUpdate>
     {
         public static NullProgress Instance { get; } = new();

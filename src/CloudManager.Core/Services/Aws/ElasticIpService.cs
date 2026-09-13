@@ -18,6 +18,7 @@ public sealed class ElasticIpService
     {
         using var ec2 = factory.CreateEc2Client();
         var response = await ec2.DescribeAddressesAsync(new DescribeAddressesRequest());
+#pragma warning disable IDE0028
         return (response.Addresses ?? [])
             .Select(a => new ElasticIpInfo(
                 a.AllocationId ?? string.Empty,
@@ -26,6 +27,7 @@ public sealed class ElasticIpService
                 a.InstanceId,
                 a.NetworkInterfaceId))
             .ToList();
+#pragma warning restore IDE0028
     }
 
     public async ValueTask AssociateElasticIpAsync(string allocationId, string instanceId, CancellationToken cancellationToken = default)

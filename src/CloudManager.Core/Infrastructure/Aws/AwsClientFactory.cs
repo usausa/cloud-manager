@@ -24,8 +24,7 @@ using Amazon.SimpleNotificationService;
 using Amazon.SimpleSystemsManagement;
 using Amazon.SQS;
 
-// AWS サービスクライアントを生成するファクトリ。資格情報とリージョンはクライアント生成のたびに resolver で解決する
-// 生成したクライアントの破棄は呼び出し側が行う
+// Creates AWS clients, resolving credentials and region on every call
 public sealed class AwsClientFactory
 {
     private readonly Func<(AWSCredentials Credentials, RegionEndpoint Region)> resolver;
@@ -35,7 +34,7 @@ public sealed class AwsClientFactory
         this.resolver = resolver;
     }
 
-    // プロファイル/リージョンを固定して生成する(ジョブ実行向け)
+    // Creates a factory bound to a fixed profile and region (for job execution)
     public static AwsClientFactory Create(string profileName, string regionName) =>
         new(() => CredentialResolver.Resolve(profileName, regionName));
 
@@ -101,7 +100,7 @@ public sealed class AwsClientFactory
         return new AmazonSimpleSystemsManagementClient(credentials, region);
     }
 
-    // Pricing API は us-east-1 固定
+    // Pricing API is only available in us-east-1
     public AmazonPricingClient CreatePricingClient()
     {
         var (credentials, _) = Resolve();
@@ -138,7 +137,7 @@ public sealed class AwsClientFactory
         return new AmazonElasticLoadBalancingV2Client(credentials, region);
     }
 
-    // Route53 はグローバルエンドポイント
+    // Route53 uses the global endpoint
     public AmazonRoute53Client CreateRoute53Client()
     {
         var (credentials, _) = Resolve();

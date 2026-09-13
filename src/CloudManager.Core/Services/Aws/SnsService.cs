@@ -30,11 +30,11 @@ public sealed class SnsService
                 results.Add(new SnsTopicInfo(
                     t.TopicArn ?? string.Empty,
                     displayName ?? string.Empty,
-                    int.TryParse(subCount, out var n) ? n : 0));
+                    Int32.TryParse(subCount, out var n) ? n : 0));
             }
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 
@@ -59,7 +59,7 @@ public sealed class SnsService
             }
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 
@@ -75,7 +75,7 @@ public sealed class SnsService
             TopicArn = topicArn,
             Message = message
         };
-        if (!string.IsNullOrWhiteSpace(subject))
+        if (!String.IsNullOrWhiteSpace(subject))
         {
             request.Subject = subject;
         }

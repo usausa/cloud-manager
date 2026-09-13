@@ -18,7 +18,7 @@ public sealed class EbsService
     {
         using var ec2 = factory.CreateEc2Client();
         var filters = new List<Filter>();
-        if (!string.IsNullOrEmpty(state))
+        if (!String.IsNullOrEmpty(state))
         {
             filters.Add(new Filter("status", [state]));
         }
@@ -48,7 +48,7 @@ public sealed class EbsService
 
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
         return results;
     }
 

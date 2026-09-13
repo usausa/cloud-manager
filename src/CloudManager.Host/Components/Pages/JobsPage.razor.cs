@@ -33,12 +33,14 @@ public sealed partial class JobsPage
         LoadAsync(async () =>
         {
             var jobs = await JobService.QueryAllAsync(CancellationToken);
+#pragma warning disable IDE0028
             rows = jobs.Select(x => new JobRow(x, Manager.GetNextExecutionTime(x))).ToList();
+#pragma warning restore IDE0028
         });
 
     private async Task AddAsync()
     {
-        // 新規は現在のセッションのプロファイル/リージョンを初期値にする
+        // New jobs default to the profile and region of the current session
         var form = await ShowEditDialog("ジョブ追加", new JobForm
         {
             ProfileName = Session.ProfileName,
@@ -132,7 +134,7 @@ public sealed partial class JobsPage
         return (result is { Canceled: false }) ? (JobForm)result.Data! : null;
     }
 
-    // 共通項目は生成マッパで写し、操作ごとのパラメータはフォームの該当項目へ展開する
+    // Common fields use the generated mapper, parameters are expanded per operation
     [Mapper]
     [AfterMap(nameof(ExpandParameters))]
     private static partial JobForm ToForm(JobDefinition job);

@@ -25,8 +25,6 @@ builder.ConfigureHttp();
 builder.ConfigureApi();
 // Compress
 builder.ConfigureCompression();
-// OpenApi
-builder.ConfigureOpenApi();
 
 // Blazor
 builder.ConfigureBlazor();
@@ -38,7 +36,7 @@ builder.ConfigureHealth();
 builder.ConfigureComponents();
 
 //--------------------------------------------------------------------------------
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 //--------------------------------------------------------------------------------
 var app = builder.Build();
 

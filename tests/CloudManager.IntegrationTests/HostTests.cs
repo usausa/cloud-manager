@@ -52,7 +52,7 @@ public sealed class HostTests : IClassFixture<TestApplicationFactory>
         Assert.Contains("ページが見つかりません", content, StringComparison.Ordinal);
     }
 
-    // API は HTML ではなく素の 404
+    // API returns a plain 404 instead of HTML
     [Fact]
     public async Task UnknownApiReturnsPlainNotFound()
     {
@@ -81,7 +81,7 @@ public sealed class HostTests : IClassFixture<TestApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    // 存在しないプロファイルは AWS へ接続せずに ProblemDetails で返す
+    // An unknown profile returns ProblemDetails without calling AWS
     [Fact]
     public async Task S3DownloadWithUnknownProfileReturnsProblem()
     {

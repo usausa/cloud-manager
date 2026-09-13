@@ -40,7 +40,7 @@ public sealed class JobFormValidatorTests
         Assert.Contains(result.Errors, static x => x.PropertyName == nameof(JobForm.CronExpression));
     }
 
-    // 操作に応じた必須項目だけが検証される
+    // Only the fields required by the operation are validated
     [Fact]
     public void OperationSpecificParametersAreRequired()
     {

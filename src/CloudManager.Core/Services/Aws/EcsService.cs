@@ -15,7 +15,7 @@ public sealed class EcsService
         this.factory = factory;
     }
 
-    // ECS クラスター一覧を取得する(ページング対応)。
+    // Lists ECS clusters (paged)
     public async ValueTask<List<EcsClusterInfo>> ListClustersAsync()
     {
         using var ecs = factory.CreateEcsClient();
@@ -29,7 +29,7 @@ public sealed class EcsService
             arns.AddRange(listResponse.ClusterArns);
             nextToken = listResponse.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
 
         if (arns.Count == 0)
         {
@@ -38,6 +38,7 @@ public sealed class EcsService
 
         var descResponse = await ecs.DescribeClustersAsync(
             new DescribeClustersRequest { Clusters = arns });
+#pragma warning disable IDE0028
         return descResponse.Clusters
             .Select(c => new EcsClusterInfo(
                 c.ClusterArn,
@@ -46,9 +47,10 @@ public sealed class EcsService
                 c.ActiveServicesCount.GetValueOrDefault(),
                 c.RunningTasksCount.GetValueOrDefault()))
             .ToList();
+#pragma warning restore IDE0028
     }
 
-    // 指定クラスターのサービス一覧を取得する(ページング対応)。
+    // Lists services in a cluster (paged)
     public async ValueTask<List<EcsServiceInfo>> ListServicesAsync(string clusterName)
     {
         using var ecs = factory.CreateEcsClient();
@@ -66,7 +68,7 @@ public sealed class EcsService
             arns.AddRange(listResponse.ServiceArns);
             nextToken = listResponse.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
 
         if (arns.Count == 0)
         {
@@ -80,6 +82,7 @@ public sealed class EcsService
                 Services = arns
             });
 
+#pragma warning disable IDE0028
         return descResponse.Services
             .Select(s => new EcsServiceInfo(
                 s.ServiceName,
@@ -89,9 +92,10 @@ public sealed class EcsService
                 s.PendingCount.GetValueOrDefault(),
                 s.TaskDefinition))
             .ToList();
+#pragma warning restore IDE0028
     }
 
-    // ECS タスクを実行する。FARGATE の場合は subnetId / securityGroupId が必要。
+    // Runs an ECS task; FARGATE requires subnetId and securityGroupId
     public async ValueTask<string> RunTaskAsync(string clusterName, string taskDefinition, string launchType, string? subnetId, string? securityGroupId, bool assignPublicIp, CancellationToken cancellationToken = default)
     {
         using var ecs = factory.CreateEcsClient();
@@ -103,7 +107,7 @@ public sealed class EcsService
             Count = 1
         };
 
-        if (string.Equals(launchType, "FARGATE", StringComparison.OrdinalIgnoreCase))
+        if (String.Equals(launchType, "FARGATE", StringComparison.OrdinalIgnoreCase))
         {
             request.NetworkConfiguration = new NetworkConfiguration
             {
@@ -129,7 +133,7 @@ public sealed class EcsService
         return response.Tasks[0].TaskArn;
     }
 
-    // ECS サービスの希望タスク数を変更する。
+    // Changes the desired task count of a service
     public async ValueTask UpdateServiceDesiredCountAsync(string clusterName, string serviceName, int desiredCount, CancellationToken cancellationToken = default)
     {
         using var ecs = factory.CreateEcsClient();
@@ -143,7 +147,7 @@ public sealed class EcsService
             cancellationToken);
     }
 
-    // サービスのタスク一覧を取得する。
+    // Lists tasks of a service
     public async ValueTask<List<EcsTaskInfo>> ListTasksAsync(string clusterName, string? serviceName)
     {
         using var ecs = factory.CreateEcsClient();
@@ -152,7 +156,7 @@ public sealed class EcsService
         do
         {
             var request = new ListTasksRequest { Cluster = clusterName, NextToken = nextToken };
-            if (!string.IsNullOrEmpty(serviceName))
+            if (!String.IsNullOrEmpty(serviceName))
             {
                 request.ServiceName = serviceName;
             }
@@ -160,7 +164,7 @@ public sealed class EcsService
             arns.AddRange(listResponse.TaskArns);
             nextToken = listResponse.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
 
         if (arns.Count == 0)
         {
@@ -168,6 +172,7 @@ public sealed class EcsService
         }
 
         var descResponse = await ecs.DescribeTasksAsync(new DescribeTasksRequest { Cluster = clusterName, Tasks = arns });
+#pragma warning disable IDE0028
         return (descResponse.Tasks ?? []).Select(t => new EcsTaskInfo(
             t.TaskArn,
             t.TaskArn.Split('/').Last(),
@@ -175,9 +180,10 @@ public sealed class EcsService
             t.LastStatus ?? string.Empty,
             t.StartedBy ?? string.Empty,
             t.StartedAt == DateTime.MinValue ? null : t.StartedAt)).ToList();
+#pragma warning restore IDE0028
     }
 
-    // サービスを強制再デプロイする(イメージ更新反映)。
+    // Forces a new deployment of a service to pick up image updates
     public async ValueTask ForceRedeployAsync(string clusterName, string serviceName, CancellationToken cancellationToken = default)
     {
         using var ecs = factory.CreateEcsClient();

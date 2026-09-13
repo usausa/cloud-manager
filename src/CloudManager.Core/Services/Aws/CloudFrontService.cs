@@ -16,7 +16,7 @@ public sealed class CloudFrontService
         this.factory = factory;
     }
 
-    // CloudFront ディストリビューション一覧を取得する(ページング対応)。
+    // Lists CloudFront distributions (paged)
     public async ValueTask<List<CloudFrontDistributionInfo>> ListDistributionsAsync()
     {
         using var cloudFront = factory.CreateCloudFrontClient();
@@ -35,7 +35,7 @@ public sealed class CloudFrontService
 
             foreach (var dist in list.Items)
             {
-                var origins = string.Join(", ", dist.Origins.Items.Select(o => o.DomainName));
+                var origins = String.Join(", ", dist.Origins.Items.Select(o => o.DomainName));
                 result.Add(new CloudFrontDistributionInfo(
                     dist.Id,
                     dist.DomainName,
@@ -51,10 +51,11 @@ public sealed class CloudFrontService
         return result;
     }
 
-    // CloudFront キャッシュを無効化する。
+    // Invalidates CloudFront cache
     public async ValueTask InvalidateCacheAsync(string distributionId, IReadOnlyList<string> paths, CancellationToken cancellationToken = default)
     {
         using var cloudFront = factory.CreateCloudFrontClient();
+#pragma warning disable IDE0028
         var request = new CreateInvalidationRequest
         {
             DistributionId = distributionId,
@@ -64,10 +65,11 @@ public sealed class CloudFrontService
                 Paths = new Paths
                 {
                     Quantity = paths.Count,
-                    Items = [.. paths]
+                    Items = paths.ToList()
                 }
             }
         };
+#pragma warning restore IDE0028
         await cloudFront.CreateInvalidationAsync(
             request,
             cancellationToken);

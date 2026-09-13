@@ -143,11 +143,13 @@ public sealed partial class CloudWatchLogsPage
             }
             while (result.Status is "Running" or "Scheduled" && attempts < 30);
 
+#pragma warning disable IDE0028
             insightResults = result.Records.Select(static x => new InsightRow(x)).ToList();
             if (result.Records.Count > 0)
             {
-                insightColumns = [.. result.Records[0].Keys];
+                insightColumns = result.Records[0].Keys.ToList();
             }
+#pragma warning restore IDE0028
         });
     }
 

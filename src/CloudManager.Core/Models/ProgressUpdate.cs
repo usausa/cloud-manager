@@ -1,4 +1,4 @@
 namespace CloudManager.Models;
 
-// 進捗更新情報。
+// Progress information
 public sealed record ProgressUpdate(double Ratio, string? Message);

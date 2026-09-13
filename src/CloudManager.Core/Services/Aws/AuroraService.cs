@@ -5,7 +5,7 @@ using Amazon.RDS.Model;
 using CloudManager.Infrastructure.Aws;
 using CloudManager.Models.Aws.Rds;
 
-// Aurora クラスタ操作
+// Aurora cluster operations
 public sealed class AuroraService
 {
     private readonly AwsClientFactory factory;
@@ -40,7 +40,7 @@ public sealed class AuroraService
             }
             marker = response.Marker;
         }
-        while (!string.IsNullOrEmpty(marker));
+        while (!String.IsNullOrEmpty(marker));
         return result;
     }
 

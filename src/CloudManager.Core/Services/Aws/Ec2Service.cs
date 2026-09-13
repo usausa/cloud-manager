@@ -17,17 +17,17 @@ public sealed class Ec2Service
         this.factory = factory;
     }
 
-    // EC2 インスタンスを全件取得する(ページング対応)。
+    // Lists all EC2 instances (paged)
     public async ValueTask<List<Ec2InstanceInfo>> ListInstancesAsync(string? state, string? tag)
     {
         using var ec2 = factory.CreateEc2Client();
         var filters = new List<Filter>();
-        if (!string.IsNullOrWhiteSpace(state))
+        if (!String.IsNullOrWhiteSpace(state))
         {
             filters.Add(new Filter("instance-state-name", [state]));
         }
 
-        if (!string.IsNullOrWhiteSpace(tag))
+        if (!String.IsNullOrWhiteSpace(tag))
         {
             var parts = tag.Split('=', 2);
             if (parts.Length == 2)
@@ -66,18 +66,20 @@ public sealed class Ec2Service
 
             nextToken = response.NextToken;
         }
-        while (!string.IsNullOrEmpty(nextToken));
+        while (!String.IsNullOrEmpty(nextToken));
 
         return result;
     }
 
-    // インスタンスを起動する。wait 時は running になるまでポーリング。
+    // Starts instances, polling until running when wait is set
     public async ValueTask StartInstancesAsync(string[] ids, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
+#pragma warning disable IDE0028
         await ec2.StartInstancesAsync(
-            new StartInstancesRequest { InstanceIds = [.. ids] },
+            new StartInstancesRequest { InstanceIds = ids.ToList() },
             cancellationToken);
+#pragma warning restore IDE0028
 
         if (!wait)
         {
@@ -87,13 +89,15 @@ public sealed class Ec2Service
         await WaitForStateAsync(ec2, ids, "running", timeoutSeconds, progress, cancellationToken);
     }
 
-    // インスタンスを停止する。wait 時は stopped になるまでポーリング。
+    // Stops instances, polling until stopped when wait is set
     public async ValueTask StopInstancesAsync(string[] ids, bool force, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
+#pragma warning disable IDE0028
         await ec2.StopInstancesAsync(
-            new StopInstancesRequest { InstanceIds = [.. ids], Force = force },
+            new StopInstancesRequest { InstanceIds = ids.ToList(), Force = force },
             cancellationToken);
+#pragma warning restore IDE0028
 
         if (!wait)
         {
@@ -103,22 +107,26 @@ public sealed class Ec2Service
         await WaitForStateAsync(ec2, ids, "stopped", timeoutSeconds, progress, cancellationToken);
     }
 
-    // インスタンスを再起動する。
+    // Reboots instances
     public async ValueTask RebootInstancesAsync(string[] ids, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
+#pragma warning disable IDE0028
         await ec2.RebootInstancesAsync(
-            new RebootInstancesRequest { InstanceIds = [.. ids] },
+            new RebootInstancesRequest { InstanceIds = ids.ToList() },
             cancellationToken);
+#pragma warning restore IDE0028
     }
 
-    // インスタンスを終了(削除)する。wait 時は terminated になるまでポーリング。
+    // Terminates instances, polling until terminated when wait is set
     public async ValueTask TerminateInstancesAsync(string[] ids, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
+#pragma warning disable IDE0028
         await ec2.TerminateInstancesAsync(
-            new TerminateInstancesRequest { InstanceIds = [.. ids] },
+            new TerminateInstancesRequest { InstanceIds = ids.ToList() },
             cancellationToken);
+#pragma warning restore IDE0028
 
         if (!wait)
         {
@@ -128,7 +136,7 @@ public sealed class Ec2Service
         await WaitForStateAsync(ec2, ids, "terminated", timeoutSeconds, progress, cancellationToken);
     }
 
-    // SSM Run Command を実行し、完了まで待機して出力を返す。Linux/AWS-RunShellScript 固定。
+    // Runs an SSM command (AWS-RunShellScript) and waits for the output
     public async ValueTask<SsmRunResult> SsmRunAsync(string instanceId, string command, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ssm = factory.CreateSsmClient();
@@ -190,12 +198,14 @@ public sealed class Ec2Service
             cancellationToken.ThrowIfCancellationRequested();
             await Task.Delay(pollInterval, cancellationToken);
 
+#pragma warning disable IDE0028
             var response = await ec2.DescribeInstancesAsync(
                 new DescribeInstancesRequest
                 {
-                    InstanceIds = [.. ids]
+                    InstanceIds = ids.ToList()
                 },
                 cancellationToken);
+#pragma warning restore IDE0028
 
             var states = response.Reservations
                 .SelectMany(r => r.Instances)
@@ -205,7 +215,7 @@ public sealed class Ec2Service
             var done = states.All(s => s == targetState);
             var elapsed = (DateTime.UtcNow - (deadline - TimeSpan.FromSeconds(timeoutSeconds))).TotalSeconds;
 
-            progress.Report(new ProgressUpdate(Math.Min(elapsed / timeoutSeconds, 0.99), $"[{string.Join(",", states)}]"));
+            progress.Report(new ProgressUpdate(Math.Min(elapsed / timeoutSeconds, 0.99), $"[{String.Join(",", states)}]"));
 
             if (done)
             {

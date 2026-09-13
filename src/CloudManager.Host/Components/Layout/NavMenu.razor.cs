@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Routing;
 
 public sealed partial class NavMenu
 {
-    // 現在のURLが属するグループを展開する
+    // Expand the group containing the current URL
     private static readonly Dictionary<NavGroup, string[]> GroupRoutes = new()
     {
         [NavGroup.Compute] = ["ec2", "ebs", "ecs", "lambda"],
