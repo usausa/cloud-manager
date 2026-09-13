@@ -33,8 +33,6 @@ builder.ConfigureBlazor();
 
 // Health
 builder.ConfigureHealth();
-// Metrics
-builder.ConfigureTelemetry();
 
 // Components
 builder.ConfigureComponents();

@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
 using CloudManager.Accessors;
-using CloudManager.Host.Application.Telemetry;
 using CloudManager.Host.Components;
 using CloudManager.Host.Endpoints;
 using CloudManager.Host.Infrastructure.Aws;
@@ -25,21 +24,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.FeatureManagement;
 
 using MiniDataProfiler;
 using MiniDataProfiler.Listener.Logging;
-using MiniDataProfiler.Listener.OpenTelemetry;
 
 using Mofucat.JobScheduler;
 
 using MudBlazor;
 using MudBlazor.Services;
-
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 
 using Serilog;
 
@@ -77,9 +69,6 @@ public static class ApplicationExtensions
             .AddWindowsService()
             .AddSystemd();
 
-        // Feature management
-        builder.Services.AddFeatureManagement();
-
         return builder;
     }
 
@@ -89,16 +78,12 @@ public static class ApplicationExtensions
 
     public static IHostApplicationBuilder ConfigureLogging(this IHostApplicationBuilder builder)
     {
-        var useOtlpExporter = builder.Configuration.IsOtelExporterEnabled();
-
         // Application log
         builder.Logging.ClearProviders();
-        builder.Services.AddSerilog(
-            options =>
-            {
-                options.ReadFrom.Configuration(builder.Configuration);
-            },
-            writeToProviders: useOtlpExporter);
+        builder.Services.AddSerilog(options =>
+        {
+            options.ReadFrom.Configuration(builder.Configuration);
+        });
 
         // HTTP log
         builder.Services.AddHttpLogging(static options =>
@@ -295,106 +280,6 @@ public static class ApplicationExtensions
     }
 
     //--------------------------------------------------------------------------------
-    // Telemetry
-    //--------------------------------------------------------------------------------
-
-    public static IHostApplicationBuilder ConfigureTelemetry(this IHostApplicationBuilder builder)
-    {
-        var useOtlpExporter = builder.Configuration.IsOtelExporterEnabled();
-
-        var prometheusSection = builder.Configuration.GetSection("Prometheus");
-        var prometheusUri = prometheusSection.GetValue<string>("Uri")!;
-        var usePrometheusExporter = !String.IsNullOrEmpty(prometheusUri);
-
-        var telemetry = builder.Services.AddOpenTelemetry()
-            .ConfigureResource(config =>
-            {
-                config.AddService(
-                    serviceName: builder.Environment.ApplicationName,
-                    serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString(),
-                    serviceInstanceId: Environment.MachineName);
-            });
-
-        // Log
-        if (useOtlpExporter)
-        {
-            builder.Logging.AddOpenTelemetry(logging =>
-            {
-                logging.IncludeFormattedMessage = true;
-                logging.IncludeScopes = true;
-            });
-            builder.Services.Configure<OpenTelemetryLoggerOptions>(static logging =>
-            {
-                logging.AddOtlpExporter();
-            });
-        }
-
-        // Metrics
-        if (useOtlpExporter || usePrometheusExporter)
-        {
-            telemetry
-                .WithMetrics(metrics =>
-                {
-                    metrics
-                        .AddRuntimeInstrumentation()
-                        .AddHttpClientInstrumentation()
-                        .AddAspNetCoreInstrumentation()
-                        .AddApplicationInstrumentation();
-
-                    if (useOtlpExporter)
-                    {
-                        metrics.AddOtlpExporter();
-                    }
-
-                    if (usePrometheusExporter)
-                    {
-                        var prometheusEndpoint = new Uri(prometheusUri);
-                        metrics.AddPrometheusHttpListener(config =>
-                        {
-                            config.Host = prometheusEndpoint.Host;
-                            config.Port = prometheusEndpoint.Port;
-                        });
-                    }
-                });
-        }
-
-        // Trace
-        if (useOtlpExporter)
-        {
-            telemetry
-                .WithTracing(tracing =>
-                {
-                    tracing
-                        .AddSource(builder.Environment.ApplicationName)
-                        .AddAspNetCoreInstrumentation(static options =>
-                        {
-                            options.Filter = static context =>
-                            {
-                                var path = context.Request.Path;
-                                return !path.StartsWithSegments(AlivenessEndpointPath, StringComparison.OrdinalIgnoreCase) &&
-                                       !path.StartsWithSegments(HealthEndpointPath, StringComparison.OrdinalIgnoreCase) &&
-                                       !path.StartsWithSegments("/openapi", StringComparison.OrdinalIgnoreCase) &&
-                                       !path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase) &&
-                                       !path.StartsWithSegments("/redoc", StringComparison.OrdinalIgnoreCase) &&
-                                       !path.StartsWithSegments("/_blazor", StringComparison.OrdinalIgnoreCase) &&
-                                       !path.StartsWithSegments("/_framework", StringComparison.OrdinalIgnoreCase);
-                            };
-                        })
-                        .AddHttpClientInstrumentation()
-                        .AddMiniDataProfilerInstrumentation()
-                        .AddApplicationInstrumentation();
-
-                    tracing.AddOtlpExporter();
-                });
-        }
-
-        // Custom instrument
-        builder.Services.AddApplicationInstrument();
-
-        return builder;
-    }
-
-    //--------------------------------------------------------------------------------
     // Components
     //--------------------------------------------------------------------------------
 
@@ -464,15 +349,11 @@ public static class ApplicationExtensions
     {
         ThreadPool.GetMinThreads(out var workerThreads, out var completionPortThreads);
 
-        var prometheusSection = app.Configuration.GetSection("Prometheus");
-        var prometheusUri = prometheusSection.GetValue("Uri", string.Empty);
-
         app.Logger.InfoServiceStart();
         app.Logger.InfoServiceSettingsRuntime(RuntimeInformation.OSDescription, RuntimeInformation.FrameworkDescription, RuntimeInformation.RuntimeIdentifier);
         app.Logger.InfoServiceSettingsEnvironment(typeof(Program).Assembly.GetName().Version, Environment.CurrentDirectory);
         app.Logger.InfoServiceSettingsGC(GCSettings.IsServerGC, GCSettings.LatencyMode, GCSettings.LargeObjectHeapCompactionMode);
         app.Logger.InfoServiceSettingsThreadPool(workerThreads, completionPortThreads);
-        app.Logger.InfoServiceSettingsTelemetry(app.Configuration.GetOtelExporterEndpoint(), prometheusUri);
     }
 
     //--------------------------------------------------------------------------------
@@ -526,9 +407,6 @@ public static class ApplicationExtensions
 
     public static ValueTask InitializeApplicationAsync(this WebApplication app)
     {
-        // Prepare instrument
-        app.Services.GetRequiredService<ApplicationInstrument>();
-
         // Prepare database
         app.Services.GetRequiredService<JobService>().CreateTable();
         app.Services.GetRequiredService<JobLogService>().CreateTable();
@@ -537,43 +415,22 @@ public static class ApplicationExtensions
     }
 
     //--------------------------------------------------------------------------------
-    // Configuration
-    //--------------------------------------------------------------------------------
-
-    private static bool IsOtelExporterEnabled(this IConfiguration configuration) =>
-        !String.IsNullOrWhiteSpace(configuration.GetOtelExporterEndpoint());
-
-    //--------------------------------------------------------------------------------
     // Profiler
     //--------------------------------------------------------------------------------
 
-    // SQLトレースをログ/テレメトリそれぞれの設定で有効化する
-    private static IProfileListener? CreateProfileListener(IServiceProvider provider, ProfilerSetting setting)
+    // SQLトレースをログへ出力する(設定で有効化)
+    private static LoggingListener? CreateProfileListener(IServiceProvider provider, ProfilerSetting setting)
     {
-        var listeners = new List<IProfileListener>();
-        if (setting.SqlLog.Enable)
+        if (!setting.SqlLog.Enable)
         {
-            var option = new LoggingListenerOption
-            {
-                OutputParameter = setting.SqlLog.OutputParameter,
-                ElapsedThreshold = TimeSpan.FromMilliseconds(setting.SqlLog.ElapsedThresholdMilliseconds)
-            };
-            listeners.Add(new LoggingListener(provider.GetRequiredService<ILogger<LoggingListener>>(), option));
+            return null;
         }
 
-        if (setting.SqlTelemetry.Enable)
+        var option = new LoggingListenerOption
         {
-            listeners.Add(new OpenTelemetryListener(new OpenTelemetryListenerOption()));
-        }
-
-        return listeners.Count switch
-        {
-            0 => null,
-            1 => listeners[0],
-            _ => new ChainListener(listeners)
+            OutputParameter = setting.SqlLog.OutputParameter,
+            ElapsedThreshold = TimeSpan.FromMilliseconds(setting.SqlLog.ElapsedThresholdMilliseconds)
         };
+        return new LoggingListener(provider.GetRequiredService<ILogger<LoggingListener>>(), option);
     }
-
-    private static string GetOtelExporterEndpoint(this IConfiguration configuration) =>
-        configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? string.Empty;
 }

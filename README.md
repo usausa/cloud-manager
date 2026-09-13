@@ -9,7 +9,6 @@ AWS リソースを参照・操作する Blazor Server 製の管理 Web UI。
 | --- | --- |
 | `src/CloudManager.Core` | AWS サービス操作 (`Services/Aws`)、ジョブ定義・実行履歴の永続化 (`Accessors`, `Services`)、モデル |
 | `src/CloudManager.Host` | Blazor Server ホスト。画面 (`Components`)、ジョブスケジューラ (`Infrastructure/Jobs`, `Workers`)、S3 ダウンロード API (`Endpoints`) |
-| `src/CloudManager.AppHost` | .NET Aspire AppHost (開発用ダッシュボード) |
 | `tests/CloudManager.UnitTests` | 単体テスト (xUnit v3 / bUnit) |
 | `tests/CloudManager.IntegrationTests` | ホスト起動を伴う統合テスト (SQLite 実体を使用) |
 | `tests/CloudManager.E2ETests` | Playwright によるブラウザテスト |
@@ -41,7 +40,7 @@ region = ap-northeast-1
 dotnet run --project src/CloudManager.Host
 ```
 
-`http://localhost:8080` で開く。Aspire ダッシュボードから起動する場合は `dotnet run --project src/CloudManager.AppHost`。
+`http://localhost:8080` で開く。
 
 ## 設定 (`appsettings.json`)
 
@@ -51,7 +50,7 @@ dotnet run --project src/CloudManager.Host
 | `Aws:DefaultProfile` | 起動時に選択するプロファイル。画面の「設定」で切り替え可能 |
 | `Aws:DefaultRegion` | 起動時に選択するリージョン |
 | `Job:LogRetentionCountPerJob` | ジョブごとに保持する実行履歴の件数 |
-| `Log` / `Profiler` / `Prometheus` / `Serilog` | ログ・SQL プロファイラ・メトリクス出力 |
+| `Log` / `Profiler` / `Serilog` | HTTP ログ・SQL ログ・ログ出力先 |
 
 ## 対応サービス
 
@@ -89,8 +88,12 @@ EC2 / RDS の起動・停止、ECS の希望タスク数変更、Lambda 実行�
 
 ## テスト
 
+各テストプロジェクトは Microsoft.Testing.Platform の実行ファイルとして動作する。
+
 ```bash
-dotnet test CloudManager.slnx
+dotnet run --project tests/CloudManager.UnitTests
+dotnet run --project tests/CloudManager.IntegrationTests
+dotnet run --project tests/CloudManager.E2ETests
 ```
 
 統合テスト・E2E テストは存在しないプロファイル名で起動するため AWS へは接続しない。

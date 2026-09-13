@@ -1,10 +1,7 @@
 <Solution>
-  <Folder Name="/Aspire/">
-    <Project Path="src/CloudManager.AppHost/CloudManager.AppHost.csproj" DefaultStartup="true" />
-  </Folder>
   <Folder Name="/Application/">
     <Project Path="src/CloudManager.Core/CloudManager.Core.csproj" />
-    <Project Path="src/CloudManager.Host/CloudManager.Host.csproj" />
+    <Project Path="src/CloudManager.Host/CloudManager.Host.csproj" DefaultStartup="true" />
   </Folder>
   <Folder Name="/Test/">
     <Project Path="tests/CloudManager.UnitTests/CloudManager.UnitTests.csproj" />
@@ -21,7 +18,6 @@
     <File Path="Database.sql" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
-    <File Path="global.json" />
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path="CloudManager.sln.DotSettings" />
