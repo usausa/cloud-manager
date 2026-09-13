@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
+using Amazon;
+
 using CloudManager.Accessors;
 using CloudManager.Host.Components;
 using CloudManager.Host.Endpoints;
@@ -54,6 +56,9 @@ public static class ApplicationExtensions
 
         // Encoding
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        // AWS SDK collections are empty instead of null
+        AWSConfigs.InitializeCollections = true;
 
         return builder;
     }
@@ -116,9 +121,6 @@ public static class ApplicationExtensions
 
     public static IHostApplicationBuilder ConfigureHttp(this IHostApplicationBuilder builder)
     {
-        // Add services to the container
-        builder.Services.AddHttpContextAccessor();
-
         // XForward
         builder.Services.Configure<ForwardedHeadersOptions>(static options =>
         {
@@ -146,9 +148,6 @@ public static class ApplicationExtensions
             options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             options.SerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
         });
-
-        // Validation
-        builder.Services.AddValidation();
 
         // Error handler
         builder.Services.AddProblemDetails(static options =>
@@ -282,9 +281,6 @@ public static class ApplicationExtensions
             static ex => ex is SqliteException { SqliteErrorCode: 19 } or SqliteException { SqliteExtendedErrorCode: 1555 or 2067 },
             static x => Regex.Replace(x, "[%_]", "[$0]")));
         builder.Services.AddDataAccessors(typeof(JobAccessor).Assembly);
-
-        // Cache
-        builder.Services.AddMemoryCache();
 
         // Service
         builder.Services.AddCoreServices();

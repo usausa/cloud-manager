@@ -14,14 +14,14 @@ public sealed class SecretsManagerService
         this.factory = factory;
     }
 
-    public async ValueTask<List<SecretInfo>> ListSecretsAsync()
+    public async ValueTask<List<SecretInfo>> ListSecretsAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateSecretsManagerClient();
         var results = new List<SecretInfo>();
         string? nextToken = null;
         do
         {
-            var response = await client.ListSecretsAsync(new ListSecretsRequest { NextToken = nextToken });
+            var response = await client.ListSecretsAsync(new ListSecretsRequest { NextToken = nextToken }, cancellationToken);
             foreach (var s in response.SecretList ?? [])
             {
                 results.Add(new SecretInfo(
@@ -36,10 +36,10 @@ public sealed class SecretsManagerService
         return results;
     }
 
-    public async ValueTask<SecretValueInfo> GetSecretValueAsync(string id)
+    public async ValueTask<SecretValueInfo> GetSecretValueAsync(string id, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateSecretsManagerClient();
-        var response = await client.GetSecretValueAsync(new GetSecretValueRequest { SecretId = id });
+        var response = await client.GetSecretValueAsync(new GetSecretValueRequest { SecretId = id }, cancellationToken);
         return new SecretValueInfo(
             response.Name ?? string.Empty,
             response.SecretString ?? string.Empty,

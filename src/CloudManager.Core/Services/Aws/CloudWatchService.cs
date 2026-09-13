@@ -22,7 +22,8 @@ public sealed class CloudWatchService
         DateTime startTime,
         DateTime endTime,
         int periodSeconds,
-        string statistic)
+        string statistic,
+        CancellationToken cancellationToken = default)
     {
         using var cw = factory.CreateCloudWatchClient();
         var dimensions = new List<Dimension>();
@@ -45,7 +46,8 @@ public sealed class CloudWatchService
                 EndTime = endTime.ToUniversalTime(),
                 Period = periodSeconds,
                 Statistics = [statistic]
-            });
+            },
+            cancellationToken);
 
 #pragma warning disable IDE0028
         return response.Datapoints

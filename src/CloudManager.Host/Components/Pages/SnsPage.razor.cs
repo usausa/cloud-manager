@@ -28,7 +28,7 @@ public sealed partial class SnsPage
         subscriptions = [];
         return LoadAsync(async () =>
         {
-            topics = await Service.ListTopicsAsync();
+            topics = await Service.ListTopicsAsync(CancellationToken);
         });
     }
 
@@ -43,7 +43,7 @@ public sealed partial class SnsPage
         isSubsLoading = true;
         try
         {
-            subscriptions = await Service.ListSubscriptionsAsync(topic.TopicArn);
+            subscriptions = await Service.ListSubscriptionsAsync(topic.TopicArn, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

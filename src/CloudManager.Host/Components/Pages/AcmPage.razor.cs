@@ -27,7 +27,7 @@ public sealed partial class AcmPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            certificates = await Service.ListCertificatesAsync();
+            certificates = await Service.ListCertificatesAsync(CancellationToken);
         });
 
     private async Task ShowDetailAsync(AcmCertificateInfo cert)
@@ -35,7 +35,7 @@ public sealed partial class AcmPage
         AcmCertificateDetail detail;
         try
         {
-            detail = await Service.GetCertificateAsync(cert.Arn);
+            detail = await Service.GetCertificateAsync(cert.Arn, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

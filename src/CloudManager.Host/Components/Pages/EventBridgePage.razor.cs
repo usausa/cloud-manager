@@ -23,7 +23,7 @@ public sealed partial class EventBridgePage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            rules = await Service.ListRulesAsync();
+            rules = await Service.ListRulesAsync(cancellationToken: CancellationToken);
         });
 
     private Task EnableAsync(EventBridgeRuleInfo rule) =>

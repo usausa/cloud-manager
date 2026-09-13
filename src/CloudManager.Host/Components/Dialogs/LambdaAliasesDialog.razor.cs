@@ -24,7 +24,7 @@ public sealed partial class LambdaAliasesDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            aliases = await Service.ListAliasesAsync(FunctionName);
+            aliases = await Service.ListAliasesAsync(FunctionName, CancellationToken);
         });
 
     private async Task DeleteAsync(LambdaAliasInfo alias)
@@ -34,7 +34,7 @@ public sealed partial class LambdaAliasesDialog
         {
             await Service.DeleteAliasAsync(FunctionName, alias.Name);
             Snackbar.AddSuccess($"エイリアス {alias.Name} を削除しました");
-            aliases = await Service.ListAliasesAsync(FunctionName);
+            aliases = await Service.ListAliasesAsync(FunctionName, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

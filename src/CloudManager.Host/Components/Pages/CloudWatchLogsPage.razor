@@ -12,7 +12,7 @@
                   AdornmentIcon="@Icons.Material.Filled.FilterList" IconSize="Size.Small"
                   Immediate="false" Clearable="true" Margin="Margin.Dense" />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
@@ -48,7 +48,7 @@
                         <MudText Typo="Typo.subtitle2">@selectedGroup.GroupName</MudText>
                         <MudSpacer />
                         <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                                   OnClick="LoadStreamsAsync" Disabled="IsRunning">更新</MudButton>
+                                   OnClick="LoadStreamsAsync" Disabled="IsBusy">更新</MudButton>
                     </MudStack>
                     <MudTable T="LogStreamInfo" Items="logStreams" Dense="true" Hover="true" Bordered="true"
                               Loading="@isStreamsLoading" RowsPerPage="20" SelectedItem="selectedStream"
@@ -121,7 +121,7 @@
             <MudText Typo="Typo.subtitle2">イベント: @selectedStream.StreamName</MudText>
             <MudSpacer />
             <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                       OnClick="LoadEventsAsync" Disabled="IsRunning">更新</MudButton>
+                       OnClick="LoadEventsAsync" Disabled="IsBusy">更新</MudButton>
         </MudStack>
         <MudTable T="LogEventInfo" Items="logEvents" Dense="true" Hover="true" Bordered="true" Striped="true"
                   Loading="@isEventsLoading" RowsPerPage="50">

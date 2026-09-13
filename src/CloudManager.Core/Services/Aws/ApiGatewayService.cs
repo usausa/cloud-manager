@@ -14,14 +14,14 @@ public sealed class ApiGatewayService
         this.factory = factory;
     }
 
-    public async ValueTask<List<ApiGatewayInfo>> ListRestApisAsync()
+    public async ValueTask<List<ApiGatewayInfo>> ListRestApisAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateApiGatewayClient();
         var results = new List<ApiGatewayInfo>();
         string? position = null;
         do
         {
-            var response = await client.GetRestApisAsync(new GetRestApisRequest { Position = position });
+            var response = await client.GetRestApisAsync(new GetRestApisRequest { Position = position }, cancellationToken);
             foreach (var api in response.Items ?? [])
             {
                 results.Add(new ApiGatewayInfo(
@@ -36,10 +36,10 @@ public sealed class ApiGatewayService
         return results;
     }
 
-    public async ValueTask<List<StageInfo>> ListStagesAsync(string restApiId)
+    public async ValueTask<List<StageInfo>> ListStagesAsync(string restApiId, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateApiGatewayClient();
-        var response = await client.GetStagesAsync(new GetStagesRequest { RestApiId = restApiId });
+        var response = await client.GetStagesAsync(new GetStagesRequest { RestApiId = restApiId }, cancellationToken);
 #pragma warning disable IDE0028
         return (response.Item ?? []).Select(s => new StageInfo(
             s.StageName ?? string.Empty,

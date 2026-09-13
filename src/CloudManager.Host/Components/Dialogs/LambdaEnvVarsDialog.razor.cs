@@ -20,6 +20,6 @@ public sealed partial class LambdaEnvVarsDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            envVars = await Service.GetEnvironmentVariablesAsync(FunctionName);
+            envVars = await Service.GetEnvironmentVariablesAsync(FunctionName, CancellationToken);
         });
 }

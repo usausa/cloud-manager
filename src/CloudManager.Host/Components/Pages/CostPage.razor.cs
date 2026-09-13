@@ -41,7 +41,7 @@ public sealed partial class CostPage
         ec2Result = null;
         return LoadAsync(async () =>
         {
-            ec2Result = await Service.EstimateEc2Async(ec2InstanceType, ec2Region, ec2Hours);
+            ec2Result = await Service.EstimateEc2Async(ec2InstanceType, ec2Region, ec2Hours, CancellationToken);
         });
     }
 
@@ -50,7 +50,7 @@ public sealed partial class CostPage
         rdsResult = null;
         return LoadAsync(async () =>
         {
-            rdsResult = await Service.EstimateRdsAsync(rdsEngine, rdsInstanceClass, rdsRegion, rdsHours);
+            rdsResult = await Service.EstimateRdsAsync(rdsEngine, rdsInstanceClass, rdsRegion, rdsHours, CancellationToken);
         });
     }
 }

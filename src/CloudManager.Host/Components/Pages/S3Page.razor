@@ -7,7 +7,7 @@
     <MudText Typo="Typo.h5">S3 バケット</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadBucketsAsync">更新</MudButton>
+               OnClick="LoadBucketsAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />

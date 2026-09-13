@@ -21,7 +21,7 @@ public sealed partial class S3Page
     private Task LoadBucketsAsync() =>
         LoadAsync(async () =>
         {
-            buckets = await Service.ListBucketsAsync();
+            buckets = await Service.ListBucketsAsync(CancellationToken);
         });
 
     private async Task ShowPublicAccessAsync(S3BucketInfo bucket)

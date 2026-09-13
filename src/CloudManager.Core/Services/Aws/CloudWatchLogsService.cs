@@ -15,7 +15,7 @@ public sealed class CloudWatchLogsService
         this.factory = factory;
     }
 
-    public async ValueTask<List<LogGroupInfo>> ListLogGroupsAsync(string? prefix = null)
+    public async ValueTask<List<LogGroupInfo>> ListLogGroupsAsync(string? prefix = null, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCloudWatchLogsClient();
         var results = new List<LogGroupInfo>();
@@ -27,7 +27,7 @@ public sealed class CloudWatchLogsService
             {
                 request.LogGroupNamePrefix = prefix;
             }
-            var response = await client.DescribeLogGroupsAsync(request);
+            var response = await client.DescribeLogGroupsAsync(request, cancellationToken);
             foreach (var g in response.LogGroups ?? [])
             {
                 results.Add(new LogGroupInfo(
@@ -42,7 +42,7 @@ public sealed class CloudWatchLogsService
         return results;
     }
 
-    public async ValueTask<List<LogStreamInfo>> ListLogStreamsAsync(string logGroup, int limit = 50)
+    public async ValueTask<List<LogStreamInfo>> ListLogStreamsAsync(string logGroup, int limit = 50, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCloudWatchLogsClient();
         var results = new List<LogStreamInfo>();
@@ -53,7 +53,7 @@ public sealed class CloudWatchLogsService
             Descending = true,
             Limit = limit
         };
-        var response = await client.DescribeLogStreamsAsync(request);
+        var response = await client.DescribeLogStreamsAsync(request, cancellationToken);
         foreach (var s in response.LogStreams ?? [])
         {
             results.Add(new LogStreamInfo(
@@ -69,7 +69,8 @@ public sealed class CloudWatchLogsService
         string logStream,
         DateTime? start = null,
         DateTime? end = null,
-        int limit = 100)
+        int limit = 100,
+        CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCloudWatchLogsClient();
         var results = new List<LogEventInfo>();
@@ -88,7 +89,7 @@ public sealed class CloudWatchLogsService
         {
             request.EndTime = end.Value;
         }
-        var response = await client.GetLogEventsAsync(request);
+        var response = await client.GetLogEventsAsync(request, cancellationToken);
         foreach (var ev in response.Events ?? [])
         {
             results.Add(new LogEventInfo(
@@ -96,57 +97,6 @@ public sealed class CloudWatchLogsService
                 ev.Message ?? string.Empty));
         }
         return results;
-    }
-
-    public async Task TailAsync(
-        string logGroup,
-        string? streamPrefix,
-        IProgress<LogEventInfo> sink,
-        CancellationToken ct)
-    {
-        using var client = factory.CreateCloudWatchLogsClient();
-        long? lastTimestampMs = null;
-        while (!ct.IsCancellationRequested)
-        {
-            var request = new FilterLogEventsRequest
-            {
-                LogGroupName = logGroup,
-                StartTime = lastTimestampMs.HasValue ? lastTimestampMs.Value + 1 : DateTimeOffset.UtcNow.AddMinutes(-1).ToUnixTimeMilliseconds()
-            };
-            if (!String.IsNullOrWhiteSpace(streamPrefix))
-            {
-                request.LogStreamNamePrefix = streamPrefix;
-            }
-            string? nextToken = null;
-            do
-            {
-                request.NextToken = nextToken;
-                FilterLogEventsResponse response;
-                try
-                {
-                    response = await client.FilterLogEventsAsync(request, ct);
-                }
-                catch (OperationCanceledException)
-                {
-                    return;
-                }
-                foreach (var ev in response.Events ?? [])
-                {
-                    var info = new LogEventInfo(
-                        DateTimeOffset.FromUnixTimeMilliseconds(ev.Timestamp.GetValueOrDefault()).UtcDateTime,
-                        ev.Message ?? string.Empty,
-                        ev.LogStreamName);
-                    sink.Report(info);
-                    if (!lastTimestampMs.HasValue || ev.Timestamp > lastTimestampMs)
-                    {
-                        lastTimestampMs = ev.Timestamp;
-                    }
-                }
-                nextToken = response.NextToken;
-            }
-            while (!String.IsNullOrEmpty(nextToken));
-            await Task.Delay(5000, ct).ConfigureAwait(false);
-        }
     }
 
     public async ValueTask<string> StartQueryAsync(

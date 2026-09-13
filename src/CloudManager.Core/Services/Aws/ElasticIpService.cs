@@ -14,10 +14,10 @@ public sealed class ElasticIpService
         this.factory = factory;
     }
 
-    public async ValueTask<List<ElasticIpInfo>> ListElasticIpsAsync()
+    public async ValueTask<List<ElasticIpInfo>> ListElasticIpsAsync(CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
-        var response = await ec2.DescribeAddressesAsync(new DescribeAddressesRequest());
+        var response = await ec2.DescribeAddressesAsync(new DescribeAddressesRequest(), cancellationToken);
 #pragma warning disable IDE0028
         return (response.Addresses ?? [])
             .Select(a => new ElasticIpInfo(

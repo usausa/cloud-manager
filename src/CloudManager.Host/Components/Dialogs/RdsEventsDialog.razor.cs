@@ -23,6 +23,6 @@ public sealed partial class RdsEventsDialog
             // Last 7 days
             var end = DateTime.UtcNow;
             var start = end.AddDays(-7);
-            events = await Service.ListEventsAsync(SourceIdentifier, "db-instance", start, end);
+            events = await Service.ListEventsAsync(SourceIdentifier, "db-instance", start, end, CancellationToken);
         });
 }

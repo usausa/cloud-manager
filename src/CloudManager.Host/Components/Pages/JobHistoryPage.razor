@@ -7,7 +7,7 @@
     <MudText Typo="Typo.h5">ジョブ実行履歴</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />

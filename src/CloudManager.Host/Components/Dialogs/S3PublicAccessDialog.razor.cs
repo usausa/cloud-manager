@@ -20,6 +20,6 @@ public sealed partial class S3PublicAccessDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            report = await Service.GetBucketPublicAccessAsync(BucketName);
+            report = await Service.GetBucketPublicAccessAsync(BucketName, CancellationToken);
         });
 }

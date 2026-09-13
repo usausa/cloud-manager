@@ -14,14 +14,14 @@ public sealed class EcrService
         this.factory = factory;
     }
 
-    public async ValueTask<List<EcrRepositoryInfo>> ListRepositoriesAsync()
+    public async ValueTask<List<EcrRepositoryInfo>> ListRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateEcrClient();
         var results = new List<EcrRepositoryInfo>();
         string? nextToken = null;
         do
         {
-            var response = await client.DescribeRepositoriesAsync(new DescribeRepositoriesRequest { NextToken = nextToken });
+            var response = await client.DescribeRepositoriesAsync(new DescribeRepositoriesRequest { NextToken = nextToken }, cancellationToken);
             foreach (var r in response.Repositories ?? [])
             {
                 results.Add(new EcrRepositoryInfo(
@@ -37,7 +37,7 @@ public sealed class EcrService
         return results;
     }
 
-    public async ValueTask<List<EcrImageInfo>> ListImagesAsync(string repository)
+    public async ValueTask<List<EcrImageInfo>> ListImagesAsync(string repository, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateEcrClient();
         var results = new List<EcrImageInfo>();
@@ -49,7 +49,7 @@ public sealed class EcrService
                 RepositoryName = repository,
                 NextToken = nextToken
             };
-            var response = await client.DescribeImagesAsync(request);
+            var response = await client.DescribeImagesAsync(request, cancellationToken);
             foreach (var img in response.ImageDetails ?? [])
             {
                 var tag = img.ImageTags?.Count > 0 ? img.ImageTags[0] : null;
@@ -77,15 +77,15 @@ public sealed class EcrService
             cancellationToken);
     }
 
-    public async ValueTask<string?> GetLifecyclePolicyAsync(string repository)
+    public async ValueTask<string?> GetLifecyclePolicyAsync(string repository, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateEcrClient();
         try
         {
-            var response = await client.GetLifecyclePolicyAsync(new GetLifecyclePolicyRequest { RepositoryName = repository });
+            var response = await client.GetLifecyclePolicyAsync(new GetLifecyclePolicyRequest { RepositoryName = repository }, cancellationToken);
             return response.LifecyclePolicyText;
         }
-        catch (Amazon.ECR.Model.LifecyclePolicyNotFoundException)
+        catch (LifecyclePolicyNotFoundException)
         {
             return null;
         }

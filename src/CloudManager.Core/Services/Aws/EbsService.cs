@@ -14,7 +14,7 @@ public sealed class EbsService
         this.factory = factory;
     }
 
-    public async ValueTask<List<EbsVolumeInfo>> ListVolumesAsync(string? state = null)
+    public async ValueTask<List<EbsVolumeInfo>> ListVolumesAsync(string? state = null, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
         var filters = new List<Filter>();
@@ -32,7 +32,8 @@ public sealed class EbsService
                 {
                     Filters = filters.Count > 0 ? filters : null,
                     NextToken = nextToken
-                });
+                },
+                cancellationToken);
             foreach (var v in response.Volumes ?? [])
             {
                 var attached = v.Attachments?.FirstOrDefault();

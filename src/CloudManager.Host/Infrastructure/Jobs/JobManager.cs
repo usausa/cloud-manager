@@ -15,16 +15,20 @@ public sealed class JobManager
 
     private readonly JobScheduler scheduler;
 
+    private readonly IHostApplicationLifetime lifetime;
+
     public JobManager(
         ILogger<JobManager> log,
         JobService jobService,
         JobExecutionService jobExecutionService,
-        JobScheduler scheduler)
+        JobScheduler scheduler,
+        IHostApplicationLifetime lifetime)
     {
         this.log = log;
         this.jobService = jobService;
         this.jobExecutionService = jobExecutionService;
         this.scheduler = scheduler;
+        this.lifetime = lifetime;
     }
 
     // Registers enabled jobs at startup, skipping broken definitions
@@ -73,11 +77,17 @@ public sealed class JobManager
         return jobService.DeleteAsync(id, cancellationToken);
     }
 
-    public ValueTask<string> ExecuteNowAsync(JobDefinition job, CancellationToken cancellationToken = default) =>
-        jobExecutionService.ExecuteAsync(job, cancellationToken);
+    // Manual runs are not tied to the caller and stop only with the application
+    public ValueTask<string> ExecuteNowAsync(JobDefinition job) =>
+        jobExecutionService.ExecuteAsync(job, lifetime.ApplicationStopping);
 
     public DateTimeOffset? GetNextExecutionTime(JobDefinition job)
     {
+        if (!job.IsEnabled)
+        {
+            return null;
+        }
+
         if (job.CronTimeZone == JobCronTimeZone.Local)
         {
             // Local cron jobs are triggered every minute, so calculate the next run here

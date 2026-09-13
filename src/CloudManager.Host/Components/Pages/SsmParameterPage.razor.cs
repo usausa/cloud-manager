@@ -23,7 +23,7 @@ public sealed partial class SsmParameterPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            parameters = await Service.ListParametersAsync(pathPrefix);
+            parameters = await Service.ListParametersAsync(pathPrefix, CancellationToken);
         });
 
     private bool FilterFunc(ParameterInfo p) =>
@@ -35,7 +35,7 @@ public sealed partial class SsmParameterPage
         RunAsync("取得中...", async (_, _) =>
         {
             var isSecure = param.Type == "SecureString";
-            var result = await Service.GetParameterAsync(param.Name, isSecure);
+            var result = await Service.GetParameterAsync(param.Name, isSecure, CancellationToken);
             var dialogParameters = new DialogParameters<SsmParameterValueDialog>
             {
                 { x => x.ParameterName, result.Name },
@@ -62,7 +62,7 @@ public sealed partial class SsmParameterPage
         ParameterValueInfo? current = null;
         await RunAsync("取得中...", async (_, _) =>
         {
-            current = await Service.GetParameterAsync(param.Name, param.Type == "SecureString");
+            current = await Service.GetParameterAsync(param.Name, param.Type == "SecureString", CancellationToken);
         });
         if (current is null)
         {

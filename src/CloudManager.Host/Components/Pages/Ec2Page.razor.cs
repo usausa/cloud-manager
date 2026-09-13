@@ -31,7 +31,7 @@ public sealed partial class Ec2Page
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            instances = await Service.ListInstancesAsync(filterState, filterTag);
+            instances = await Service.ListInstancesAsync(filterState, filterTag, CancellationToken);
         });
 
     private async Task StartAsync(Ec2InstanceInfo instance)

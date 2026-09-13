@@ -12,7 +12,7 @@ public sealed class AuroraService
 
     public AuroraService(AwsClientFactory factory) => this.factory = factory;
 
-    public async ValueTask<List<AuroraClusterInfo>> ListClustersAsync()
+    public async ValueTask<List<AuroraClusterInfo>> ListClustersAsync(CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
         var result = new List<AuroraClusterInfo>();
@@ -20,7 +20,8 @@ public sealed class AuroraService
         do
         {
             var response = await rds.DescribeDBClustersAsync(
-                new DescribeDBClustersRequest { Marker = marker });
+                new DescribeDBClustersRequest { Marker = marker },
+                cancellationToken);
             foreach (var c in response.DBClusters ?? [])
             {
                 var members = (c.DBClusterMembers ?? [])

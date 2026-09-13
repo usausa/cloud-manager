@@ -27,7 +27,7 @@ public sealed partial class S3VersionsDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            versions = await Service.ListVersionsAsync(BucketName, Key);
+            versions = await Service.ListVersionsAsync(BucketName, Key, CancellationToken);
         });
 
     private async Task RestoreAsync(S3VersionInfo v)
@@ -37,7 +37,7 @@ public sealed partial class S3VersionsDialog
         {
             await Service.RestoreVersionAsync(BucketName, Key, v.VersionId);
             Snackbar.AddSuccess($"バージョン {v.VersionId} を復元しました");
-            versions = await Service.ListVersionsAsync(BucketName, Key);
+            versions = await Service.ListVersionsAsync(BucketName, Key, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

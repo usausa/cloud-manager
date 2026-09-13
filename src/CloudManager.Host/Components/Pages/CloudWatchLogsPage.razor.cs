@@ -7,7 +7,9 @@ public sealed partial class CloudWatchLogsPage
     [Inject]
     public required CloudWatchLogsService Service { get; set; }
 
-    private List<LogGroupInfo> logGroups = [];    private List<LogStreamInfo> logStreams = [];
+    private List<LogGroupInfo> logGroups = [];
+
+    private List<LogStreamInfo> logStreams = [];
 
     private List<LogEventInfo> logEvents = [];
 
@@ -46,7 +48,7 @@ public sealed partial class CloudWatchLogsPage
         logEvents = [];
         return LoadAsync(async () =>
         {
-            logGroups = await Service.ListLogGroupsAsync(groupPrefix);
+            logGroups = await Service.ListLogGroupsAsync(groupPrefix, CancellationToken);
         });
     }
 
@@ -74,7 +76,7 @@ public sealed partial class CloudWatchLogsPage
         isStreamsLoading = true;
         try
         {
-            logStreams = await Service.ListLogStreamsAsync(selectedGroup.GroupName);
+            logStreams = await Service.ListLogStreamsAsync(selectedGroup.GroupName, cancellationToken: CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -105,7 +107,7 @@ public sealed partial class CloudWatchLogsPage
         isEventsLoading = true;
         try
         {
-            logEvents = await Service.GetLogEventsAsync(selectedGroup.GroupName, selectedStream.StreamName);
+            logEvents = await Service.GetLogEventsAsync(selectedGroup.GroupName, selectedStream.StreamName, cancellationToken: CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -156,6 +158,5 @@ public sealed partial class CloudWatchLogsPage
     private sealed class InsightRow(Dictionary<string, string> data)
     {
         public string Get(string key) => data.GetValueOrDefault(key, "-");
-        public IEnumerable<string> Keys => data.Keys;
     }
 }

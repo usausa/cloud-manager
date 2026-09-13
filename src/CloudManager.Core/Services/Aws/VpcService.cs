@@ -15,11 +15,12 @@ public sealed class VpcService
     }
 
     // Lists VPCs
-    public async ValueTask<List<VpcInfo>> ListVpcsAsync()
+    public async ValueTask<List<VpcInfo>> ListVpcsAsync(CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
         var response = await ec2.DescribeVpcsAsync(
-            new DescribeVpcsRequest());
+            new DescribeVpcsRequest(),
+            cancellationToken);
 #pragma warning disable IDE0028
         return (response.Vpcs ?? [])
             .Select(v => new VpcInfo(
@@ -33,11 +34,12 @@ public sealed class VpcService
     }
 
     // Gets the details of a VPC
-    public async ValueTask<VpcDetail> GetVpcDetailAsync(string vpcId)
+    public async ValueTask<VpcDetail> GetVpcDetailAsync(string vpcId, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
         var vpcResponse = await ec2.DescribeVpcsAsync(
-            new DescribeVpcsRequest { VpcIds = [vpcId] });
+            new DescribeVpcsRequest { VpcIds = [vpcId] },
+            cancellationToken);
         var vpc = (vpcResponse.Vpcs ?? []).First();
         var vpcInfo = new VpcInfo(
             vpc.VpcId,
@@ -49,7 +51,8 @@ public sealed class VpcService
         var vpcFilter = new Filter("vpc-id", [vpcId]);
 
         var subnetResponse = await ec2.DescribeSubnetsAsync(
-            new DescribeSubnetsRequest { Filters = [vpcFilter] });
+            new DescribeSubnetsRequest { Filters = [vpcFilter] },
+            cancellationToken);
         var subnets = (subnetResponse.Subnets ?? [])
             .Select(s => new VpcSubnetInfo(
                 s.SubnetId,
@@ -61,7 +64,8 @@ public sealed class VpcService
             .ToList();
 
         var rtResponse = await ec2.DescribeRouteTablesAsync(
-            new DescribeRouteTablesRequest { Filters = [vpcFilter] });
+            new DescribeRouteTablesRequest { Filters = [vpcFilter] },
+            cancellationToken);
         var routeTables = (rtResponse.RouteTables ?? [])
             .Select(rt => new VpcRouteTableInfo(
                 rt.RouteTableId,
@@ -71,7 +75,8 @@ public sealed class VpcService
             .ToList();
 
         var sgResponse = await ec2.DescribeSecurityGroupsAsync(
-            new DescribeSecurityGroupsRequest { Filters = [vpcFilter] });
+            new DescribeSecurityGroupsRequest { Filters = [vpcFilter] },
+            cancellationToken);
         var securityGroups = (sgResponse.SecurityGroups ?? [])
             .Select(sg => new VpcSecurityGroupInfo(sg.GroupId, sg.GroupName, sg.Description))
             .ToList();
@@ -80,7 +85,8 @@ public sealed class VpcService
             new DescribeInternetGatewaysRequest
             {
                 Filters = [new Filter("attachment.vpc-id", [vpcId])]
-            });
+            },
+            cancellationToken);
         var igws = (igwResponse.InternetGateways ?? [])
             .Select(igw => new VpcIgwInfo(
                 igw.InternetGatewayId,
@@ -92,7 +98,8 @@ public sealed class VpcService
             new DescribeNatGatewaysRequest
             {
                 Filter = [vpcFilter]
-            });
+            },
+            cancellationToken);
         var natGws = (natResponse.NatGateways ?? [])
             .Select(nat => new VpcNatGwInfo(
                 nat.NatGatewayId,

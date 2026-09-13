@@ -31,7 +31,7 @@ public sealed partial class VpcPage
         ClearDetail();
         return LoadAsync(async () =>
         {
-            vpcs = await Service.ListVpcsAsync();
+            vpcs = await Service.ListVpcsAsync(CancellationToken);
         });
     }
 
@@ -57,7 +57,7 @@ public sealed partial class VpcPage
         isDetailLoading = true;
         try
         {
-            var detail = await Service.GetVpcDetailAsync(vpc.VpcId);
+            var detail = await Service.GetVpcDetailAsync(vpc.VpcId, CancellationToken);
             subnets = detail.Subnets;
             securityGroups = detail.SecurityGroups;
             routeTables = detail.RouteTables;

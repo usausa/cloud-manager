@@ -20,7 +20,7 @@ public sealed partial class LambdaPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            functions = await Service.ListFunctionsAsync();
+            functions = await Service.ListFunctionsAsync(CancellationToken);
         });
 
     private async Task InvokeAsync(LambdaFunctionInfo function)

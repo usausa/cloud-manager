@@ -33,7 +33,7 @@ public sealed partial class RdsPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            instances = await Service.ListInstancesAsync(null);
+            instances = await Service.ListInstancesAsync(null, CancellationToken);
         });
 
     private async Task LoadSnapshotsAsync()
@@ -41,7 +41,7 @@ public sealed partial class RdsPage
         isSnapLoading = true;
         try
         {
-            snapshots = await Service.ListSnapshotsAsync(null);
+            snapshots = await Service.ListSnapshotsAsync(null, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -171,7 +171,7 @@ public sealed partial class RdsPage
     {
         try
         {
-            paramGroups = await ParamGroupService.ListParameterGroupsAsync();
+            paramGroups = await ParamGroupService.ListParameterGroupsAsync(CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -183,7 +183,7 @@ public sealed partial class RdsPage
     {
         try
         {
-            clusters = await AuroraService.ListClustersAsync();
+            clusters = await AuroraService.ListClustersAsync(CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

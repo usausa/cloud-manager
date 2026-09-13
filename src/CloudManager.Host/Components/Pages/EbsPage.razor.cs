@@ -24,7 +24,7 @@ public sealed partial class EbsPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            volumes = await Service.ListVolumesAsync();
+            volumes = await Service.ListVolumesAsync(cancellationToken: CancellationToken);
         });
 
     private async Task CreateSnapshotAsync(EbsVolumeInfo volume)

@@ -16,7 +16,7 @@ public sealed class RdsService
     }
 
     // Lists all RDS instances (paged)
-    public async ValueTask<List<RdsInstanceInfo>> ListInstancesAsync(string? engine)
+    public async ValueTask<List<RdsInstanceInfo>> ListInstancesAsync(string? engine, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
         var result = new List<RdsInstanceInfo>();
@@ -25,7 +25,8 @@ public sealed class RdsService
         do
         {
             var response = await rds.DescribeDBInstancesAsync(
-                new DescribeDBInstancesRequest { Marker = marker });
+                new DescribeDBInstancesRequest { Marker = marker },
+                cancellationToken);
 
             foreach (var db in response.DBInstances ?? [])
             {
@@ -86,7 +87,7 @@ public sealed class RdsService
     }
 
     // Lists snapshots, limited to one instance when id is given
-    public async ValueTask<List<RdsSnapshotInfo>> ListSnapshotsAsync(string? dbInstanceId)
+    public async ValueTask<List<RdsSnapshotInfo>> ListSnapshotsAsync(string? dbInstanceId, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
         var result = new List<RdsSnapshotInfo>();
@@ -100,7 +101,7 @@ public sealed class RdsService
                 request.DBInstanceIdentifier = dbInstanceId;
             }
 
-            var response = await rds.DescribeDBSnapshotsAsync(request);
+            var response = await rds.DescribeDBSnapshotsAsync(request, cancellationToken);
 
             foreach (var snap in response.DBSnapshots ?? [])
             {

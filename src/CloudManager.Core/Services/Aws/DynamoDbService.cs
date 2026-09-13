@@ -15,7 +15,7 @@ public sealed class DynamoDbService
     }
 
     // Lists DynamoDB tables (paged)
-    public async ValueTask<List<DynamoDbTableInfo>> ListTablesAsync()
+    public async ValueTask<List<DynamoDbTableInfo>> ListTablesAsync(CancellationToken cancellationToken = default)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
         var result = new List<DynamoDbTableInfo>();
@@ -27,7 +27,8 @@ public sealed class DynamoDbService
                 new ListTablesRequest
                 {
                     ExclusiveStartTableName = lastEvaluatedTableName
-                });
+                },
+                cancellationToken);
 
             foreach (var tableName in listResponse.TableNames)
             {
@@ -35,7 +36,8 @@ public sealed class DynamoDbService
                     new DescribeTableRequest
                     {
                         TableName = tableName
-                    });
+                    },
+                    cancellationToken);
 
                 var table = descResponse.Table;
                 result.Add(new DynamoDbTableInfo(
@@ -73,10 +75,10 @@ public sealed class DynamoDbService
     }
 
     // Gets the TTL setting
-    public async ValueTask<DynamoDbTtlInfo> GetTtlAsync(string tableName)
+    public async ValueTask<DynamoDbTtlInfo> GetTtlAsync(string tableName, CancellationToken cancellationToken = default)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
-        var response = await dynamoDb.DescribeTimeToLiveAsync(new DescribeTimeToLiveRequest { TableName = tableName });
+        var response = await dynamoDb.DescribeTimeToLiveAsync(new DescribeTimeToLiveRequest { TableName = tableName }, cancellationToken);
         var enabled = response.TimeToLiveDescription?.TimeToLiveStatus?.Value == "ENABLED";
         return new DynamoDbTtlInfo(tableName, enabled, response.TimeToLiveDescription?.AttributeName);
     }
@@ -99,10 +101,10 @@ public sealed class DynamoDbService
     }
 
     // Gets the point-in-time recovery setting
-    public async ValueTask<DynamoDbPitrInfo> GetPitrAsync(string tableName)
+    public async ValueTask<DynamoDbPitrInfo> GetPitrAsync(string tableName, CancellationToken cancellationToken = default)
     {
         using var dynamoDb = factory.CreateDynamoDbClient();
-        var response = await dynamoDb.DescribeContinuousBackupsAsync(new DescribeContinuousBackupsRequest { TableName = tableName });
+        var response = await dynamoDb.DescribeContinuousBackupsAsync(new DescribeContinuousBackupsRequest { TableName = tableName }, cancellationToken);
         var pitr = response.ContinuousBackupsDescription?.PointInTimeRecoveryDescription;
         var enabled = pitr?.PointInTimeRecoveryStatus?.Value == "ENABLED";
         return new DynamoDbPitrInfo(tableName, enabled, pitr?.EarliestRestorableDateTime, pitr?.LatestRestorableDateTime);

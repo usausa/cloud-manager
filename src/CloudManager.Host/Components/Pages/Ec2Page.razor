@@ -9,7 +9,7 @@
     <MudText Typo="Typo.h5">EC2 インスタンス</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
@@ -26,7 +26,7 @@
         <MudTextField @bind-Value="filterTag" Label="Tag K=V" Variant="Variant.Outlined" Margin="Margin.Dense"
                       Class="search-field" />
         <MudButton StartIcon="@Icons.Material.Filled.FilterList" Variant="Variant.Outlined" Size="Size.Small"
-                   OnClick="LoadAsync" Disabled="IsRunning">絞り込み</MudButton>
+                   OnClick="LoadAsync" Disabled="IsBusy">絞り込み</MudButton>
     </MudStack>
 </MudPaper>
 

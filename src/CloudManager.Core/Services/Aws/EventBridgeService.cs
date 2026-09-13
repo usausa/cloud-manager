@@ -14,7 +14,7 @@ public sealed class EventBridgeService
         this.factory = factory;
     }
 
-    public async ValueTask<List<EventBridgeRuleInfo>> ListRulesAsync(string? busName = null)
+    public async ValueTask<List<EventBridgeRuleInfo>> ListRulesAsync(string? busName = null, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateEventBridgeClient();
         var results = new List<EventBridgeRuleInfo>();
@@ -25,14 +25,16 @@ public sealed class EventBridgeService
             {
                 EventBusName = busName,
                 NextToken = nextToken
-            });
+            },
+            cancellationToken);
             foreach (var rule in response.Rules ?? [])
             {
                 var targetsResp = await client.ListTargetsByRuleAsync(new ListTargetsByRuleRequest
                 {
                     Rule = rule.Name,
                     EventBusName = busName
-                });
+                },
+                cancellationToken);
                 var targets = targetsResp.Targets.Select(t => t.Arn ?? string.Empty).ToList();
                 results.Add(new EventBridgeRuleInfo(
                     rule.Name ?? string.Empty,

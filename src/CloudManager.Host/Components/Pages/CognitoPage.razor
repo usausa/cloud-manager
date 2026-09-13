@@ -3,11 +3,13 @@
 
 <PageTitle>CloudManager - Cognito</PageTitle>
 
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
     <MudText Typo="Typo.h5">Cognito ユーザープール</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
@@ -41,7 +43,7 @@
                 <MudTextField @bind-Value="userSearchText" Placeholder="検索..." Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" />
                 <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                           OnClick="LoadUsersAsync" Disabled="isUsersLoading">更新</MudButton>
+                           OnClick="LoadUsersAsync" Disabled="IsBusy">更新</MudButton>
             </MudStack>
             <MudTable T="CognitoUserInfo" Items="FilteredUsers" Dense="true" Hover="true" Bordered="true" Striped="true"
                       Loading="@isUsersLoading" RowsPerPage="25">

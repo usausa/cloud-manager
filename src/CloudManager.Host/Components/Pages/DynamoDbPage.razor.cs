@@ -18,7 +18,7 @@ public sealed partial class DynamoDbPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            tables = await Service.ListTablesAsync();
+            tables = await Service.ListTablesAsync(CancellationToken);
         });
 
     private static Color DdbStateColor(string state) => state switch

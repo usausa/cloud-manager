@@ -33,7 +33,7 @@ public sealed partial class ElbPage
         targetHealth = [];
         return LoadAsync(async () =>
         {
-            loadBalancers = await Service.ListLoadBalancersAsync();
+            loadBalancers = await Service.ListLoadBalancersAsync(CancellationToken);
         });
     }
 
@@ -50,7 +50,7 @@ public sealed partial class ElbPage
         isTgLoading = true;
         try
         {
-            targetGroups = await Service.ListTargetGroupsAsync(lb.Arn);
+            targetGroups = await Service.ListTargetGroupsAsync(lb.Arn, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -68,7 +68,7 @@ public sealed partial class ElbPage
         isHealthLoading = true;
         try
         {
-            targetHealth = await Service.ListTargetHealthAsync(tg.Arn);
+            targetHealth = await Service.ListTargetHealthAsync(tg.Arn, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

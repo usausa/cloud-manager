@@ -21,6 +21,9 @@ public abstract class AwsComponentBase : AppComponentBase
 
     protected bool IsRunning { get; private set; }
 
+    // Reload buttons are disabled while loading or running
+    protected bool IsBusy => IsLoading || IsRunning;
+
     protected double ProgressRatio { get; private set; }
 
     protected string? ProgressMessage { get; private set; }

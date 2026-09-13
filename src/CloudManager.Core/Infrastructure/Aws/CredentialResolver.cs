@@ -26,7 +26,7 @@ public static class CredentialResolver
         {
             if (!chain.TryGetProfile(name, out var profile) || profile.Region is null)
             {
-                throw new InvalidOperationException($"Region not specified. Use --region or set region in ~/.aws/config for profile '{name}'.");
+                throw new InvalidOperationException($"Region not specified. Select a region or set region in ~/.aws/config for profile '{name}'.");
             }
 
             region = profile.Region;

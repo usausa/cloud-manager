@@ -14,7 +14,7 @@ public sealed class ElbService
         this.factory = factory;
     }
 
-    public async ValueTask<List<ElbInfo>> ListLoadBalancersAsync()
+    public async ValueTask<List<ElbInfo>> ListLoadBalancersAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateElbClient();
         var results = new List<ElbInfo>();
@@ -22,7 +22,7 @@ public sealed class ElbService
         do
         {
             var request = new DescribeLoadBalancersRequest { Marker = marker };
-            var response = await client.DescribeLoadBalancersAsync(request);
+            var response = await client.DescribeLoadBalancersAsync(request, cancellationToken);
             foreach (var lb in response.LoadBalancers ?? [])
             {
                 results.Add(new ElbInfo(
@@ -40,7 +40,7 @@ public sealed class ElbService
         return results;
     }
 
-    public async ValueTask<List<TargetGroupInfo>> ListTargetGroupsAsync(string? loadBalancerArn = null)
+    public async ValueTask<List<TargetGroupInfo>> ListTargetGroupsAsync(string? loadBalancerArn = null, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateElbClient();
         var results = new List<TargetGroupInfo>();
@@ -52,7 +52,7 @@ public sealed class ElbService
             {
                 request.LoadBalancerArn = loadBalancerArn;
             }
-            var response = await client.DescribeTargetGroupsAsync(request);
+            var response = await client.DescribeTargetGroupsAsync(request, cancellationToken);
             foreach (var tg in response.TargetGroups ?? [])
             {
                 results.Add(new TargetGroupInfo(
@@ -69,13 +69,14 @@ public sealed class ElbService
         return results;
     }
 
-    public async ValueTask<List<TargetHealthInfo>> ListTargetHealthAsync(string targetGroupArn)
+    public async ValueTask<List<TargetHealthInfo>> ListTargetHealthAsync(string targetGroupArn, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateElbClient();
         var response = await client.DescribeTargetHealthAsync(new DescribeTargetHealthRequest
         {
             TargetGroupArn = targetGroupArn
-        });
+        },
+        cancellationToken);
 #pragma warning disable IDE0028
         return (response.TargetHealthDescriptions ?? []).Select(t => new TargetHealthInfo(
             t.Target?.Id ?? string.Empty,

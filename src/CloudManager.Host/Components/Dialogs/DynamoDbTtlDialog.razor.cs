@@ -28,7 +28,7 @@ public sealed partial class DynamoDbTtlDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            ttlInfo = await Service.GetTtlAsync(TableName);
+            ttlInfo = await Service.GetTtlAsync(TableName, CancellationToken);
             enable = ttlInfo.Enabled;
             attributeName = ttlInfo.AttributeName ?? string.Empty;
         });

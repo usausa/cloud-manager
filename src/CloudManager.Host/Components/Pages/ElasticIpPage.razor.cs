@@ -19,7 +19,7 @@ public sealed partial class ElasticIpPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            addresses = await Service.ListElasticIpsAsync();
+            addresses = await Service.ListElasticIpsAsync(CancellationToken);
         });
 
     private async Task AssociateAsync(ElasticIpInfo eip)

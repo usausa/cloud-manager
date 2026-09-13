@@ -103,10 +103,10 @@ public sealed partial class Home
 
     private async Task LoadSummaryAsync()
     {
-        var ec2Task = Ec2Service.ListInstancesAsync(null, null).AsTask();
-        var rdsTask = RdsService.ListInstancesAsync(null).AsTask();
+        var ec2Task = Ec2Service.ListInstancesAsync(null, null, CancellationToken).AsTask();
+        var rdsTask = RdsService.ListInstancesAsync(null, CancellationToken).AsTask();
         var alarmTask = CloudWatchService.ListAlarmsAsync().AsTask();
-        var ecsTask = EcsService.ListClustersAsync().AsTask();
+        var ecsTask = EcsService.ListClustersAsync(CancellationToken).AsTask();
         await Task.WhenAll(ec2Task, rdsTask, alarmTask, ecsTask);
 
         var instances = await ec2Task;

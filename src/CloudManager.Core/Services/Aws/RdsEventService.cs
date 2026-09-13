@@ -17,7 +17,8 @@ public sealed class RdsEventService
         string? sourceIdentifier,
         string? sourceType,
         DateTime? startTime,
-        DateTime? endTime)
+        DateTime? endTime,
+        CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
         var result = new List<RdsEventInfo>();
@@ -32,7 +33,7 @@ public sealed class RdsEventService
                 EndTime = endTime,
                 Marker = marker
             };
-            var response = await rds.DescribeEventsAsync(request);
+            var response = await rds.DescribeEventsAsync(request, cancellationToken);
             foreach (var e in response.Events ?? [])
             {
                 result.Add(new RdsEventInfo(

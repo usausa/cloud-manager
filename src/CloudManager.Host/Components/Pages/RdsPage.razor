@@ -9,7 +9,7 @@
     <MudText Typo="Typo.h5">RDS</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
@@ -69,7 +69,7 @@
     <MudTabPanel Text="スナップショット">
         <MudStack Row="true" Class="mb-1 mt-1">
             <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                       OnClick="LoadSnapshotsAsync" Disabled="IsRunning">スナップショット更新</MudButton>
+                       OnClick="LoadSnapshotsAsync" Disabled="IsBusy">スナップショット更新</MudButton>
         </MudStack>
         <MudTable T="RdsSnapshotInfo" Items="snapshots" Dense="true" Hover="true" Bordered="true" Striped="true"
                   Loading="@isSnapLoading" RowsPerPage="25">
@@ -107,7 +107,7 @@
     <MudTabPanel Text="パラメータグループ">
         <MudStack Row="true" Class="mb-1 mt-1">
             <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                       OnClick="LoadParamGroupsAsync" Disabled="IsRunning">更新</MudButton>
+                       OnClick="LoadParamGroupsAsync" Disabled="IsBusy">更新</MudButton>
         </MudStack>
         <MudTable T="RdsParamGroupInfo" Items="paramGroups" Dense="true" Hover="true" Bordered="true" RowsPerPage="25">
             <HeaderContent>
@@ -134,7 +134,7 @@
     <MudTabPanel Text="Aurora クラスタ">
         <MudStack Row="true" Class="mb-1 mt-1">
             <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                       OnClick="LoadClustersAsync" Disabled="IsRunning">更新</MudButton>
+                       OnClick="LoadClustersAsync" Disabled="IsBusy">更新</MudButton>
         </MudStack>
         <MudTable T="AuroraClusterInfo" Items="clusters" Dense="true" Hover="true" Bordered="true" RowsPerPage="25">
             <HeaderContent>

@@ -17,7 +17,7 @@ public sealed class CloudFrontService
     }
 
     // Lists CloudFront distributions (paged)
-    public async ValueTask<List<CloudFrontDistributionInfo>> ListDistributionsAsync()
+    public async ValueTask<List<CloudFrontDistributionInfo>> ListDistributionsAsync(CancellationToken cancellationToken = default)
     {
         using var cloudFront = factory.CreateCloudFrontClient();
         var result = new List<CloudFrontDistributionInfo>();
@@ -29,7 +29,8 @@ public sealed class CloudFrontService
                 new ListDistributionsRequest
                 {
                     Marker = marker
-                });
+                },
+                cancellationToken);
 
             var list = response.DistributionList;
 

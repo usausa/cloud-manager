@@ -34,7 +34,7 @@ public sealed partial class CognitoPage
         users = [];
         return LoadAsync(async () =>
         {
-            pools = await Service.ListUserPoolsAsync();
+            pools = await Service.ListUserPoolsAsync(CancellationToken);
         });
     }
 
@@ -58,7 +58,7 @@ public sealed partial class CognitoPage
         isUsersLoading = true;
         try
         {
-            users = await Service.ListUsersAsync(selectedPool.Id);
+            users = await Service.ListUsersAsync(selectedPool.Id, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

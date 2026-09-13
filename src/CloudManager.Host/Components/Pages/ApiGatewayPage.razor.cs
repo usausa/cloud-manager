@@ -28,7 +28,7 @@ public sealed partial class ApiGatewayPage
         stages = [];
         return LoadAsync(async () =>
         {
-            apis = await Service.ListRestApisAsync();
+            apis = await Service.ListRestApisAsync(CancellationToken);
         });
     }
 
@@ -52,7 +52,7 @@ public sealed partial class ApiGatewayPage
         isStagesLoading = true;
         try
         {
-            stages = await Service.ListStagesAsync(selectedApi.Id);
+            stages = await Service.ListStagesAsync(selectedApi.Id, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

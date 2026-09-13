@@ -32,7 +32,7 @@ public sealed partial class S3ObjectsPage
     private Task LoadObjectsAsync() =>
         LoadAsync(async () =>
         {
-            objects = await Service.ListObjectsAsync(BucketName, prefixFilter);
+            objects = await Service.ListObjectsAsync(BucketName, prefixFilter, CancellationToken);
         });
 
     private async Task UploadAsync()

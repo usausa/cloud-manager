@@ -14,17 +14,17 @@ public sealed class SnsService
         this.factory = factory;
     }
 
-    public async ValueTask<List<SnsTopicInfo>> ListTopicsAsync()
+    public async ValueTask<List<SnsTopicInfo>> ListTopicsAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateSnsClient();
         var results = new List<SnsTopicInfo>();
         string? nextToken = null;
         do
         {
-            var response = await client.ListTopicsAsync(new ListTopicsRequest { NextToken = nextToken });
+            var response = await client.ListTopicsAsync(new ListTopicsRequest { NextToken = nextToken }, cancellationToken);
             foreach (var t in response.Topics ?? [])
             {
-                var attrs = await client.GetTopicAttributesAsync(new GetTopicAttributesRequest { TopicArn = t.TopicArn });
+                var attrs = await client.GetTopicAttributesAsync(new GetTopicAttributesRequest { TopicArn = t.TopicArn }, cancellationToken);
                 attrs.Attributes.TryGetValue("DisplayName", out var displayName);
                 attrs.Attributes.TryGetValue("SubscriptionsConfirmed", out var subCount);
                 results.Add(new SnsTopicInfo(
@@ -38,7 +38,7 @@ public sealed class SnsService
         return results;
     }
 
-    public async ValueTask<List<SnsSubscriptionInfo>> ListSubscriptionsAsync(string topicArn)
+    public async ValueTask<List<SnsSubscriptionInfo>> ListSubscriptionsAsync(string topicArn, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateSnsClient();
         var results = new List<SnsSubscriptionInfo>();
@@ -49,7 +49,8 @@ public sealed class SnsService
             {
                 TopicArn = topicArn,
                 NextToken = nextToken
-            });
+            },
+            cancellationToken);
             foreach (var s in response.Subscriptions ?? [])
             {
                 results.Add(new SnsSubscriptionInfo(

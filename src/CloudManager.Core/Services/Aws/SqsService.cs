@@ -14,7 +14,7 @@ public sealed class SqsService
         this.factory = factory;
     }
 
-    public async ValueTask<List<SqsQueueInfo>> ListQueuesAsync()
+    public async ValueTask<List<SqsQueueInfo>> ListQueuesAsync(CancellationToken cancellationToken = default)
     {
         using var sqs = factory.CreateSqsClient();
         var urls = new List<string>();
@@ -23,7 +23,8 @@ public sealed class SqsService
         do
         {
             var listResponse = await sqs.ListQueuesAsync(
-                new ListQueuesRequest { NextToken = nextToken });
+                new ListQueuesRequest { NextToken = nextToken },
+                cancellationToken);
             urls.AddRange(listResponse.QueueUrls ?? []);
             nextToken = listResponse.NextToken;
         }
@@ -38,7 +39,8 @@ public sealed class SqsService
                 {
                     QueueUrl = url,
                     AttributeNames = ["ApproximateNumberOfMessages", "ApproximateNumberOfMessagesNotVisible", "DelaySeconds", "VisibilityTimeout"]
-                });
+                },
+                cancellationToken);
 
             var name = url.Split('/').LastOrDefault() ?? url;
             _ = Int32.TryParse(attrResponse.Attributes.GetValueOrDefault("ApproximateNumberOfMessages", "0"), out var messages);

@@ -20,6 +20,6 @@ public sealed partial class LambdaDlqDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            dlqInfo = await Service.GetDlqAsync(FunctionName);
+            dlqInfo = await Service.GetDlqAsync(FunctionName, CancellationToken);
         });
 }

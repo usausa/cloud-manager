@@ -26,7 +26,7 @@ public sealed partial class DynamoDbPitrDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            pitrInfo = await Service.GetPitrAsync(TableName);
+            pitrInfo = await Service.GetPitrAsync(TableName, CancellationToken);
             enable = pitrInfo.Enabled;
         });
 

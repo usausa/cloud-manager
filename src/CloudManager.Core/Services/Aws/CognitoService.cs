@@ -14,7 +14,7 @@ public sealed class CognitoService
         this.factory = factory;
     }
 
-    public async ValueTask<List<UserPoolInfo>> ListUserPoolsAsync()
+    public async ValueTask<List<UserPoolInfo>> ListUserPoolsAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCognitoClient();
         var results = new List<UserPoolInfo>();
@@ -26,7 +26,8 @@ public sealed class CognitoService
                 {
                     MaxResults = 60,
                     NextToken = nextToken
-                });
+                },
+                cancellationToken);
             foreach (var pool in response.UserPools ?? [])
             {
                 results.Add(new UserPoolInfo(
@@ -41,7 +42,7 @@ public sealed class CognitoService
         return results;
     }
 
-    public async ValueTask<List<CognitoUserInfo>> ListUsersAsync(string userPoolId)
+    public async ValueTask<List<CognitoUserInfo>> ListUsersAsync(string userPoolId, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCognitoClient();
         var results = new List<CognitoUserInfo>();
@@ -53,7 +54,8 @@ public sealed class CognitoService
                 {
                     UserPoolId = userPoolId,
                     PaginationToken = paginationToken
-                });
+                },
+                cancellationToken);
             foreach (var user in response.Users ?? [])
             {
                 var email = user.Attributes?.FirstOrDefault(a => a.Name == "email")?.Value;

@@ -26,7 +26,7 @@ public sealed partial class LambdaConcurrencyDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            info = await Service.GetConcurrencyAsync(FunctionName);
+            info = await Service.GetConcurrencyAsync(FunctionName, CancellationToken);
             newValue = info.ReservedConcurrency;
         });
 

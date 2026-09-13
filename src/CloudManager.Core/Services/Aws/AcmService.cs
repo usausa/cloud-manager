@@ -14,14 +14,14 @@ public sealed class AcmService
         this.factory = factory;
     }
 
-    public async ValueTask<List<AcmCertificateInfo>> ListCertificatesAsync()
+    public async ValueTask<List<AcmCertificateInfo>> ListCertificatesAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateAcmClient();
         var results = new List<AcmCertificateInfo>();
         string? nextToken = null;
         do
         {
-            var response = await client.ListCertificatesAsync(new ListCertificatesRequest { NextToken = nextToken });
+            var response = await client.ListCertificatesAsync(new ListCertificatesRequest { NextToken = nextToken }, cancellationToken);
             var now = DateTime.UtcNow;
             foreach (var cert in response.CertificateSummaryList ?? [])
             {
@@ -42,10 +42,10 @@ public sealed class AcmService
         return results;
     }
 
-    public async ValueTask<AcmCertificateDetail> GetCertificateAsync(string arn)
+    public async ValueTask<AcmCertificateDetail> GetCertificateAsync(string arn, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateAcmClient();
-        var response = await client.DescribeCertificateAsync(new DescribeCertificateRequest { CertificateArn = arn });
+        var response = await client.DescribeCertificateAsync(new DescribeCertificateRequest { CertificateArn = arn }, cancellationToken);
         var cert = response.Certificate;
         return new AcmCertificateDetail(
             cert.CertificateArn ?? string.Empty,

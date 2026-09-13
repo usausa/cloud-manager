@@ -26,6 +26,6 @@ public sealed partial class RdsParamGroupDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            parameters = await Service.ListParametersAsync(GroupName);
+            parameters = await Service.ListParametersAsync(GroupName, CancellationToken);
         });
 }

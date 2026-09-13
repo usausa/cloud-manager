@@ -106,9 +106,9 @@ public sealed partial class JobsPage
             return;
         }
 
-        await RunAsync($"実行中: {job.Name}", async (_, cancellationToken) =>
+        await RunAsync($"実行中: {job.Name}", async (_, _) =>
         {
-            var status = await Manager.ExecuteNowAsync(job, cancellationToken);
+            var status = await Manager.ExecuteNowAsync(job);
             if (status == JobExecutionStatus.Success)
             {
                 Snackbar.AddSuccess($"ジョブを実行しました: {job.Name}");

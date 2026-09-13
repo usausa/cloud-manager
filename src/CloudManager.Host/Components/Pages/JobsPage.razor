@@ -11,7 +11,7 @@
     <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Size="Size.Small"
                Disabled="IsRunning" OnClick="AddAsync">追加</MudButton>
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               Disabled="IsRunning" OnClick="LoadAsync">更新</MudButton>
+               Disabled="IsBusy" OnClick="LoadAsync">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />

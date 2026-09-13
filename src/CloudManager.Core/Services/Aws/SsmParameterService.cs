@@ -14,7 +14,7 @@ public sealed class SsmParameterService
         this.factory = factory;
     }
 
-    public async ValueTask<List<ParameterInfo>> ListParametersAsync(string? pathPrefix = null)
+    public async ValueTask<List<ParameterInfo>> ListParametersAsync(string? pathPrefix = null, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateSsmClient();
         var results = new List<ParameterInfo>();
@@ -34,7 +34,7 @@ public sealed class SsmParameterService
                     }
                 ];
             }
-            var response = await client.DescribeParametersAsync(request);
+            var response = await client.DescribeParametersAsync(request, cancellationToken);
             foreach (var p in response.Parameters ?? [])
             {
                 results.Add(new ParameterInfo(
@@ -49,14 +49,15 @@ public sealed class SsmParameterService
         return results;
     }
 
-    public async ValueTask<ParameterValueInfo> GetParameterAsync(string name, bool withDecryption = false)
+    public async ValueTask<ParameterValueInfo> GetParameterAsync(string name, bool withDecryption = false, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateSsmClient();
         var response = await client.GetParameterAsync(new GetParameterRequest
         {
             Name = name,
             WithDecryption = withDecryption
-        });
+        },
+        cancellationToken);
         var p = response.Parameter;
         return new ParameterValueInfo(
             p.Name ?? string.Empty,

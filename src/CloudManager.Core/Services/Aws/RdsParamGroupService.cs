@@ -12,7 +12,7 @@ public sealed class RdsParamGroupService
 
     public RdsParamGroupService(AwsClientFactory factory) => this.factory = factory;
 
-    public async ValueTask<List<RdsParamGroupInfo>> ListParameterGroupsAsync()
+    public async ValueTask<List<RdsParamGroupInfo>> ListParameterGroupsAsync(CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
         var result = new List<RdsParamGroupInfo>();
@@ -20,7 +20,8 @@ public sealed class RdsParamGroupService
         do
         {
             var response = await rds.DescribeDBParameterGroupsAsync(
-                new DescribeDBParameterGroupsRequest { Marker = marker });
+                new DescribeDBParameterGroupsRequest { Marker = marker },
+                cancellationToken);
             foreach (var g in response.DBParameterGroups ?? [])
             {
                 result.Add(new RdsParamGroupInfo(
@@ -34,7 +35,7 @@ public sealed class RdsParamGroupService
         return result;
     }
 
-    public async ValueTask<List<RdsParameterInfo>> ListParametersAsync(string groupName)
+    public async ValueTask<List<RdsParameterInfo>> ListParametersAsync(string groupName, CancellationToken cancellationToken = default)
     {
         using var rds = factory.CreateRdsClient();
         var result = new List<RdsParameterInfo>();
@@ -42,7 +43,8 @@ public sealed class RdsParamGroupService
         do
         {
             var response = await rds.DescribeDBParametersAsync(
-                new DescribeDBParametersRequest { DBParameterGroupName = groupName, Marker = marker });
+                new DescribeDBParametersRequest { DBParameterGroupName = groupName, Marker = marker },
+                cancellationToken);
             foreach (var p in response.Parameters ?? [])
             {
                 result.Add(new RdsParameterInfo(

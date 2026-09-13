@@ -28,7 +28,7 @@ public sealed partial class Route53Page
         recordSets = [];
         return LoadAsync(async () =>
         {
-            hostedZones = await Service.ListHostedZonesAsync();
+            hostedZones = await Service.ListHostedZonesAsync(CancellationToken);
         });
     }
 
@@ -52,7 +52,7 @@ public sealed partial class Route53Page
         isRecordsLoading = true;
         try
         {
-            recordSets = await Service.ListRecordSetsAsync(selectedZone.Id);
+            recordSets = await Service.ListRecordSetsAsync(selectedZone.Id, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

@@ -9,7 +9,7 @@
     <MudText Typo="Typo.h5">API Gateway</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
@@ -43,7 +43,7 @@
                 <MudText Typo="Typo.subtitle2">ステージ: @selectedApi.Name</MudText>
                 <MudSpacer />
                 <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                           OnClick="LoadStagesAsync" Disabled="isStagesLoading">更新</MudButton>
+                           OnClick="LoadStagesAsync" Disabled="IsBusy">更新</MudButton>
             </MudStack>
             <MudTable T="StageInfo" Items="stages" Dense="true" Hover="true" Bordered="true" Striped="true"
                       Loading="@isStagesLoading" RowsPerPage="25">

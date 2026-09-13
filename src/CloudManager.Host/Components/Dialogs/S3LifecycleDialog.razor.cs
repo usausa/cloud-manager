@@ -20,6 +20,6 @@ public sealed partial class S3LifecycleDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            rules = await Service.GetLifecycleAsync(BucketName);
+            rules = await Service.GetLifecycleAsync(BucketName, CancellationToken);
         });
 }

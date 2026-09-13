@@ -16,7 +16,7 @@ public sealed class EcsService
     }
 
     // Lists ECS clusters (paged)
-    public async ValueTask<List<EcsClusterInfo>> ListClustersAsync()
+    public async ValueTask<List<EcsClusterInfo>> ListClustersAsync(CancellationToken cancellationToken = default)
     {
         using var ecs = factory.CreateEcsClient();
         var arns = new List<string>();
@@ -25,7 +25,8 @@ public sealed class EcsService
         do
         {
             var listResponse = await ecs.ListClustersAsync(
-                new ListClustersRequest { NextToken = nextToken });
+                new ListClustersRequest { NextToken = nextToken },
+                cancellationToken);
             arns.AddRange(listResponse.ClusterArns);
             nextToken = listResponse.NextToken;
         }
@@ -37,7 +38,8 @@ public sealed class EcsService
         }
 
         var descResponse = await ecs.DescribeClustersAsync(
-            new DescribeClustersRequest { Clusters = arns });
+            new DescribeClustersRequest { Clusters = arns },
+            cancellationToken);
 #pragma warning disable IDE0028
         return descResponse.Clusters
             .Select(c => new EcsClusterInfo(
@@ -51,7 +53,7 @@ public sealed class EcsService
     }
 
     // Lists services in a cluster (paged)
-    public async ValueTask<List<EcsServiceInfo>> ListServicesAsync(string clusterName)
+    public async ValueTask<List<EcsServiceInfo>> ListServicesAsync(string clusterName, CancellationToken cancellationToken = default)
     {
         using var ecs = factory.CreateEcsClient();
         var arns = new List<string>();
@@ -64,7 +66,8 @@ public sealed class EcsService
                 {
                     Cluster = clusterName,
                     NextToken = nextToken
-                });
+                },
+                cancellationToken);
             arns.AddRange(listResponse.ServiceArns);
             nextToken = listResponse.NextToken;
         }
@@ -80,7 +83,8 @@ public sealed class EcsService
             {
                 Cluster = clusterName,
                 Services = arns
-            });
+            },
+            cancellationToken);
 
 #pragma warning disable IDE0028
         return descResponse.Services
@@ -148,7 +152,7 @@ public sealed class EcsService
     }
 
     // Lists tasks of a service
-    public async ValueTask<List<EcsTaskInfo>> ListTasksAsync(string clusterName, string? serviceName)
+    public async ValueTask<List<EcsTaskInfo>> ListTasksAsync(string clusterName, string? serviceName, CancellationToken cancellationToken = default)
     {
         using var ecs = factory.CreateEcsClient();
         var arns = new List<string>();
@@ -160,7 +164,7 @@ public sealed class EcsService
             {
                 request.ServiceName = serviceName;
             }
-            var listResponse = await ecs.ListTasksAsync(request);
+            var listResponse = await ecs.ListTasksAsync(request, cancellationToken);
             arns.AddRange(listResponse.TaskArns);
             nextToken = listResponse.NextToken;
         }
@@ -171,7 +175,7 @@ public sealed class EcsService
             return [];
         }
 
-        var descResponse = await ecs.DescribeTasksAsync(new DescribeTasksRequest { Cluster = clusterName, Tasks = arns });
+        var descResponse = await ecs.DescribeTasksAsync(new DescribeTasksRequest { Cluster = clusterName, Tasks = arns }, cancellationToken);
 #pragma warning disable IDE0028
         return (descResponse.Tasks ?? []).Select(t => new EcsTaskInfo(
             t.TaskArn,

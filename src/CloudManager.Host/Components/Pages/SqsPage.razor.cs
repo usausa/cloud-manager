@@ -21,7 +21,7 @@ public sealed partial class SqsPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            queues = await Service.ListQueuesAsync();
+            queues = await Service.ListQueuesAsync(CancellationToken);
         });
 
     private async Task SendMessageAsync(SqsQueueInfo queue)

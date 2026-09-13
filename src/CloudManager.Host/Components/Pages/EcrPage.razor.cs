@@ -16,7 +16,7 @@ public sealed partial class EcrPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            repositories = await Service.ListRepositoriesAsync();
+            repositories = await Service.ListRepositoriesAsync(CancellationToken);
         });
 
     private bool FilterFunc(EcrRepositoryInfo r) =>

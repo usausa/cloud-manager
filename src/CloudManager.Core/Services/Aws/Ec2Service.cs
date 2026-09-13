@@ -18,7 +18,7 @@ public sealed class Ec2Service
     }
 
     // Lists all EC2 instances (paged)
-    public async ValueTask<List<Ec2InstanceInfo>> ListInstancesAsync(string? state, string? tag)
+    public async ValueTask<List<Ec2InstanceInfo>> ListInstancesAsync(string? state, string? tag, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
         var filters = new List<Filter>();
@@ -46,7 +46,8 @@ public sealed class Ec2Service
                 {
                     Filters = filters.Count > 0 ? filters : null,
                     NextToken = nextToken
-                });
+                },
+                cancellationToken);
 
             foreach (var reservation in response.Reservations ?? [])
             {

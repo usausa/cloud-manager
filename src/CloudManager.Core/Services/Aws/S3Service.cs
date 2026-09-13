@@ -17,10 +17,10 @@ public sealed class S3Service
     }
 
     // Lists buckets
-    public async ValueTask<List<S3BucketInfo>> ListBucketsAsync()
+    public async ValueTask<List<S3BucketInfo>> ListBucketsAsync(CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
-        var response = await s3.ListBucketsAsync();
+        var response = await s3.ListBucketsAsync(cancellationToken);
 #pragma warning disable IDE0028
         return response.Buckets
             .Select(b => new S3BucketInfo(b.BucketName, b.CreationDate.GetValueOrDefault()))
@@ -29,7 +29,7 @@ public sealed class S3Service
     }
 
     // Lists objects in a bucket (paged)
-    public async ValueTask<List<S3ObjectInfo>> ListObjectsAsync(string bucketName, string? prefix)
+    public async ValueTask<List<S3ObjectInfo>> ListObjectsAsync(string bucketName, string? prefix, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
         var result = new List<S3ObjectInfo>();
@@ -47,7 +47,7 @@ public sealed class S3Service
                 request.Prefix = prefix;
             }
 
-            var response = await s3.ListObjectsV2Async(request);
+            var response = await s3.ListObjectsV2Async(request, cancellationToken);
 
             foreach (var obj in response.S3Objects ?? [])
             {
@@ -223,22 +223,22 @@ public sealed class S3Service
     }
 
     // Checks the public access settings of a bucket
-    public async ValueTask<S3PublicAccessReport> GetBucketPublicAccessAsync(string bucketName)
+    public async ValueTask<S3PublicAccessReport> GetBucketPublicAccessAsync(string bucketName, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
 
-        var pubAccess = await s3.GetPublicAccessBlockAsync(new GetPublicAccessBlockRequest { BucketName = bucketName });
+        var pubAccess = await s3.GetPublicAccessBlockAsync(new GetPublicAccessBlockRequest { BucketName = bucketName }, cancellationToken);
         var cfg = pubAccess.PublicAccessBlockConfiguration;
 
         bool? isPolicyPublic = null;
         try
         {
-            var policyStatus = await s3.GetBucketPolicyStatusAsync(new GetBucketPolicyStatusRequest { BucketName = bucketName });
+            var policyStatus = await s3.GetBucketPolicyStatusAsync(new GetBucketPolicyStatusRequest { BucketName = bucketName }, cancellationToken);
             isPolicyPublic = policyStatus.PolicyStatus?.IsPublic;
         }
         catch (AmazonS3Exception)
         {
-            /* バケットポリシーなし */
+            // No bucket policy
         }
 
         var blockAll = cfg.BlockPublicAcls.GetValueOrDefault()
@@ -257,7 +257,7 @@ public sealed class S3Service
     }
 
     // Lists object versions
-    public async ValueTask<List<S3VersionInfo>> ListVersionsAsync(string bucketName, string key)
+    public async ValueTask<List<S3VersionInfo>> ListVersionsAsync(string bucketName, string key, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
         var result = new List<S3VersionInfo>();
@@ -272,7 +272,8 @@ public sealed class S3Service
                     Prefix = key,
                     KeyMarker = keyMarker,
                     VersionIdMarker = versionIdMarker
-                });
+                },
+                cancellationToken);
             foreach (var v in (response.Versions ?? []).Where(v => v.Key == key))
             {
                 result.Add(new S3VersionInfo(
@@ -338,12 +339,12 @@ public sealed class S3Service
     }
 
     // Lists lifecycle rules
-    public async ValueTask<List<S3LifecycleRuleInfo>> GetLifecycleAsync(string bucketName)
+    public async ValueTask<List<S3LifecycleRuleInfo>> GetLifecycleAsync(string bucketName, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
         try
         {
-            var response = await s3.GetLifecycleConfigurationAsync(bucketName);
+            var response = await s3.GetLifecycleConfigurationAsync(bucketName, cancellationToken);
 #pragma warning disable IDE0028
             return response.Configuration.Rules
                 .Select(r => new S3LifecycleRuleInfo(
@@ -363,7 +364,7 @@ public sealed class S3Service
     }
 
     // Lists objects with a delimiter for the folder view
-    public async ValueTask<S3Listing> ListObjectsWithDelimiterAsync(string bucketName, string prefix)
+    public async ValueTask<S3Listing> ListObjectsWithDelimiterAsync(string bucketName, string prefix, CancellationToken cancellationToken = default)
     {
         using var s3 = factory.CreateS3Client();
         var commonPrefixes = new List<string>();
@@ -378,7 +379,8 @@ public sealed class S3Service
                     Prefix = prefix,
                     Delimiter = "/",
                     ContinuationToken = continuationToken
-                });
+                },
+                cancellationToken);
             commonPrefixes.AddRange(response.CommonPrefixes ?? []);
             foreach (var obj in (response.S3Objects ?? []).Where(o => o.Key != prefix))
             {

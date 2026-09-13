@@ -9,7 +9,7 @@
     <MudText Typo="Typo.h5">Route 53</MudText>
     <MudSpacer />
     <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+               OnClick="LoadAsync" Disabled="IsBusy">更新</MudButton>
 </MudStack>
 
 <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
@@ -45,7 +45,7 @@
                 <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Color="Color.Primary"
                            Size="Size.Small" OnClick="OpenUpsertDialogAsync" Disabled="IsRunning">追加/更新</MudButton>
                 <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
-                           OnClick="LoadRecordsAsync" Disabled="IsLoading">更新</MudButton>
+                           OnClick="LoadRecordsAsync" Disabled="IsBusy">更新</MudButton>
             </MudStack>
             <MudTable T="RecordSetInfo" Items="recordSets" Dense="true" Hover="true" Bordered="true" Striped="true"
                       Loading="@isRecordsLoading" RowsPerPage="25">

@@ -19,7 +19,7 @@ public sealed partial class CloudFrontPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            distributions = await Service.ListDistributionsAsync();
+            distributions = await Service.ListDistributionsAsync(CancellationToken);
         });
 
     private async Task InvalidateAsync(CloudFrontDistributionInfo dist)

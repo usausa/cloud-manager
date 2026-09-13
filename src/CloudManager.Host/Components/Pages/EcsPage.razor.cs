@@ -25,7 +25,7 @@ public sealed partial class EcsPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            clusters = await Service.ListClustersAsync();
+            clusters = await Service.ListClustersAsync(CancellationToken);
         });
 
     private async Task LoadServicesAsync(string? clusterName)
@@ -40,7 +40,7 @@ public sealed partial class EcsPage
         isSvcLoading = true;
         try
         {
-            services = await Service.ListServicesAsync(clusterName);
+            services = await Service.ListServicesAsync(clusterName, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

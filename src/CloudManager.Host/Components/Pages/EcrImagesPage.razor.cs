@@ -24,8 +24,8 @@ public sealed partial class EcrImagesPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            images = await Service.ListImagesAsync(Repository);
-            lifecyclePolicy = await Service.GetLifecyclePolicyAsync(Repository);
+            images = await Service.ListImagesAsync(Repository, CancellationToken);
+            lifecyclePolicy = await Service.GetLifecyclePolicyAsync(Repository, CancellationToken);
         });
 
     private async Task DeleteAsync(EcrImageInfo image)

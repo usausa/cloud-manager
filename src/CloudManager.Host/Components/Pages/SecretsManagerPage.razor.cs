@@ -21,7 +21,7 @@ public sealed partial class SecretsManagerPage
     private Task LoadAsync() =>
         LoadAsync(async () =>
         {
-            secrets = await Service.ListSecretsAsync();
+            secrets = await Service.ListSecretsAsync(CancellationToken);
         });
 
     private bool FilterFunc(SecretInfo s) =>
@@ -32,7 +32,7 @@ public sealed partial class SecretsManagerPage
     private Task ShowValueAsync(SecretInfo secret) =>
         RunAsync("取得中...", async (_, _) =>
         {
-            var value = await Service.GetSecretValueAsync(secret.Arn);
+            var value = await Service.GetSecretValueAsync(secret.Arn, CancellationToken);
             var parameters = new DialogParameters<SecretValueDialog>
             {
                 { x => x.SecretName, value.Name },

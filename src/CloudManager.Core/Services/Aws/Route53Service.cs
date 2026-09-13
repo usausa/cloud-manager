@@ -15,7 +15,7 @@ public sealed class Route53Service
         this.factory = factory;
     }
 
-    public async ValueTask<List<HostedZoneInfo>> ListHostedZonesAsync()
+    public async ValueTask<List<HostedZoneInfo>> ListHostedZonesAsync(CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateRoute53Client();
         var results = new List<HostedZoneInfo>();
@@ -23,7 +23,7 @@ public sealed class Route53Service
         do
         {
             var request = new ListHostedZonesRequest { Marker = marker };
-            var response = await client.ListHostedZonesAsync(request);
+            var response = await client.ListHostedZonesAsync(request, cancellationToken);
             foreach (var z in response.HostedZones ?? [])
             {
                 results.Add(new HostedZoneInfo(
@@ -39,7 +39,7 @@ public sealed class Route53Service
         return results;
     }
 
-    public async ValueTask<List<RecordSetInfo>> ListRecordSetsAsync(string hostedZoneId)
+    public async ValueTask<List<RecordSetInfo>> ListRecordSetsAsync(string hostedZoneId, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateRoute53Client();
         var results = new List<RecordSetInfo>();
@@ -54,7 +54,7 @@ public sealed class Route53Service
                 request.StartRecordName = startRecordName;
                 request.StartRecordType = startRecordType;
             }
-            var response = await client.ListResourceRecordSetsAsync(request);
+            var response = await client.ListResourceRecordSetsAsync(request, cancellationToken);
             foreach (var r in response.ResourceRecordSets ?? [])
             {
                 var values = r.ResourceRecords.Select(rr => rr.Value ?? string.Empty).ToList();

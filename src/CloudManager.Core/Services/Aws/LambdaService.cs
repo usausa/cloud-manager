@@ -15,7 +15,7 @@ public sealed class LambdaService
     }
 
     // Lists Lambda functions (paged)
-    public async ValueTask<List<LambdaFunctionInfo>> ListFunctionsAsync()
+    public async ValueTask<List<LambdaFunctionInfo>> ListFunctionsAsync(CancellationToken cancellationToken = default)
     {
         using var lambda = factory.CreateLambdaClient();
         var result = new List<LambdaFunctionInfo>();
@@ -24,7 +24,8 @@ public sealed class LambdaService
         do
         {
             var response = await lambda.ListFunctionsAsync(
-                new ListFunctionsRequest { Marker = marker });
+                new ListFunctionsRequest { Marker = marker },
+                cancellationToken);
 
             foreach (var fn in response.Functions ?? [])
             {
@@ -77,10 +78,10 @@ public sealed class LambdaService
     }
 
     // Gets environment variables
-    public async ValueTask<List<LambdaEnvVarInfo>> GetEnvironmentVariablesAsync(string functionName)
+    public async ValueTask<List<LambdaEnvVarInfo>> GetEnvironmentVariablesAsync(string functionName, CancellationToken cancellationToken = default)
     {
         using var lambda = factory.CreateLambdaClient();
-        var response = await lambda.GetFunctionConfigurationAsync(new GetFunctionConfigurationRequest { FunctionName = functionName });
+        var response = await lambda.GetFunctionConfigurationAsync(new GetFunctionConfigurationRequest { FunctionName = functionName }, cancellationToken);
         return response.Environment?.Variables?
             .Select(kv => new LambdaEnvVarInfo(kv.Key, kv.Value))
             .OrderBy(e => e.Key)
@@ -101,7 +102,7 @@ public sealed class LambdaService
     }
 
     // Lists aliases
-    public async ValueTask<List<LambdaAliasInfo>> ListAliasesAsync(string functionName)
+    public async ValueTask<List<LambdaAliasInfo>> ListAliasesAsync(string functionName, CancellationToken cancellationToken = default)
     {
         using var lambda = factory.CreateLambdaClient();
         var result = new List<LambdaAliasInfo>();
@@ -109,7 +110,8 @@ public sealed class LambdaService
         do
         {
             var response = await lambda.ListAliasesAsync(
-                new ListAliasesRequest { FunctionName = functionName, Marker = marker });
+                new ListAliasesRequest { FunctionName = functionName, Marker = marker },
+                cancellationToken);
             foreach (var a in response.Aliases ?? [])
             {
                 var routing = a.RoutingConfig?.AdditionalVersionWeights?.FirstOrDefault();
@@ -152,13 +154,13 @@ public sealed class LambdaService
     }
 
     // Gets the reserved concurrency
-    public async ValueTask<LambdaConcurrencyInfo> GetConcurrencyAsync(string functionName)
+    public async ValueTask<LambdaConcurrencyInfo> GetConcurrencyAsync(string functionName, CancellationToken cancellationToken = default)
     {
         using var lambda = factory.CreateLambdaClient();
         int? reserved = null;
         try
         {
-            var r = await lambda.GetFunctionConcurrencyAsync(new GetFunctionConcurrencyRequest { FunctionName = functionName });
+            var r = await lambda.GetFunctionConcurrencyAsync(new GetFunctionConcurrencyRequest { FunctionName = functionName }, cancellationToken);
             reserved = r.ReservedConcurrentExecutions;
         }
         catch (ResourceNotFoundException)
@@ -191,10 +193,10 @@ public sealed class LambdaService
     }
 
     // Gets the dead-letter queue setting
-    public async ValueTask<LambdaDlqInfo> GetDlqAsync(string functionName)
+    public async ValueTask<LambdaDlqInfo> GetDlqAsync(string functionName, CancellationToken cancellationToken = default)
     {
         using var lambda = factory.CreateLambdaClient();
-        var response = await lambda.GetFunctionConfigurationAsync(new GetFunctionConfigurationRequest { FunctionName = functionName });
+        var response = await lambda.GetFunctionConfigurationAsync(new GetFunctionConfigurationRequest { FunctionName = functionName }, cancellationToken);
         return new LambdaDlqInfo(functionName, response.DeadLetterConfig?.TargetArn);
     }
 }

@@ -23,6 +23,6 @@ public sealed partial class EcsTasksDialog
     protected override Task OnInitializedAsync() =>
         LoadAsync(async () =>
         {
-            tasks = await Service.ListTasksAsync(ClusterName, ServiceName);
+            tasks = await Service.ListTasksAsync(ClusterName, ServiceName, CancellationToken);
         });
 }
