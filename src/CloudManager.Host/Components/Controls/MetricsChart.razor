@@ -1,0 +1,13 @@
+@if ((Series is null) || (Series.Count == 0) || Series.All(static x => x.Points.Count == 0))
+{
+    <MudText Typo="Typo.body2" Color="Color.Secondary">No data</MudText>
+}
+else
+{
+    <MudText Typo="Typo.subtitle2" Class="mb-1">@Title @(Unit is not null ? $"({Unit})" : String.Empty)</MudText>
+    <MudChart T="double" ChartType="ChartType.Line"
+              ChartSeries="chartSeries"
+              ChartLabels="labels"
+              ChartOptions="chartOptions"
+              Height="240px" />
+}

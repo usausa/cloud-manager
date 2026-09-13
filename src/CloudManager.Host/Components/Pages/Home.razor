@@ -1,6 +1,101 @@
 @page "/"
+@inherits AwsComponentBase
 
-<PageTitle>CloudManager - Home</PageTitle>
+<PageTitle>CloudManager - ダッシュボード</PageTitle>
 
-<MudText Typo="Typo.h4">Home</MudText>
-<MudText Class="mt-2">CloudManager</MudText>
+<MudText Typo="Typo.h5" Class="mb-2">ダッシュボード</MudText>
+
+@if (!Session.IsProfileAvailable)
+{
+    <MudAlert Severity="Severity.Warning" Class="mb-2">
+        プロファイル '@Session.ProfileName' が ~/.aws/credentials または ~/.aws/config に見つかりません。
+        <MudLink Href="settings" Class="ml-2">設定を開く</MudLink>
+    </MudAlert>
+}
+else
+{
+    <MudPaper Class="pa-2 mb-3">
+        <MudGrid Spacing="1">
+            <MudItem xs="6"><MudText Typo="Typo.body2"><b>プロファイル: </b>@Session.ProfileName</MudText></MudItem>
+            <MudItem xs="6"><MudText Typo="Typo.body2"><b>リージョン: </b>@(Session.Region?.SystemName ?? "-")</MudText></MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+    <MudGrid Spacing="2" Class="mb-4">
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-3">
+                @if (IsLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60px" />
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle2">EC2 稼働中</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Success">@ec2Running</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">停止中: @ec2Stopped</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-3">
+                @if (IsLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60px" />
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle2">ECS 稼働タスク</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Primary">@ecsRunningTasks</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">クラスター: @ecsClusters</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-3">
+                @if (IsLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60px" />
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle2">RDS 稼働中</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Success">@rdsAvailable</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">停止中: @rdsStopped</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="pa-3">
+                @if (IsLoading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="60px" />
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle2">CloudWatch アラーム</MudText>
+                    <MudText Typo="Typo.h4" Color="@(alarmCount > 0 ? Color.Error : Color.Default)">@alarmCount</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">ALARM 状態</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+<MudText Typo="Typo.subtitle1" Class="mb-1">サービス一覧</MudText>
+
+@foreach (var category in Categories)
+{
+    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-1">@category.Name</MudText>
+    <MudGrid Spacing="1" Class="mb-3">
+        @foreach (var item in category.Items)
+        {
+            <MudItem xs="12" sm="6" md="3">
+                <MudPaper Class="pa-2 service-item">
+                    <MudLink Href="@item.Href"><MudIcon Icon="@item.Icon" Class="mr-1" />@item.Name</MudLink>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+}

@@ -17,6 +17,7 @@ using CloudManager.Host.Infrastructure.Jobs;
 using CloudManager.Host.Workers;
 using CloudManager.Infrastructure.Aws;
 
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -178,18 +179,31 @@ public static class ApplicationExtensions
 
     public static WebApplication UseErrorHandler(this WebApplication app)
     {
-        // API: ProblemDetails
+        // Page: not found page (UseWhen のブランチ内では再ルーティングされないためアプリ直下に置く)
+        app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+
+        // API: ProblemDetails, status code as is
         app.UseWhen(
             static context => context.Request.Path.StartsWithSegments(ApiPathPrefix, StringComparison.OrdinalIgnoreCase),
-            static b => b.UseExceptionHandler());
+            static b =>
+            {
+                b.UseExceptionHandler();
+                b.Use(static (context, next) =>
+                {
+                    var feature = context.Features.Get<IStatusCodePagesFeature>();
+                    if (feature is not null)
+                    {
+                        feature.Enabled = false;
+                    }
+
+                    return next(context);
+                });
+            });
 
         // Page: error page
         app.UseWhen(
             static context => !context.Request.Path.StartsWithSegments(ApiPathPrefix, StringComparison.OrdinalIgnoreCase),
-            static b =>
-            {
-                b.UseExceptionHandler("/error", createScopeForErrors: true);
-            });
+            static b => b.UseExceptionHandler("/error", createScopeForErrors: true));
 
         return app;
     }

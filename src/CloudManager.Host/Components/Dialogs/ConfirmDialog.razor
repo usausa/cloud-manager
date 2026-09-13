@@ -1,0 +1,21 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>@Message</MudText>
+        @if (ShowForce)
+        {
+            <MudCheckBox @bind-Value="force" Label="強制実行 (--force)" Class="mt-2" />
+        }
+        @if (RequireConfirmText is not null)
+        {
+            <MudText Typo="Typo.body2" Class="mt-2">確認のため次の値を入力してください: <strong>@RequireConfirmText</strong></MudText>
+            <MudTextField @bind-Value="confirmInput" Label="確認入力" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Class="mt-1" />
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnCancelClick">キャンセル</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="OnSubmitClick" Disabled="@(!IsSubmitEnabled)">実行</MudButton>
+    </DialogActions>
+</MudDialog>

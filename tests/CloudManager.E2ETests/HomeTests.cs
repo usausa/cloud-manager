@@ -18,6 +18,6 @@ public sealed class HomeTests : PageTest
 
         // Assert
         await Expect(Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions { Name = "CloudManager" })).ToBeVisibleAsync();
-        await Expect(Page.GetByRole(AriaRole.Link, new PageGetByRoleOptions { Name = "Home" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Link, new PageGetByRoleOptions { Name = "ダッシュボード" })).ToBeVisibleAsync();
     }
 }

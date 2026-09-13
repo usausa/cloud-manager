@@ -34,4 +34,25 @@ public static class DialogServiceExtensions
         var result = await reference.Result;
         return (bool?)result!.Data == true;
     }
+
+    // 危険な操作の確認。キャンセル時はnull
+    public static async ValueTask<ConfirmResult?> ShowOperationConfirm(
+        this IDialogService dialog,
+        string title,
+        string message,
+        bool showForce = false,
+        string? requireConfirmText = null)
+    {
+        var reference = await dialog.ShowAsync<ConfirmDialog>(
+            string.Empty,
+            new DialogParameters
+            {
+                { nameof(ConfirmDialog.Title), title },
+                { nameof(ConfirmDialog.Message), message },
+                { nameof(ConfirmDialog.ShowForce), showForce },
+                { nameof(ConfirmDialog.RequireConfirmText), requireConfirmText }
+            });
+        var result = await reference.Result;
+        return (result is { Canceled: false }) ? (ConfirmResult)result.Data! : null;
+    }
 }

@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <title>CloudManager</title>
     <link rel="stylesheet" href="@Assets["_content/MudBlazor/MudBlazor.min.css"]" />
     <link rel="stylesheet" href="@Assets["css/app.css"]" />
     <ImportMap />
@@ -33,7 +34,10 @@
     [CascadingParameter]
     public HttpContext HttpContext { get; set; } = default!;
 
-    // Static SSR for pages with [ExcludeFromInteractiveRouting] (login etc.)
+    // AWS API を呼ぶページが多く、プリレンダリングすると同じ呼び出しが二重になるため無効化する
+    private static readonly IComponentRenderMode InteractiveServerWithoutPrerender = new InteractiveServerRenderMode(prerender: false);
+
+    // Static SSR for pages with [ExcludeFromInteractiveRouting] (error etc.)
     private IComponentRenderMode? PageRenderMode =>
-        HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
+        HttpContext.AcceptsInteractiveRouting() ? InteractiveServerWithoutPrerender : null;
 }

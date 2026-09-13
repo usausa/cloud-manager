@@ -2,6 +2,35 @@ html, body {
     margin: 0;
 }
 
+body {
+    font-size: 0.875rem;
+}
+
+/* Dense table */
+.mud-table-dense .mud-table-row td {
+    padding: 2px 8px;
+}
+
+/* Service list */
+.service-item a.mud-link {
+    display: flex;
+    align-items: center;
+}
+
+/* Error banner */
+.error-banner {
+    border-left: 4px solid var(--mud-palette-error);
+}
+
+/* Progress overlay */
+.progress-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
 /* Blazor error UI */
 #blazor-error-ui {
     color-scheme: light only;

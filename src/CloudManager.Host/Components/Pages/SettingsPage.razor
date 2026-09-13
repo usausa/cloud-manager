@@ -1,0 +1,37 @@
+@page "/settings"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - 設定</PageTitle>
+
+<MudText Typo="Typo.h5" Class="mb-2">設定</MudText>
+
+<MudPaper Class="pa-2 mb-2" Style="max-width: 480px;">
+    <MudText Typo="Typo.subtitle2" Class="mb-1">現在の設定</MudText>
+    <MudText Typo="Typo.body2">プロファイル: <strong>@Session.ProfileName</strong></MudText>
+    <MudText Typo="Typo.body2">リージョン: <strong>@(Session.Region?.SystemName ?? "未設定")</strong></MudText>
+</MudPaper>
+
+<MudPaper Class="pa-2" Style="max-width: 480px;">
+    @if (Session.AvailableProfiles.Count == 0)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mb-2">~/.aws にプロファイルが見つかりません。</MudAlert>
+    }
+
+    <MudSelect T="string" @bind-Value="selectedProfile" Label="プロファイル" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2">
+        @foreach (var profile in Session.AvailableProfiles)
+        {
+            <MudSelectItem Value="@profile">@profile</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudSelect T="string" @bind-Value="selectedRegion" Label="リージョン" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2">
+        @foreach (var region in Regions)
+        {
+            <MudSelectItem Value="@region">@region</MudSelectItem>
+        }
+    </MudSelect>
+
+    <ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+    <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Apply" Disabled="@String.IsNullOrEmpty(selectedProfile)">適用</MudButton>
+</MudPaper>
