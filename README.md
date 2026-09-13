@@ -1,96 +1,88 @@
 # CloudManager
 
-AWS リソースを参照・操作する Blazor Server 製の管理 Web UI。
-`~/.aws/credentials` / `~/.aws/config` のプロファイルを切り替えながら、EC2 / RDS / S3 などの状態確認と起動・停止などの操作、cron によるジョブ実行ができる。
+A web console for browsing and operating AWS resources from your local AWS profiles.
+Switch between profiles and regions, inspect EC2 / RDS / S3 and other services, run day-to-day operations, and schedule recurring jobs with cron.
 
-## 構成
+![Dashboard](docs/images/dashboard.png)
 
-| プロジェクト | 役割 |
-| --- | --- |
-| `src/CloudManager.Core` | AWS サービス操作 (`Services/Aws`)、ジョブ定義・実行履歴の永続化 (`Accessors`, `Services`)、モデル |
-| `src/CloudManager.Host` | Blazor Server ホスト。画面 (`Components`)、ジョブスケジューラ (`Infrastructure/Jobs`, `Workers`)、S3 ダウンロード API (`Endpoints`) |
-| `tests/CloudManager.UnitTests` | 単体テスト (xUnit v3 / bUnit) |
-| `tests/CloudManager.IntegrationTests` | ホスト起動を伴う統合テスト (SQLite 実体を使用) |
+## ✨ Features
 
-## 前提条件
+| Service | View | Operations |
+| --- | --- | --- |
+| EC2 | ✅ | Start / Stop / Reboot / Terminate / SSM Run Command |
+| EBS | ✅ | Attach / Detach / Create snapshot |
+| ECS | ✅ | Change desired count / Force new deployment / List tasks |
+| Lambda | ✅ | Invoke / Environment variables / Aliases / Concurrency / DLQ |
+| ECR | ✅ | List images / Delete image |
+| S3 | ✅ | Upload / Download / Delete / Preview / Copy & move / Versions / Lifecycle / Public access |
+| RDS | ✅ | Start / Stop / Reboot / Snapshots (create, restore, delete) / Parameter groups / Events / Aurora failover |
+| DynamoDB | ✅ | Scan / PITR / TTL |
+| VPC | ✅ | Subnets / Security groups / Route tables / Internet gateways / NAT gateways |
+| Elastic IP | ✅ | Associate / Disassociate |
+| CloudFront | ✅ | Invalidate cache |
+| ELB | ✅ | Target health |
+| Route 53 | ✅ | Add / Update / Delete records |
+| ACM | ✅ | Certificate details |
+| API Gateway | ✅ | Deploy |
+| EventBridge | ✅ | Enable / Disable rules |
+| SQS | ✅ | Send / Receive / Purge |
+| SNS | ✅ | Publish |
+| CloudWatch | ✅ | Metrics / Alarms |
+| CloudWatch Logs | ✅ | Log events / Logs Insights |
+| SSM Parameter Store | ✅ | View / Edit values |
+| Secrets Manager | ✅ | View values |
+| Cognito | ✅ | Reset password |
+| Cost | — | Estimates from the Pricing API |
 
-- .NET 10 SDK
-- `~/.aws/credentials` / `~/.aws/config` に認証情報とリージョンが設定済みであること
+## 🔐 Requirements
 
-### ~/.aws/credentials
+CloudManager uses the AWS profiles on the machine it runs on. Configure `~/.aws/credentials` and `~/.aws/config` before use.
 
 ```ini
+# ~/.aws/credentials
 [default]
 aws_access_key_id = AKIAIOSFODNN7EXAMPLE
 aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
 
-### ~/.aws/config
-
 ```ini
+# ~/.aws/config
 [default]
 region = ap-northeast-1
 ```
 
-## 起動
+## 🧭 Usage
 
-```bash
-dotnet run --project src/CloudManager.Host
-```
+### 🔄 Profile and region
 
-`http://localhost:8080` で開く。
+The dashboard shows the active profile and region. Open **Settings** to switch to any profile found in `~/.aws`; the change applies immediately to every page.
 
-## 設定 (`appsettings.json`)
+### 🖥️ Browsing and operating resources
 
-| キー | 説明 |
+Each service has its own page reachable from the navigation menu or the dashboard. Lists can be filtered and refreshed, and row actions open dialogs for operations.
+Destructive operations (terminate, delete, force failover, ...) ask for confirmation and, where appropriate, require the resource identifier to be typed in. Long-running operations show progress while the service reaches the target state.
+
+### 📦 S3
+
+Buckets and objects can be browsed by prefix. Objects can be uploaded from the browser, downloaded, previewed (images and text), copied or moved, and their versions restored. Bucket-level lifecycle rules and public access settings are available from the bucket list.
+
+### ⏰ Scheduled jobs
+
+**Jobs** lets you schedule recurring operations with a cron expression:
+
+- Start / Stop / Reboot an EC2 instance
+- Start / Stop an RDS instance
+- Change the desired count of an ECS service
+- Invoke a Lambda function
+- Invalidate a CloudFront distribution
+
+Each job runs with its own profile and region, and the cron expression can be evaluated in UTC or local time. Jobs can also be executed immediately, and every run is recorded in **Job History** with its result and error details.
+
+## ⚙️ Configuration
+
+| Key | Description |
 | --- | --- |
-| `ConnectionStrings:Default` | ジョブ定義・実行履歴を保存する SQLite の接続文字列 (テーブルは起動時に作成) |
-| `Aws:DefaultProfile` | 起動時に選択するプロファイル。画面の「設定」で切り替え可能 |
-| `Aws:DefaultRegion` | 起動時に選択するリージョン |
-| `Job:LogRetentionCountPerJob` | ジョブごとに保持する実行履歴の件数 |
-| `Log` / `Profiler` / `Serilog` | HTTP ログ・SQL ログ・ログ出力先 |
-
-## 対応サービス
-
-| サービス | 参照 | 操作 |
-| --- | --- | --- |
-| EC2 | ✅ | 起動 / 停止 / 再起動 / 終了 / SSM Run Command |
-| EBS | ✅ | アタッチ / デタッチ / スナップショット |
-| ECS | ✅ | 希望タスク数変更 / 強制再デプロイ / タスク一覧 |
-| Lambda | ✅ | 実行 / 環境変数 / エイリアス / 同時実行数 / DLQ |
-| ECR | ✅ | イメージ一覧 / 削除 |
-| S3 | ✅ | アップロード / ダウンロード / 削除 / プレビュー / コピー・移動 / バージョン / ライフサイクル / パブリックアクセス |
-| RDS | ✅ | 起動 / 停止 / 再起動 / スナップショット作成・復元・削除 / パラメータグループ / イベント / Aurora フェイルオーバー |
-| DynamoDB | ✅ | スキャン / PITR / TTL |
-| VPC | ✅ | — |
-| Elastic IP | ✅ | 関連付け / 解除 |
-| CloudFront | ✅ | キャッシュ無効化 |
-| ELB | ✅ | ターゲットヘルス |
-| Route 53 | ✅ | レコード追加 / 変更 / 削除 |
-| ACM | ✅ | 証明書詳細 |
-| API Gateway | ✅ | デプロイ |
-| EventBridge | ✅ | ルール有効化 / 無効化 |
-| SQS | ✅ | メッセージ送受信 / パージ |
-| SNS | ✅ | メッセージ発行 |
-| CloudWatch | ✅ | メトリクス / アラーム |
-| CloudWatch Logs | ✅ | ログイベント / Logs Insights |
-| SSM Parameter Store | ✅ | 値の参照 / 編集 |
-| Secrets Manager | ✅ | 値の参照 |
-| Cognito | ✅ | パスワードリセット |
-| Cost | — | Pricing API による概算 |
-
-## ジョブ
-
-EC2 / RDS の起動・停止、ECS の希望タスク数変更、Lambda 実行、CloudFront キャッシュ無効化を cron 式で定期実行できる。
-定義は SQLite に保存され、起動時にスケジューラへ登録される。実行結果は「実行履歴」から確認できる。
-
-## テスト
-
-各テストプロジェクトは Microsoft.Testing.Platform の実行ファイルとして動作する。
-
-```bash
-dotnet run --project tests/CloudManager.UnitTests
-dotnet run --project tests/CloudManager.IntegrationTests
-```
-
-統合テストは存在しないプロファイル名で起動するため AWS へは接続しない。
+| `Aws:DefaultProfile` | Profile selected at startup |
+| `Aws:DefaultRegion` | Region selected at startup |
+| `Job:LogRetentionCountPerJob` | Number of history entries kept per job |
+| `ConnectionStrings:Default` | SQLite database that stores job definitions and history (created automatically) |
