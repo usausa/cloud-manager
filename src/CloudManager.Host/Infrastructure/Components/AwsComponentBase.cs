@@ -62,11 +62,11 @@ public abstract class AwsComponentBase : AppComponentBase
     }
 
     // 操作の実行。進捗オーバーレイを表示し、失敗はバナーとスナックバーに表示する
-    protected async Task RunAsync(Func<IProgress<ProgressUpdate>, CancellationToken, Task> operation, Func<Task>? reload = null)
+    protected async Task RunAsync(string message, Func<IProgress<ProgressUpdate>, CancellationToken, Task> operation, Func<Task>? reload = null)
     {
         IsRunning = true;
         ProgressRatio = 0;
-        ProgressMessage = "実行中...";
+        ProgressMessage = message;
         ErrorMessage = null;
 
         var progress = new Progress<ProgressUpdate>(x =>

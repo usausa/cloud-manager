@@ -1,0 +1,94 @@
+@page "/ec2"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - EC2</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">EC2 インスタンス</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudPaper Class="pa-2 mb-2">
+    <MudStack Row="true" Spacing="2">
+        <MudSelect T="string" @bind-Value="filterState" Label="状態" Variant="Variant.Outlined" Margin="Margin.Dense"
+                   Style="max-width:160px" Clearable="true">
+            @foreach (var s in States)
+            {
+                <MudSelectItem Value="@s">@s</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField @bind-Value="filterTag" Label="Tag K=V" Variant="Variant.Outlined" Margin="Margin.Dense"
+                      Style="max-width:240px" />
+        <MudButton StartIcon="@Icons.Material.Filled.FilterList" Variant="Variant.Outlined" Size="Size.Small"
+                   OnClick="LoadAsync" Disabled="IsRunning">絞り込み</MudButton>
+    </MudStack>
+</MudPaper>
+
+<MudTable T="Ec2InstanceInfo" Items="instances" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25" MultiSelection="true" @bind-SelectedItems="selectedItems">
+    <HeaderContent>
+        <MudTh>名前</MudTh>
+        <MudTh>インスタンス ID</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>タイプ</MudTh>
+        <MudTh>パブリック IP</MudTh>
+        <MudTh>プライベート IP</MudTh>
+        <MudTh>起動時刻</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>@context.InstanceId</MudTd>
+        <MudTd><MudChip T="string" Color="@StateColor(context.State)" Size="Size.Small">@context.State</MudChip></MudTd>
+        <MudTd>@context.InstanceType</MudTd>
+        <MudTd>@(context.PublicIp ?? "-")</MudTd>
+        <MudTd>@(context.PrivateIp ?? "-")</MudTd>
+        <MudTd>@context.LaunchTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd>
+            <MudTooltip Text="Start">
+                <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => StartAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="Stop">
+                <MudIconButton Icon="@Icons.Material.Filled.Stop" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => StopAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="Reboot">
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => RebootAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="Terminate">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                               Disabled="IsRunning" OnClick="() => TerminateAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="SSM Run">
+                <MudIconButton Icon="@Icons.Material.Filled.Terminal" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => SsmRunAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@if (ssmResult is not null)
+{
+    <MudPaper Class="pa-2 mt-2">
+        <MudText Typo="Typo.subtitle2">SSM 結果：@ssmResult.Status</MudText>
+        <MudExpansionPanels>
+            <MudExpansionPanel Text="stdout">
+                <pre style="white-space:pre-wrap;font-size:0.8rem">@ssmResult.StandardOutput</pre>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="stderr">
+                <pre style="white-space:pre-wrap;font-size:0.8rem">@ssmResult.StandardError</pre>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudPaper>
+}

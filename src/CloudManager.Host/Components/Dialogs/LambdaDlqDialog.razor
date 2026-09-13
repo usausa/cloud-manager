@@ -1,0 +1,29 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>DLQ 設定 - @FunctionName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (dlqInfo is not null)
+        {
+            @if (!String.IsNullOrEmpty(dlqInfo.DlqArn))
+            {
+                <MudAlert Severity="Severity.Info">DLQ ARN: @dlqInfo.DlqArn</MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Warning">DLQ が設定されていません。</MudAlert>
+            }
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

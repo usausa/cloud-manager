@@ -1,0 +1,35 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>タスク一覧 - @ServiceName</TitleContent>
+    <DialogContent>
+        @if (IsLoading) { <MudProgressCircular Indeterminate="true" /> }
+        else if (tasks.Count == 0) { <MudText>タスクがありません。</MudText> }
+        else
+        {
+            <MudTable T="EcsTaskInfo" Items="tasks" Dense="true" Hover="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>タスク ID</MudTh>
+                    <MudTh>希望状態</MudTh>
+                    <MudTh>最終状態</MudTh>
+                    <MudTh>起動者</MudTh>
+                    <MudTh>開始時刻</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.TaskId</MudTd>
+                    <MudTd>@context.Status</MudTd>
+                    <MudTd>@context.LastStatus</MudTd>
+                    <MudTd>@(String.IsNullOrEmpty(context.StartedBy) ? "-" : context.StartedBy)</MudTd>
+                    <MudTd>@(context.StartedAt.HasValue ? context.StartedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,0 +1,9 @@
+<MudDialog>
+    <TitleContent><MudText Typo="Typo.h6">実行結果 - @FunctionName (HTTP @StatusCode)</MudText></TitleContent>
+    <DialogContent>
+        <MudTextField Value="@Payload" Variant="Variant.Outlined" Lines="12" ReadOnly="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close" Variant="Variant.Filled" Color="Color.Primary">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

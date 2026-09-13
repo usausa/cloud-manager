@@ -1,0 +1,46 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>エイリアス - @FunctionName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (aliases.Count == 0)
+        {
+            <MudText>エイリアスがありません。</MudText>
+        }
+        else
+        {
+            <MudTable T="LambdaAliasInfo" Items="aliases" Dense="true" Hover="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>名前</MudTh>
+                    <MudTh>バージョン</MudTh>
+                    <MudTh>説明</MudTh>
+                    <MudTh>追加バージョン</MudTh>
+                    <MudTh>操作</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.FunctionVersion</MudTd>
+                    <MudTd>@(context.Description ?? "-")</MudTd>
+                    <MudTd>@(context.AdditionalVersion is not null ? $"{context.AdditionalVersion} ({context.AdditionalWeight:P0})" : "-")</MudTd>
+                    <MudTd>
+                        <MudTooltip Text="削除">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                                           OnClick="() => DeleteAsync(context)" Disabled="isDeleting" />
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

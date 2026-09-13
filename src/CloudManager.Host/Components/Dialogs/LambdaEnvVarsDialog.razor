@@ -1,0 +1,31 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>環境変数 - @FunctionName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else
+        {
+            <MudTable T="LambdaEnvVarInfo" Items="envVars" Dense="true" Hover="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>キー</MudTh>
+                    <MudTh>値</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Key</MudTd>
+                    <MudTd>@context.Value</MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

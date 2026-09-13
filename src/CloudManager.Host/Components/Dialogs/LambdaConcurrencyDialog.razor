@@ -1,0 +1,26 @@
+@inherits AwsComponentBase
+
+<MudDialog>
+    <TitleContent>同時実行数 - @FunctionName</TitleContent>
+    <DialogContent>
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (info is not null)
+        {
+            <MudStack Spacing="2">
+                <MudText>予約同時実行数: @(info.ReservedConcurrency.HasValue ? info.ReservedConcurrency.Value.ToString(CultureInfo.InvariantCulture) : "未設定（アカウント共有）")</MudText>
+                <MudNumericField @bind-Value="newValue" Label="新しい予約同時実行数（空 = 削除）" Min="0" />
+            </MudStack>
+        }
+        @if (ErrorMessage is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@ErrorMessage</MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveAsync" Disabled="isSaving">保存</MudButton>
+    </DialogActions>
+</MudDialog>

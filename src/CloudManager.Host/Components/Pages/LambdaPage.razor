@@ -1,0 +1,62 @@
+@page "/lambda"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - Lambda</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">Lambda</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="LambdaFunctionInfo" Items="functions" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" Filter="FilterFunc" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"
+                      Immediate="true" Clearable="true" Margin="Margin.Dense" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>関数名</MudTh>
+        <MudTh>ランタイム</MudTh>
+        <MudTh>コードサイズ</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>最終更新</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.FunctionName</MudTd>
+        <MudTd>@context.Runtime</MudTd>
+        <MudTd>@context.CodeSize</MudTd>
+        <MudTd>@context.State</MudTd>
+        <MudTd>@(context.LastModified.HasValue ? context.LastModified.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
+        <MudTd>
+            <MudTooltip Text="Invoke">
+                <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => InvokeAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="環境変数">
+                <MudIconButton Icon="@Icons.Material.Filled.Tune" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => ShowEnvVarsAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="エイリアス">
+                <MudIconButton Icon="@Icons.Material.Filled.Label" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => ShowAliasesAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="同時実行数">
+                <MudIconButton Icon="@Icons.Material.Filled.Speed" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => ShowConcurrencyAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="DLQ">
+                <MudIconButton Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => ShowDlqAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

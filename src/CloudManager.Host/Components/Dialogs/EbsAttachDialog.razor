@@ -1,0 +1,13 @@
+<MudDialog>
+    <TitleContent>ボリュームのアタッチ - @VolumeId</TitleContent>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudTextField @bind-Value="instanceId" Label="インスタンス ID" Required="true" FullWidth="true" AutoFocus="true" />
+            <MudTextField @bind-Value="device" Label="デバイス名" Placeholder="/dev/sdf" Required="true" FullWidth="true" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Disabled="@(!IsValid)">アタッチ</MudButton>
+    </DialogActions>
+</MudDialog>

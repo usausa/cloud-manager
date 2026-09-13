@@ -1,0 +1,66 @@
+@page "/ebs"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - EBS</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">EBS ボリューム</MudText>
+    <MudSpacer />
+    <MudSelect T="string" @bind-Value="stateFilter" Label="状態" Dense="true" Margin="Margin.Dense" Style="max-width:160px">
+        <MudSelectItem Value='@("")'>すべて</MudSelectItem>
+        <MudSelectItem Value='"available"'>available</MudSelectItem>
+        <MudSelectItem Value='"in-use"'>in-use</MudSelectItem>
+    </MudSelect>
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="EbsVolumeInfo" Items="FilteredVolumes" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25">
+    <HeaderContent>
+        <MudTh>ボリューム ID</MudTh>
+        <MudTh>サイズ(GiB)</MudTh>
+        <MudTh>タイプ</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>AZ</MudTh>
+        <MudTh>アタッチ先</MudTh>
+        <MudTh>作成日時</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.VolumeId</MudTd>
+        <MudTd>@context.SizeGb</MudTd>
+        <MudTd>@context.VolumeType</MudTd>
+        <MudTd>
+            <MudChip T="string" Size="Size.Small" Color="@StateColor(context.State)">@context.State</MudChip>
+        </MudTd>
+        <MudTd>@context.AvailabilityZone</MudTd>
+        <MudTd>@(context.AttachedInstanceId ?? "-")</MudTd>
+        <MudTd>@context.CreateTime.ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd>
+            <MudTooltip Text="スナップショット作成">
+                <MudIconButton Icon="@Icons.Material.Filled.Camera" Size="Size.Small"
+                               OnClick="@(() => CreateSnapshotAsync(context))" />
+            </MudTooltip>
+            @if (context.State == "available")
+            {
+                <MudTooltip Text="アタッチ">
+                    <MudIconButton Icon="@Icons.Material.Filled.Link" Size="Size.Small"
+                                   OnClick="@(() => AttachAsync(context))" />
+                </MudTooltip>
+            }
+            @if (context.State == "in-use")
+            {
+                <MudTooltip Text="デタッチ">
+                    <MudIconButton Icon="@Icons.Material.Filled.LinkOff" Size="Size.Small"
+                                   OnClick="@(() => DetachAsync(context))" />
+                </MudTooltip>
+            }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

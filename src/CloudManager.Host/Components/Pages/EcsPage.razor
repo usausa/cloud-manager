@@ -1,0 +1,84 @@
+@page "/ecs"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - ECS</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">ECS</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTabs Outlined="true" Class="mt-1">
+    <MudTabPanel Text="クラスター">
+        <MudTable T="EcsClusterInfo" Items="clusters" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>クラスター名</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>サービス数</MudTh>
+                <MudTh>タスク数</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.ClusterName</MudTd>
+                <MudTd><MudChip T="string" Color="@EcsStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+                <MudTd>@context.ActiveServicesCount</MudTd>
+                <MudTd>@context.RunningTasksCount</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="サービス">
+        <MudStack Row="true" Class="mb-1 mt-1">
+            <MudSelect T="string" Value="selectedCluster" Label="クラスター" Variant="Variant.Outlined"
+                       Margin="Margin.Dense" Style="max-width:300px"
+                       ValueChanged="LoadServicesAsync">
+                @foreach (var c in clusters)
+                {
+                    <MudSelectItem Value="@c.ClusterName">@c.ClusterName</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+        <MudTable T="EcsServiceInfo" Items="services" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@isSvcLoading" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>サービス名</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>希望</MudTh>
+                <MudTh>実行中</MudTh>
+                <MudTh>保留中</MudTh>
+                <MudTh>タスク定義</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.ServiceName</MudTd>
+                <MudTd><MudChip T="string" Color="@EcsStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+                <MudTd>@context.DesiredCount</MudTd>
+                <MudTd>@context.RunningCount</MudTd>
+                <MudTd>@context.PendingCount</MudTd>
+                <MudTd>@context.TaskDefinition</MudTd>
+                <MudTd>
+                    <MudTooltip Text="希望数変更">
+                        <MudIconButton Icon="@Icons.Material.Filled.Tune" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => UpdateDesiredCountAsync(context)" />
+                    </MudTooltip>
+                    <MudTooltip Text="タスク一覧">
+                        <MudIconButton Icon="@Icons.Material.Filled.List" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => ShowTasksAsync(context)" />
+                    </MudTooltip>
+                    <MudTooltip Text="強制再デプロイ">
+                        <MudIconButton Icon="@Icons.Material.Filled.Replay" Size="Size.Small" Color="Color.Warning"
+                                       Disabled="IsRunning" OnClick="() => ForceRedeployAsync(context)" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+</MudTabs>
