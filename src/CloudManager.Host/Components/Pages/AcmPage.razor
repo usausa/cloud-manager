@@ -1,0 +1,53 @@
+@page "/acm"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - ACM</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">Certificate Manager (ACM)</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="AcmCertificateInfo" Items="FilteredCertificates" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索..." Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mt-0" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ドメイン名</MudTh>
+        <MudTh>ステータス</MudTh>
+        <MudTh>タイプ</MudTh>
+        <MudTh>有効期限</MudTh>
+        <MudTh>残り日数</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.DomainName</MudTd>
+        <MudTd>@context.Status</MudTd>
+        <MudTd>@context.Type</MudTd>
+        <MudTd>@(context.NotAfter?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+        <MudTd>
+            @if (context.DaysToExpiry.HasValue)
+            {
+                var color = context.DaysToExpiry < 7 ? Color.Error : context.DaysToExpiry < 30 ? Color.Warning : Color.Default;
+                <MudChip T="string" Color="@color" Size="Size.Small">@context.DaysToExpiry 日</MudChip>
+            }
+            else
+            {
+                <MudText>-</MudText>
+            }
+        </MudTd>
+        <MudTd>
+            <MudTooltip Text="詳細">
+                <MudIconButton Icon="@Icons.Material.Filled.Info" Size="Size.Small"
+                               OnClick="() => ShowDetailAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

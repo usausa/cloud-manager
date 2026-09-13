@@ -1,0 +1,139 @@
+@page "/cloudwatch-logs"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - CloudWatch Logs</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">CloudWatch Logs</MudText>
+    <MudSpacer />
+    <MudTextField @bind-Value="groupPrefix" Placeholder="グループ名プレフィックス" Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.FilterList" IconSize="Size.Small"
+                  Immediate="false" Clearable="true" Margin="Margin.Dense" />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudStack Spacing="3">
+    <div>
+        <MudText Typo="Typo.subtitle2" Class="mb-1">ロググループ</MudText>
+        <MudTable T="LogGroupInfo" Items="logGroups" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" RowsPerPage="25" SelectedItem="selectedGroup"
+                  SelectedItemChanged="OnGroupSelectedAsync">
+            <HeaderContent>
+                <MudTh>グループ名</MudTh>
+                <MudTh>保持(日)</MudTh>
+                <MudTh>サイズ(MB)</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudText Class="@(context == selectedGroup ? "mud-primary-text font-bold" : string.Empty)">
+                        @context.GroupName
+                    </MudText>
+                </MudTd>
+                <MudTd>@(context.RetentionDays.HasValue ? context.RetentionDays.ToString() : "無制限")</MudTd>
+                <MudTd>@((context.StoredBytes / 1024.0 / 1024.0).ToString("F2"))</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </div>
+    @if (selectedGroup is not null)
+    {
+            <MudTabs Elevation="1" Rounded="true" ApplyEffectsToContainer="true">
+                <MudTabPanel Text="ログストリーム">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+                        <MudText Typo="Typo.subtitle2">@selectedGroup.GroupName</MudText>
+                        <MudSpacer />
+                        <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                                   OnClick="LoadStreamsAsync" Disabled="IsRunning">更新</MudButton>
+                    </MudStack>
+                    <MudTable T="LogStreamInfo" Items="logStreams" Dense="true" Hover="true" Bordered="true"
+                              Loading="@isStreamsLoading" RowsPerPage="20" SelectedItem="selectedStream"
+                              SelectedItemChanged="OnStreamSelectedAsync">
+                        <HeaderContent>
+                            <MudTh>ストリーム名</MudTh>
+                            <MudTh>最終イベント</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>
+                                <MudText Class="@(context == selectedStream ? "mud-primary-text font-bold" : string.Empty)">
+                                    @context.StreamName
+                                </MudText>
+                            </MudTd>
+                            <MudTd>@(context.LastEvent?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-")</MudTd>
+                        </RowTemplate>
+                        <PagerContent><MudTablePager /></PagerContent>
+                    </MudTable>
+                </MudTabPanel>
+                <MudTabPanel Text="Logs Insights">
+                    <MudStack Spacing="2">
+                        <MudStack Row="true" AlignItems="AlignItems.Center">
+                            <MudDatePicker @bind-Date="insightStart" Label="開始" Margin="Margin.Dense" />
+                                <MudDatePicker @bind-Date="insightEnd" Label="終了" Margin="Margin.Dense" />
+                            <MudButton StartIcon="@Icons.Material.Filled.PlayArrow" Variant="Variant.Filled" Color="Color.Primary"
+                                       Size="Size.Small" OnClick="RunInsightsQueryAsync" Disabled="IsRunning">実行</MudButton>
+                        </MudStack>
+                        <MudTextField @bind-Value="insightQuery" Label="クエリ" Lines="3" Variant="Variant.Outlined"
+                                      Placeholder="@InsightQueryPlaceholder" />
+                        @if (insightStatus is not null)
+                        {
+                            <MudChip T="string" Color="@(insightStatus == "Complete" ? Color.Success : Color.Warning)">
+                                @insightStatus
+                            </MudChip>
+                        }
+                        @if (insightResults.Count > 0)
+                        {
+                            <MudSimpleTable Dense="true" Bordered="true" Striped="true">
+                                <thead>
+                                    <tr>
+                                        @foreach (var col in insightColumns)
+                                        {
+                                            <th>@col</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var row in insightResults)
+                                    {
+                                        <tr>
+                                            @foreach (var col in insightColumns)
+                                            {
+                                                <td>@row.Get(col)</td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </MudSimpleTable>
+                        }
+                    </MudStack>
+                </MudTabPanel>
+            </MudTabs>
+        }
+</MudStack>
+
+@if (selectedStream is not null && selectedGroup is not null)
+{
+    <MudPaper Class="mt-3 pa-3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+            <MudText Typo="Typo.subtitle2">イベント: @selectedStream.StreamName</MudText>
+            <MudSpacer />
+            <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                       OnClick="LoadEventsAsync" Disabled="IsRunning">更新</MudButton>
+        </MudStack>
+        <MudTable T="LogEventInfo" Items="logEvents" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@isEventsLoading" RowsPerPage="50">
+            <HeaderContent>
+                <MudTh>タイムスタンプ</MudTh>
+                <MudTh>メッセージ</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
+                <MudTd>@context.Message</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudPaper>
+}

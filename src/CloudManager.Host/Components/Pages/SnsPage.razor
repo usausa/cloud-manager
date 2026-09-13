@@ -1,0 +1,64 @@
+@page "/sns"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - SNS</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">SNS</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudStack Spacing="3">
+    <div>
+        <MudText Typo="Typo.subtitle2" Class="mb-1">トピック一覧</MudText>
+        <MudTable T="SnsTopicInfo" Items="topics" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" SelectedItem="selectedTopic" SelectedItemChanged="OnTopicSelectedAsync" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>トピック名</MudTh>
+                <MudTh>表示名</MudTh>
+                <MudTh>サブスクリプション数</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudText Class="@(context == selectedTopic ? "mud-primary-text font-bold" : string.Empty)">
+                        @ShortArn(context.TopicArn)
+                    </MudText>
+                </MudTd>
+                <MudTd>@context.DisplayName</MudTd>
+                <MudTd>@context.SubscriptionCount</MudTd>
+                <MudTd>
+                    <MudTooltip Text="Publish">
+                        <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small"
+                                       Disabled="IsRunning" OnClick="() => PublishAsync(context)" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </div>
+    @if (selectedTopic is not null)
+    {
+        <div>
+            <MudText Typo="Typo.subtitle2" Class="mb-1">サブスクリプション: @ShortArn(selectedTopic.TopicArn)</MudText>
+            <MudTable T="SnsSubscriptionInfo" Items="subscriptions" Dense="true" Hover="true" Bordered="true" Striped="true"
+                      Loading="@isSubsLoading" RowsPerPage="20">
+                <HeaderContent>
+                    <MudTh>プロトコル</MudTh>
+                    <MudTh>エンドポイント</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Protocol</MudTd>
+                    <MudTd>@context.Endpoint</MudTd>
+                </RowTemplate>
+                <PagerContent><MudTablePager /></PagerContent>
+            </MudTable>
+        </div>
+    }
+</MudStack>

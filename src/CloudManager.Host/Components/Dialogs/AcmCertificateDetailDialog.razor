@@ -1,0 +1,23 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">証明書詳細</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudSimpleTable Dense="true">
+            <tbody>
+                <tr><td><b>ARN</b></td><td><MudText Style="word-break:break-all">@Detail.Arn</MudText></td></tr>
+                <tr><td><b>ドメイン名</b></td><td>@Detail.DomainName</td></tr>
+                <tr><td><b>ステータス</b></td><td>@Detail.ValidationStatus</td></tr>
+                <tr><td><b>検証方法</b></td><td>@Detail.ValidationMethod</td></tr>
+                <tr><td><b>発行者</b></td><td>@Detail.Issuer</td></tr>
+                <tr>
+                    <td><b>SAN</b></td>
+                    <td>@string.Join(", ", Detail.SubjectAlternativeNames)</td>
+                </tr>
+            </tbody>
+        </MudSimpleTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

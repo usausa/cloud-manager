@@ -1,0 +1,12 @@
+<MudDialog>
+    <TitleContent><MudText Typo="Typo.h6">メッセージ送信 - @QueueName</MudText></TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="body" Label="メッセージ本文" Variant="Variant.Outlined" Lines="6"
+                      Margin="Margin.Dense" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit"
+                   Disabled="@String.IsNullOrWhiteSpace(body)">送信</MudButton>
+    </DialogActions>
+</MudDialog>

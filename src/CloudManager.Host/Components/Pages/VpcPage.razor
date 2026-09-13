@@ -1,0 +1,68 @@
+@page "/vpc"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - VPC</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">VPC</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTabs Outlined="true" Class="mt-1">
+    <MudTabPanel Text="VPC">
+        <MudTable T="VpcInfo" Items="vpcs" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading">
+            <HeaderContent>
+                <MudTh>VPC ID</MudTh>
+                <MudTh>CIDR</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>Default</MudTh>
+                <MudTh>Name</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.VpcId</MudTd>
+                <MudTd>@context.CidrBlock</MudTd>
+                <MudTd>@context.State</MudTd>
+                <MudTd>@(context.IsDefault ? "Yes" : "No")</MudTd>
+                <MudTd>@context.Name</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="サブネット">
+        <MudTable T="VpcSubnetInfo" Items="subnets" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading" RowsPerPage="50">
+            <HeaderContent>
+                <MudTh>サブネット ID</MudTh>
+                <MudTh>CIDR</MudTh>
+                <MudTh>AZ</MudTh>
+                <MudTh>Name</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.SubnetId</MudTd>
+                <MudTd>@context.CidrBlock</MudTd>
+                <MudTd>@context.AvailabilityZone</MudTd>
+                <MudTd>@context.Name</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+
+    <MudTabPanel Text="セキュリティグループ">
+        <MudTable T="VpcSecurityGroupInfo" Items="securityGroups" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading" RowsPerPage="50">
+            <HeaderContent>
+                <MudTh>ID</MudTh>
+                <MudTh>名前</MudTh>
+                <MudTh>説明</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.GroupId</MudTd>
+                <MudTd>@context.GroupName</MudTd>
+                <MudTd>@context.Description</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </MudTabPanel>
+</MudTabs>

@@ -1,0 +1,71 @@
+@page "/eventbridge"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - EventBridge</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">EventBridge</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="EventBridgeRuleInfo" Items="FilteredRules" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索..." Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mt-0" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ルール名</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>スケジュール / パターン</MudTh>
+        <MudTh>ターゲット</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>
+            <MudChip T="string" Size="Size.Small"
+                     Color="@(context.State == "ENABLED" ? Color.Success : Color.Default)">
+                @context.State
+            </MudChip>
+        </MudTd>
+        <MudTd>
+            @if (!String.IsNullOrEmpty(context.ScheduleExpression))
+            {
+                <MudText>@context.ScheduleExpression</MudText>
+            }
+            else if (!String.IsNullOrEmpty(context.EventPattern))
+            {
+                <MudText Style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    @context.EventPattern
+                </MudText>
+            }
+        </MudTd>
+        <MudTd>@context.Targets.Count</MudTd>
+        <MudTd>
+            @if (context.State == "ENABLED")
+            {
+                <MudTooltip Text="無効化">
+                    <MudIconButton Icon="@Icons.Material.Filled.PauseCircle" Size="Size.Small"
+                                   Color="Color.Warning" Disabled="IsRunning"
+                                   OnClick="() => DisableAsync(context)" />
+                </MudTooltip>
+            }
+            else
+            {
+                <MudTooltip Text="有効化">
+                    <MudIconButton Icon="@Icons.Material.Filled.PlayCircle" Size="Size.Small"
+                                   Color="Color.Success" Disabled="IsRunning"
+                                   OnClick="() => EnableAsync(context)" />
+                </MudTooltip>
+            }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

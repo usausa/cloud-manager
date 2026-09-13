@@ -1,0 +1,74 @@
+@page "/apigw"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - API Gateway</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">API Gateway</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudStack Spacing="3">
+    <div>
+        <MudText Typo="Typo.subtitle2" Class="mb-1">REST API 一覧</MudText>
+        <MudTable T="ApiGatewayInfo" Items="apis" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" SelectedItem="selectedApi" SelectedItemChanged="OnApiSelectedAsync" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>名前</MudTh>
+                <MudTh>ID</MudTh>
+                <MudTh>作成日</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudText Class="@(context == selectedApi ? "mud-primary-text font-bold" : string.Empty)">
+                        @context.Name
+                    </MudText>
+                </MudTd>
+                <MudTd>@context.Id</MudTd>
+                <MudTd>@(context.CreatedDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </div>
+    @if (selectedApi is not null)
+    {
+        <div>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
+                <MudText Typo="Typo.subtitle2">ステージ: @selectedApi.Name</MudText>
+                <MudSpacer />
+                <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                           OnClick="LoadStagesAsync" Disabled="isStagesLoading">更新</MudButton>
+            </MudStack>
+            <MudTable T="StageInfo" Items="stages" Dense="true" Hover="true" Bordered="true" Striped="true"
+                      Loading="@isStagesLoading" RowsPerPage="25">
+                <HeaderContent>
+                    <MudTh>ステージ名</MudTh>
+                    <MudTh>デプロイ ID</MudTh>
+                    <MudTh>最終更新</MudTh>
+                    <MudTh>X-Ray</MudTh>
+                    <MudTh>操作</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.StageName</MudTd>
+                    <MudTd>@(context.DeploymentId ?? "-")</MudTd>
+                    <MudTd>@(context.LastUpdated?.ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+                    <MudTd>@(context.TracingEnabled ? "有効" : "無効")</MudTd>
+                    <MudTd>
+                        <MudTooltip Text="デプロイ">
+                            <MudIconButton Icon="@Icons.Material.Filled.RocketLaunch" Size="Size.Small"
+                                           Color="Color.Primary" Disabled="IsRunning"
+                                           OnClick="() => DeployAsync(context)" />
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent><MudTablePager /></PagerContent>
+            </MudTable>
+        </div>
+    }
+</MudStack>

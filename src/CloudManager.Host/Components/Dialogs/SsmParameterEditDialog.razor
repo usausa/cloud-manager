@@ -1,0 +1,26 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@(IsEdit ? "パラメータ編集" : "パラメータ追加")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="3">
+            <MudTextField @bind-Value="name" Label="名前" Required="true" Disabled="IsEdit" />
+            <MudSelect T="string" @bind-Value="type" Label="タイプ" Required="true">
+                <MudSelectItem Value="@("String")">String</MudSelectItem>
+                <MudSelectItem Value="@("SecureString")">SecureString</MudSelectItem>
+                <MudSelectItem Value="@("StringList")">StringList</MudSelectItem>
+            </MudSelect>
+            <MudTextField @bind-Value="value" Label="値" Required="true" Lines="3" />
+            @if (IsEdit)
+            {
+                <MudCheckBox @bind-Value="overwrite" Label="上書き (Overwrite)" />
+            }
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Disabled="@(String.IsNullOrWhiteSpace(name) || String.IsNullOrWhiteSpace(value))">
+            保存
+        </MudButton>
+    </DialogActions>
+</MudDialog>

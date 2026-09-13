@@ -1,0 +1,50 @@
+@page "/sqs"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - SQS</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">SQS</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="SqsQueueInfo" Items="queues" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" Filter="FilterFunc" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"
+                      Immediate="true" Clearable="true" Margin="Margin.Dense" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>キュー名</MudTh>
+        <MudTh>メッセージ数</MudTh>
+        <MudTh>非表示数</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.QueueName</MudTd>
+        <MudTd>@context.ApproximateMessages</MudTd>
+        <MudTd>@context.MessagesNotVisible</MudTd>
+        <MudTd>
+            <MudTooltip Text="メッセージ送信">
+                <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => SendMessageAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="メッセージ受信">
+                <MudIconButton Icon="@Icons.Material.Filled.Inbox" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => ReceiveMessagesAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="パージ">
+                <MudIconButton Icon="@Icons.Material.Filled.DeleteSweep" Size="Size.Small" Color="Color.Warning"
+                               Disabled="IsRunning" OnClick="() => PurgeAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

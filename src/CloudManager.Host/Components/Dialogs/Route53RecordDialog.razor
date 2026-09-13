@@ -1,0 +1,27 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">レコード追加/更新 (UPSERT)</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="3">
+            <MudTextField @bind-Value="name" Label="名前" Required="true" Placeholder="example.com." />
+            <MudSelect T="string" @bind-Value="type" Label="タイプ" Required="true">
+                <MudSelectItem Value="@("A")">A</MudSelectItem>
+                <MudSelectItem Value="@("AAAA")">AAAA</MudSelectItem>
+                <MudSelectItem Value="@("CNAME")">CNAME</MudSelectItem>
+                <MudSelectItem Value="@("TXT")">TXT</MudSelectItem>
+                <MudSelectItem Value="@("MX")">MX</MudSelectItem>
+            </MudSelect>
+            <MudNumericField T="int" @bind-Value="ttl" Label="TTL (秒)" Min="1" />
+            <MudText Typo="Typo.caption">値 (1行1エントリ)</MudText>
+            <MudTextField @bind-Value="valuesText" Lines="4" Variant="Variant.Outlined" Placeholder="1.2.3.4&#10;5.6.7.8" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit"
+                   Disabled="@(String.IsNullOrWhiteSpace(name) || String.IsNullOrWhiteSpace(valuesText))">
+            保存
+        </MudButton>
+    </DialogActions>
+</MudDialog>

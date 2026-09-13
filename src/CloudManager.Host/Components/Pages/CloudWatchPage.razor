@@ -1,0 +1,37 @@
+@page "/cloudwatch"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - CloudWatch</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">CloudWatch アラーム</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="CloudWatchAlarmInfo" Items="alarms" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" Filter="FilterFunc" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"
+                      Immediate="true" Clearable="true" Margin="Margin.Dense" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>アラーム名</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>メトリクス</MudTh>
+        <MudTh>条件</MudTh>
+        <MudTh>更新日時</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.AlarmName</MudTd>
+        <MudTd><MudChip T="string" Color="@AlarmStateColor(context.StateValue)" Size="Size.Small">@context.StateValue</MudChip></MudTd>
+        <MudTd>@(context.Namespace) / @(context.MetricName)</MudTd>
+        <MudTd>@context.ComparisonOperator @context.Threshold (@context.EvaluationPeriods × @context.Period s)</MudTd>
+        <MudTd>@(context.StateUpdatedTimestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

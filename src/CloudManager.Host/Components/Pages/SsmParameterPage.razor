@@ -1,0 +1,61 @@
+@page "/ssm-parameters"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - SSM Parameter Store</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">SSM Parameter Store</MudText>
+    <MudSpacer />
+    <MudTextField @bind-Value="pathPrefix" Placeholder="パスプレフィックス (/app/prod)" Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.FilterList" IconSize="Size.Small"
+                  Immediate="false" Clearable="true" Margin="Margin.Dense" Style="max-width:260px" />
+    <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+               OnClick="OpenAddDialogAsync" Disabled="IsRunning">追加</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="ParameterInfo" Items="parameters" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" Filter="FilterFunc" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"
+                      Immediate="true" Clearable="true" Margin="Margin.Dense" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>名前</MudTh>
+        <MudTh>タイプ</MudTh>
+        <MudTh>最終更新</MudTh>
+        <MudTh>バージョン</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>
+            <MudChip T="string" Size="Size.Small" Color="@(context.Type == "SecureString" ? Color.Warning : Color.Default)">
+                @context.Type
+            </MudChip>
+        </MudTd>
+        <MudTd>@(context.LastModified?.ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+        <MudTd>@context.Version</MudTd>
+        <MudTd>
+            <MudTooltip Text="値を表示">
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => ShowValueAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="編集">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => OpenEditDialogAsync(context)" />
+            </MudTooltip>
+            <MudTooltip Text="削除">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                               Disabled="IsRunning" OnClick="() => DeleteAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

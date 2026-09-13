@@ -1,0 +1,10 @@
+<MudDialog>
+    <TitleContent>Elastic IP 関連付け - @AllocationId</TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="instanceId" Label="インスタンス ID" Required="true" FullWidth="true" AutoFocus="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Disabled="@String.IsNullOrWhiteSpace(instanceId)">関連付け</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,0 +1,16 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">SNS Publish</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.caption">@TopicArn</MudText>
+            <MudTextField @bind-Value="subject" Label="件名 (省略可)" />
+            <MudTextField @bind-Value="message" Label="メッセージ" Required="true" Lines="4" Variant="Variant.Outlined" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Disabled="@String.IsNullOrWhiteSpace(message)">送信</MudButton>
+    </DialogActions>
+</MudDialog>

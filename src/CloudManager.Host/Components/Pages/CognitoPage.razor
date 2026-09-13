@@ -1,0 +1,79 @@
+@page "/cognito"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - Cognito</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">Cognito ユーザープール</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudStack Spacing="3">
+    <div>
+        <MudText Typo="Typo.subtitle2" Class="mb-1">ユーザープール</MudText>
+        <MudTable T="UserPoolInfo" Items="pools" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" SelectedItem="selectedPool" SelectedItemChanged="OnPoolSelectedAsync" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>名前</MudTh>
+                <MudTh>作成日</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudText Class="@(context == selectedPool ? "mud-primary-text font-bold" : string.Empty)">
+                        @context.Name
+                    </MudText>
+                </MudTd>
+                <MudTd>@(context.CreationDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </div>
+    @if (selectedPool is not null)
+    {
+        <div>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
+                <MudText Typo="Typo.subtitle2">ユーザー: @selectedPool.Name</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="userSearchText" Placeholder="検索..." Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" />
+                <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                           OnClick="LoadUsersAsync" Disabled="isUsersLoading">更新</MudButton>
+            </MudStack>
+            <MudTable T="CognitoUserInfo" Items="FilteredUsers" Dense="true" Hover="true" Bordered="true" Striped="true"
+                      Loading="@isUsersLoading" RowsPerPage="25">
+                <HeaderContent>
+                    <MudTh>ユーザー名</MudTh>
+                    <MudTh>ステータス</MudTh>
+                    <MudTh>有効</MudTh>
+                    <MudTh>メール</MudTh>
+                    <MudTh>作成日</MudTh>
+                    <MudTh>操作</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Username</MudTd>
+                    <MudTd>@context.Status</MudTd>
+                    <MudTd>
+                        <MudChip T="string" Size="Size.Small"
+                                 Color="@(context.Enabled ? Color.Success : Color.Default)">
+                            @(context.Enabled ? "有効" : "無効")
+                        </MudChip>
+                    </MudTd>
+                    <MudTd>@(context.Email ?? "-")</MudTd>
+                    <MudTd>@(context.Created?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+                    <MudTd>
+                        <MudTooltip Text="パスワードリセット">
+                            <MudIconButton Icon="@Icons.Material.Filled.LockReset" Size="Size.Small"
+                                           Color="Color.Warning" Disabled="IsRunning"
+                                           OnClick="() => ResetPasswordAsync(context)" />
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent><MudTablePager /></PagerContent>
+            </MudTable>
+        </div>
+    }
+</MudStack>

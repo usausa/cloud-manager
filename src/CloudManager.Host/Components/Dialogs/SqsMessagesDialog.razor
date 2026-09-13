@@ -1,0 +1,15 @@
+<MudDialog>
+    <TitleContent><MudText Typo="Typo.h6">受信メッセージ - @QueueName (@Messages.Count 件)</MudText></TitleContent>
+    <DialogContent>
+        @foreach (var msg in Messages)
+        {
+            <MudPaper Class="pa-2 mb-2" Outlined="true">
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@msg.MessageId</MudText>
+                <MudText Typo="Typo.body2" Style="white-space:pre-wrap">@msg.Body</MudText>
+            </MudPaper>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close" Variant="Variant.Filled" Color="Color.Primary">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

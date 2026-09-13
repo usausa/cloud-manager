@@ -1,0 +1,51 @@
+@page "/elastic-ip"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - Elastic IP</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">Elastic IP</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="ElasticIpInfo" Items="addresses" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25">
+    <HeaderContent>
+        <MudTh>Allocation ID</MudTh>
+        <MudTh>パブリック IP</MudTh>
+        <MudTh>Association ID</MudTh>
+        <MudTh>アタッチ先 (Instance)</MudTh>
+        <MudTh>Network Interface</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.AllocationId</MudTd>
+        <MudTd>@context.PublicIp</MudTd>
+        <MudTd>@(context.AssociationId ?? "-")</MudTd>
+        <MudTd>@(context.InstanceId ?? "-")</MudTd>
+        <MudTd>@(context.NetworkInterfaceId ?? "-")</MudTd>
+        <MudTd>
+            @if (String.IsNullOrEmpty(context.AssociationId))
+            {
+                <MudTooltip Text="関連付け">
+                    <MudIconButton Icon="@Icons.Material.Filled.Link" Size="Size.Small"
+                                   OnClick="@(() => AssociateAsync(context))" />
+                </MudTooltip>
+            }
+            else
+            {
+                <MudTooltip Text="関連付け解除">
+                    <MudIconButton Icon="@Icons.Material.Filled.LinkOff" Size="Size.Small"
+                                   OnClick="@(() => DisassociateAsync(context))" />
+                </MudTooltip>
+            }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

@@ -1,0 +1,47 @@
+@page "/cost"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - Cost</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">コスト見積もり</MudText>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudGrid Spacing="2">
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-3">
+            <MudText Typo="Typo.subtitle1" Class="mb-2">EC2 見積もり</MudText>
+            <MudTextField @bind-Value="ec2InstanceType" Label="インスタンスタイプ" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2" />
+            <MudTextField @bind-Value="ec2Region" Label="リージョン" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2" />
+            <MudNumericField @bind-Value="ec2Hours" Label="時間数" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Class="mb-2" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="EstimateEc2Async"
+                       Disabled="@(IsLoading || String.IsNullOrWhiteSpace(ec2InstanceType))">見積もり</MudButton>
+            @if (ec2Result is not null)
+            {
+                <MudAlert Severity="Severity.Info" Class="mt-2" Dense="true">
+                    @ec2Result.Description - 時間単価: $@ec2Result.HourlyUsd.ToString("F4") USD / @(ec2Result.Hours)時間合計: $@ec2Result.MonthlyUsd.ToString("F2") USD
+                </MudAlert>
+            }
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-3">
+            <MudText Typo="Typo.subtitle1" Class="mb-2">RDS 見積もり</MudText>
+            <MudTextField @bind-Value="rdsEngine" Label="エンジン (aurora-postgresql 等)" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2" />
+            <MudTextField @bind-Value="rdsInstanceClass" Label="インスタンスクラス (db.t3.medium 等)" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2" />
+            <MudTextField @bind-Value="rdsRegion" Label="リージョン" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-2" />
+            <MudNumericField @bind-Value="rdsHours" Label="時間数" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Class="mb-2" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="EstimateRdsAsync"
+                       Disabled="@(IsLoading || String.IsNullOrWhiteSpace(rdsEngine))">見積もり</MudButton>
+            @if (rdsResult is not null)
+            {
+                <MudAlert Severity="Severity.Info" Class="mt-2" Dense="true">
+                    @rdsResult.Description - 時間単価: $@rdsResult.HourlyUsd.ToString("F4") USD / @(rdsResult.Hours)時間合計: $@rdsResult.MonthlyUsd.ToString("F2") USD
+                </MudAlert>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>

@@ -1,0 +1,109 @@
+@page "/elb"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - ELB</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">ELB (ALB / NLB)</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="ElbInfo" Items="loadBalancers" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" Filter="FilterFunc" RowsPerPage="25">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchText" Placeholder="検索" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"
+                      Immediate="true" Clearable="true" Margin="Margin.Dense" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>名前</MudTh>
+        <MudTh>タイプ</MudTh>
+        <MudTh>スキーム</MudTh>
+        <MudTh>DNS名</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>VPC</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>@context.Type</MudTd>
+        <MudTd>@context.Scheme</MudTd>
+        <MudTd>@context.DnsName</MudTd>
+        <MudTd>
+            <MudChip T="string" Size="Size.Small"
+                     Color="@(context.State == "active" ? Color.Success : Color.Warning)">
+                @context.State
+            </MudChip>
+        </MudTd>
+        <MudTd>@context.VpcId</MudTd>
+        <MudTd>
+            <MudTooltip Text="ターゲットグループ">
+                <MudIconButton Icon="@Icons.Material.Filled.List" Size="Size.Small"
+                               OnClick="() => ShowTargetGroupsAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>
+
+@if (selectedLb is not null)
+{
+    <MudPaper Class="mt-3 pa-3">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">ターゲットグループ: @selectedLb.Name</MudText>
+        <MudTable T="TargetGroupInfo" Items="targetGroups" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@isTgLoading" RowsPerPage="10">
+            <HeaderContent>
+                <MudTh>名前</MudTh>
+                <MudTh>プロトコル</MudTh>
+                <MudTh>ポート</MudTh>
+                <MudTh>ターゲットタイプ</MudTh>
+                <MudTh>ヘルスチェックパス</MudTh>
+                <MudTh>操作</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Protocol</MudTd>
+                <MudTd>@context.Port</MudTd>
+                <MudTd>@context.TargetType</MudTd>
+                <MudTd>@(context.HealthCheckPath ?? "-")</MudTd>
+                <MudTd>
+                    <MudTooltip Text="ターゲットヘルス">
+                        <MudIconButton Icon="@Icons.Material.Filled.MonitorHeart" Size="Size.Small"
+                                       OnClick="() => ShowTargetHealthAsync(context)" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+}
+
+@if (selectedTg is not null)
+{
+    <MudPaper Class="mt-3 pa-3">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">ターゲットヘルス: @selectedTg.Name</MudText>
+        <MudTable T="TargetHealthInfo" Items="targetHealth" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@isHealthLoading" RowsPerPage="10">
+            <HeaderContent>
+                <MudTh>TargetId</MudTh>
+                <MudTh>ポート</MudTh>
+                <MudTh>状態</MudTh>
+                <MudTh>理由</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.TargetId</MudTd>
+                <MudTd>@context.Port</MudTd>
+                <MudTd>
+                    <MudChip T="string" Size="Size.Small"
+                             Color="@(context.State == "healthy" ? Color.Success : Color.Error)">
+                        @context.State
+                    </MudChip>
+                </MudTd>
+                <MudTd>@(context.Reason ?? context.Description ?? "-")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+}

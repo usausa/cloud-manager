@@ -1,0 +1,41 @@
+@page "/cloudfront"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - CloudFront</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">CloudFront</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsRunning">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="CloudFrontDistributionInfo" Items="distributions" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Loading="@IsLoading" RowsPerPage="25">
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>ドメイン</MudTh>
+        <MudTh>状態</MudTh>
+        <MudTh>オリジン</MudTh>
+        <MudTh>最終更新</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Id</MudTd>
+        <MudTd>@context.DomainName</MudTd>
+        <MudTd><MudChip T="string" Color="@CfStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
+        <MudTd>@context.Origins</MudTd>
+        <MudTd>@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd")</MudTd>
+        <MudTd>
+            <MudTooltip Text="キャッシュ無効化">
+                <MudIconButton Icon="@Icons.Material.Filled.ClearAll" Size="Size.Small"
+                               Disabled="IsRunning" OnClick="() => InvalidateAsync(context)" />
+            </MudTooltip>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent><MudTablePager /></PagerContent>
+</MudTable>

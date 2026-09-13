@@ -153,7 +153,8 @@ public sealed class CloudWatchLogsService
         string logGroup,
         string query,
         DateTime start,
-        DateTime end)
+        DateTime end,
+        CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCloudWatchLogsClient();
         var request = new StartQueryRequest
@@ -163,14 +164,14 @@ public sealed class CloudWatchLogsService
             StartTime = new DateTimeOffset(start, TimeSpan.Zero).ToUnixTimeSeconds(),
             EndTime = new DateTimeOffset(end, TimeSpan.Zero).ToUnixTimeSeconds()
         };
-        var response = await client.StartQueryAsync(request);
+        var response = await client.StartQueryAsync(request, cancellationToken);
         return response.QueryId ?? string.Empty;
     }
 
-    public async ValueTask<LogQueryResultInfo> GetQueryResultsAsync(string queryId)
+    public async ValueTask<LogQueryResultInfo> GetQueryResultsAsync(string queryId, CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateCloudWatchLogsClient();
-        var response = await client.GetQueryResultsAsync(new GetQueryResultsRequest { QueryId = queryId });
+        var response = await client.GetQueryResultsAsync(new GetQueryResultsRequest { QueryId = queryId }, cancellationToken);
         var records = (response.Results ?? []).Select(row =>
             row.ToDictionary(f => f.Field ?? string.Empty, f => f.Value ?? string.Empty)).ToList();
         return new LogQueryResultInfo(response.Status?.Value ?? "Unknown", records);

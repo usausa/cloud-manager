@@ -1,0 +1,12 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">ステージ「@StageName」にデプロイ</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="description" Label="説明 (任意)" Placeholder="デプロイの説明" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">デプロイ</MudButton>
+    </DialogActions>
+</MudDialog>

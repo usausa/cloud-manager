@@ -1,0 +1,12 @@
+<MudDialog>
+    <TitleContent><MudText Typo="Typo.h6">キャッシュ無効化 - @DistributionId</MudText></TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="paths" Label="パス (1行1パス、例: /*)" Variant="Variant.Outlined" Lines="5"
+                      Margin="Margin.Dense" Class="mb-2" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit"
+                   Disabled="@String.IsNullOrWhiteSpace(paths)">無効化</MudButton>
+    </DialogActions>
+</MudDialog>

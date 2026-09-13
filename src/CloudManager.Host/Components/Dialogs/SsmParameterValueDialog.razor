@@ -1,0 +1,15 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">パラメータ値</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText><strong>名前:</strong> @ParameterName</MudText>
+            <MudText><strong>タイプ:</strong> @ParameterType</MudText>
+            <MudTextField Value="@ParameterValue" Label="値" Lines="4" ReadOnly="true" Variant="Variant.Outlined" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">閉じる</MudButton>
+    </DialogActions>
+</MudDialog>

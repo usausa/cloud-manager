@@ -1,0 +1,75 @@
+@page "/route53"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - Route53</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">Route 53</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync" Disabled="IsLoading">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudStack Spacing="3">
+    <div>
+        <MudText Typo="Typo.subtitle2" Class="mb-1">ホストゾーン一覧</MudText>
+        <MudTable T="HostedZoneInfo" Items="hostedZones" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  Loading="@IsLoading" SelectedItem="selectedZone" SelectedItemChanged="OnZoneSelectedAsync" RowsPerPage="25">
+            <HeaderContent>
+                <MudTh>名前</MudTh>
+                <MudTh>レコード数</MudTh>
+                <MudTh>種別</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudText Class="@(context == selectedZone ? "mud-primary-text font-bold" : string.Empty)">
+                        @context.Name
+                    </MudText>
+                </MudTd>
+                <MudTd>@context.RecordSetCount</MudTd>
+                <MudTd>@(context.PrivateZone ? "Private" : "Public")</MudTd>
+            </RowTemplate>
+            <PagerContent><MudTablePager /></PagerContent>
+        </MudTable>
+    </div>
+    @if (selectedZone is not null)
+    {
+        <div>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
+                <MudText Typo="Typo.subtitle2">レコードセット: @selectedZone.Name</MudText>
+                <MudSpacer />
+                <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Color="Color.Primary"
+                           Size="Size.Small" OnClick="OpenUpsertDialogAsync" Disabled="IsRunning">追加/更新</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+                           OnClick="LoadRecordsAsync" Disabled="IsLoading">更新</MudButton>
+            </MudStack>
+            <MudTable T="RecordSetInfo" Items="recordSets" Dense="true" Hover="true" Bordered="true" Striped="true"
+                      Loading="@isRecordsLoading" RowsPerPage="25">
+                <HeaderContent>
+                    <MudTh>名前</MudTh>
+                    <MudTh>タイプ</MudTh>
+                    <MudTh>TTL</MudTh>
+                    <MudTh>値</MudTh>
+                    <MudTh>操作</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.Type</MudTd>
+                    <MudTd>@(context.Ttl?.ToString() ?? "-")</MudTd>
+                    <MudTd>@string.Join(", ", context.Records)</MudTd>
+                    <MudTd>
+                        <MudTooltip Text="削除">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                                           Disabled="IsRunning" OnClick="() => DeleteRecordAsync(context)" />
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent><MudTablePager /></PagerContent>
+            </MudTable>
+        </div>
+    }
+</MudStack>
