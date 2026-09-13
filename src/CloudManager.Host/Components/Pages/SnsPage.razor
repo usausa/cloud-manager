@@ -33,8 +33,8 @@
                 </MudTd>
                 <MudTd>@context.DisplayName</MudTd>
                 <MudTd>@context.SubscriptionCount</MudTd>
-                <MudTd>
-                    <MudTooltip Text="Publish">
+                <MudTd Class="no-wrap">
+                    <MudTooltip Text="メッセージ送信">
                         <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small"
                                        Disabled="IsRunning" OnClick="() => PublishAsync(context)" />
                     </MudTooltip>

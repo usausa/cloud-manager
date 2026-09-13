@@ -24,8 +24,8 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.VersionId</MudTd>
-                    <MudTd>@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
-                    <MudTd>@(context.IsDeleteMarker ? "-" : FormatSize(context.Size))</MudTd>
+                    <MudTd Class="no-wrap">@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+                    <MudTd Class="no-wrap">@(context.IsDeleteMarker ? "-" : FormatSize(context.Size))</MudTd>
                     <MudTd>@(context.IsLatest ? "✓" : "")</MudTd>
                     <MudTd>@(context.IsDeleteMarker ? "✓" : "")</MudTd>
                     <MudTd>

@@ -42,12 +42,12 @@ public sealed partial class SsmParameterPage
                 { x => x.ParameterValue, result.Value },
                 { x => x.ParameterType, result.Type }
             };
-            await DialogService.ShowAsync<SsmParameterValueDialog>("パラメータ値", dialogParameters);
+            await DialogService.ShowAsync<SsmParameterValueDialog>("パラメータ値", dialogParameters, Styles.MediumDialog);
         });
 
     private async Task OpenAddDialogAsync()
     {
-        var dialog = await DialogService.ShowAsync<SsmParameterEditDialog>("パラメータ追加");
+        var dialog = await DialogService.ShowAsync<SsmParameterEditDialog>("パラメータ追加", Styles.MediumDialog);
         var result = await dialog.Result;
         if (result is null || result.Canceled)
         {
@@ -76,7 +76,7 @@ public sealed partial class SsmParameterPage
             { x => x.InitialType, current.Type },
             { x => x.IsEdit, true }
         };
-        var dialog = await DialogService.ShowAsync<SsmParameterEditDialog>("パラメータ編集", dialogParams);
+        var dialog = await DialogService.ShowAsync<SsmParameterEditDialog>("パラメータ編集", dialogParams, Styles.MediumDialog);
         var dialogResult = await dialog.Result;
         if (dialogResult is null || dialogResult.Canceled)
         {
@@ -90,7 +90,7 @@ public sealed partial class SsmParameterPage
         RunAsync("保存中...", async (_, cancellationToken) =>
         {
             await Service.PutParameterAsync(p.Name, p.Value, p.Type, p.Overwrite, cancellationToken);
-            Snackbar.AddSuccess($"パラメータ保存完了: {p.Name}");
+            Snackbar.AddSuccess($"{p.Name} を保存しました。");
             await LoadAsync();
         });
 
@@ -112,7 +112,7 @@ public sealed partial class SsmParameterPage
         await RunAsync("削除中...", async (_, cancellationToken) =>
         {
             await Service.DeleteParameterAsync(param.Name, cancellationToken);
-            Snackbar.AddSuccess($"パラメータ削除完了: {param.Name}");
+            Snackbar.AddSuccess($"{param.Name} を削除しました。");
             await LoadAsync();
         });
     }

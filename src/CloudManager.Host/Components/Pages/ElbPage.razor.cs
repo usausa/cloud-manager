@@ -42,41 +42,23 @@ public sealed partial class ElbPage
         lb.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
         lb.DnsName.Contains(searchText, StringComparison.OrdinalIgnoreCase);
 
-    private async Task ShowTargetGroupsAsync(ElbInfo lb)
+    private Task ShowTargetGroupsAsync(ElbInfo lb)
     {
         selectedLb = lb;
         selectedTg = null;
         targetHealth = [];
-        isTgLoading = true;
-        try
+        return LoadAsync(async () =>
         {
             targetGroups = await Service.ListTargetGroupsAsync(lb.Arn, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isTgLoading = false;
-        }
+        }, x => isTgLoading = x);
     }
 
-    private async Task ShowTargetHealthAsync(TargetGroupInfo tg)
+    private Task ShowTargetHealthAsync(TargetGroupInfo tg)
     {
         selectedTg = tg;
-        isHealthLoading = true;
-        try
+        return LoadAsync(async () =>
         {
             targetHealth = await Service.ListTargetHealthAsync(tg.Arn, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isHealthLoading = false;
-        }
+        }, x => isHealthLoading = x);
     }
 }

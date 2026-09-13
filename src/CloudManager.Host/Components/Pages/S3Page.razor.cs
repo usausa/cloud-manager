@@ -37,6 +37,7 @@ public sealed partial class S3Page
         await DialogService.ShowAsync<S3LifecycleDialog>("ライフサイクルルール", new DialogParameters<S3LifecycleDialog>
         {
             { x => x.BucketName, bucket.BucketName }
-        });
+        },
+        Styles.MediumDialog);
     }
 }

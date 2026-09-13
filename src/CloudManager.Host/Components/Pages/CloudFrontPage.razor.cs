@@ -28,7 +28,7 @@ public sealed partial class CloudFrontPage
         {
             { x => x.DistributionId, dist.Id }
         };
-        var dialog = await DialogService.ShowAsync<CloudFrontInvalidateDialog>("キャッシュ無効化", parameters);
+        var dialog = await DialogService.ShowAsync<CloudFrontInvalidateDialog>("キャッシュ無効化", parameters, Styles.MediumDialog);
         var dialogResult = await dialog.Result;
         if (dialogResult is null || dialogResult.Canceled)
         {
@@ -41,7 +41,7 @@ public sealed partial class CloudFrontPage
         {
             var paths = p.Paths.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
             await Service.InvalidateCacheAsync(dist.Id, paths, cancellationToken);
-            Snackbar.AddSuccess($"キャッシュ無効化完了: {dist.Id}");
+            Snackbar.AddSuccess($"{dist.Id} のキャッシュを無効化しました。");
         });
     }
 

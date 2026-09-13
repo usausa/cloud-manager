@@ -40,9 +40,9 @@
                 @context.Type
             </MudChip>
         </MudTd>
-        <MudTd>@(context.LastModified?.ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+        <MudTd Class="no-wrap">@(context.LastModified?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
         <MudTd>@context.Version</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="値を表示">
                 <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => ShowValueAsync(context)" />

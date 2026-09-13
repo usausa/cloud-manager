@@ -30,7 +30,7 @@ public sealed partial class SqsPage
         {
             { x => x.QueueName, queue.QueueName }
         };
-        var dialog = await DialogService.ShowAsync<SqsSendMessageDialog>("メッセージ送信", parameters);
+        var dialog = await DialogService.ShowAsync<SqsSendMessageDialog>("メッセージ送信", parameters, Styles.MediumDialog);
         var dialogResult = await dialog.Result;
         if (dialogResult is null || dialogResult.Canceled)
         {
@@ -42,7 +42,7 @@ public sealed partial class SqsPage
         await RunAsync("送信中...", async (_, cancellationToken) =>
         {
             await Service.SendMessageAsync(queue.QueueUrl, p.Body, 0, null, cancellationToken);
-            Snackbar.AddSuccess($"メッセージ送信完了: {queue.QueueName}");
+            Snackbar.AddSuccess($"{queue.QueueName} にメッセージを送信しました。");
             await LoadAsync();
         });
     }
@@ -56,7 +56,7 @@ public sealed partial class SqsPage
                 { x => x.QueueName, queue.QueueName },
                 { x => x.Messages, messages }
             };
-            await DialogService.ShowAsync<SqsMessagesDialog>("受信メッセージ", parameters);
+            await DialogService.ShowAsync<SqsMessagesDialog>("受信メッセージ", parameters, Styles.LargeDialog);
         });
 
     private async Task PurgeAsync(SqsQueueInfo queue)
@@ -77,7 +77,7 @@ public sealed partial class SqsPage
         await RunAsync("パージ中...", async (_, cancellationToken) =>
         {
             await Service.PurgeQueueAsync(queue.QueueUrl, cancellationToken);
-            Snackbar.AddSuccess($"パージ完了: {queue.QueueName}");
+            Snackbar.AddSuccess($"{queue.QueueName} をパージしました。");
             await LoadAsync();
         });
     }

@@ -20,7 +20,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="() => MudDialog.Close()">キャンセル</MudButton>
-        <MudButton Color="Color.Primary" OnClick="SaveAsync" Disabled="isSaving">保存</MudButton>
+        <MudButton OnClick="() => MudDialog.Cancel()">キャンセル</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="isSaving">保存</MudButton>
     </DialogActions>
 </MudDialog>

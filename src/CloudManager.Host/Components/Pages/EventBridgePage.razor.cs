@@ -30,7 +30,7 @@ public sealed partial class EventBridgePage
         RunAsync("有効化中...", async (_, cancellationToken) =>
         {
             await Service.EnableRuleAsync(rule.Name, cancellationToken: cancellationToken);
-            Snackbar.AddSuccess($"ルールを有効化しました: {rule.Name}");
+            Snackbar.AddSuccess($"{rule.Name} を有効化しました。");
             await LoadAsync();
         });
 
@@ -38,7 +38,7 @@ public sealed partial class EventBridgePage
         RunAsync("無効化中...", async (_, cancellationToken) =>
         {
             await Service.DisableRuleAsync(rule.Name, cancellationToken: cancellationToken);
-            Snackbar.AddSuccess($"ルールを無効化しました: {rule.Name}");
+            Snackbar.AddSuccess($"{rule.Name} を無効化しました。");
             await LoadAsync();
         });
 }

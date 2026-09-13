@@ -10,8 +10,6 @@ public sealed partial class JobHistoryPage
 {
     private const int RecentLimit = 500;
 
-    private static readonly DialogOptions ErrorDialogOptions = new() { MaxWidth = MaxWidth.Large, FullWidth = true, CloseOnEscapeKey = true };
-
     private List<JobExecutionLogEntity> logs = [];
 
     [Inject]
@@ -34,7 +32,7 @@ public sealed partial class JobHistoryPage
                 { nameof(JobLogsDialog.Title), $"エラー詳細 - {log.JobName}" },
                 { nameof(JobLogsDialog.ErrorDetail), log.ErrorDetail ?? string.Empty }
             },
-            ErrorDialogOptions);
+            Styles.LargeDialog);
     }
 
     private static Color StatusColor(string status) => status switch

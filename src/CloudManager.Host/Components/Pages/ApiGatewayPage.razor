@@ -31,7 +31,7 @@
                     </MudText>
                 </MudTd>
                 <MudTd>@context.Id</MudTd>
-                <MudTd>@(context.CreatedDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+                <MudTd Class="no-wrap">@(context.CreatedDate?.ToLocalTime().ToString("yyyy-MM-dd") ?? "-")</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>
         </MudTable>
@@ -57,9 +57,9 @@
                 <RowTemplate>
                     <MudTd>@context.StageName</MudTd>
                     <MudTd>@(context.DeploymentId ?? "-")</MudTd>
-                    <MudTd>@(context.LastUpdated?.ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+                    <MudTd Class="no-wrap">@(context.LastUpdated?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
                     <MudTd>@(context.TracingEnabled ? "有効" : "無効")</MudTd>
-                    <MudTd>
+                    <MudTd Class="no-wrap">
                         <MudTooltip Text="デプロイ">
                             <MudIconButton Icon="@Icons.Material.Filled.RocketLaunch" Size="Size.Small"
                                            Color="Color.Primary" Disabled="IsRunning"

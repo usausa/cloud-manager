@@ -32,27 +32,19 @@ public sealed partial class SnsPage
         });
     }
 
-    private async Task OnTopicSelectedAsync(SnsTopicInfo? topic)
+    private Task OnTopicSelectedAsync(SnsTopicInfo? topic)
     {
         selectedTopic = topic;
         subscriptions = [];
         if (topic is null)
         {
-            return;
+            return Task.CompletedTask;
         }
-        isSubsLoading = true;
-        try
+
+        return LoadAsync(async () =>
         {
             subscriptions = await Service.ListSubscriptionsAsync(topic.TopicArn, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isSubsLoading = false;
-        }
+        }, x => isSubsLoading = x);
     }
 
     private async Task PublishAsync(SnsTopicInfo topic)
@@ -61,7 +53,7 @@ public sealed partial class SnsPage
         {
             { x => x.TopicArn, topic.TopicArn }
         };
-        var dialog = await DialogService.ShowAsync<SnsPublishDialog>("メッセージ送信", dialogParams);
+        var dialog = await DialogService.ShowAsync<SnsPublishDialog>("メッセージ送信", dialogParams, Styles.MediumDialog);
         var result = await dialog.Result;
         if (result is null || result.Canceled)
         {
@@ -72,7 +64,7 @@ public sealed partial class SnsPage
         await RunAsync("送信中...", async (_, cancellationToken) =>
         {
             var messageId = await Service.PublishAsync(topic.TopicArn, p.Subject, p.Message, cancellationToken);
-            Snackbar.AddSuccess($"送信完了 (MessageId: {messageId})");
+            Snackbar.AddSuccess($"メッセージを送信しました。(MessageId: {messageId})");
         });
     }
 

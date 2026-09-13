@@ -31,7 +31,7 @@
         <MudTd><MudChip T="string" Color="@AlarmStateColor(context.StateValue)" Size="Size.Small">@context.StateValue</MudChip></MudTd>
         <MudTd>@(context.Namespace) / @(context.MetricName)</MudTd>
         <MudTd>@context.ComparisonOperator @context.Threshold (@context.EvaluationPeriods × @context.Period s)</MudTd>
-        <MudTd>@(context.StateUpdatedTimestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+        <MudTd Class="no-wrap">@(context.StateUpdatedTimestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
     </RowTemplate>
     <PagerContent><MudTablePager /></PagerContent>
 </MudTable>

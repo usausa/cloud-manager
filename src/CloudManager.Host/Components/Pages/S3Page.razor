@@ -20,8 +20,8 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>@context.BucketName</MudTd>
-        <MudTd>@context.CreationDate.ToLocalTime().ToString("yyyy-MM-dd")</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">@context.CreationDate.ToLocalTime().ToString("yyyy-MM-dd")</MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="オブジェクト一覧">
                 <MudIconButton Icon="@Icons.Material.Filled.FolderOpen" Size="Size.Small"
                                Href="@($"s3/{context.BucketName}")" />

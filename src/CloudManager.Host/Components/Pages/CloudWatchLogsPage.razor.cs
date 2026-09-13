@@ -67,25 +67,17 @@ public sealed partial class CloudWatchLogsPage
         return Task.CompletedTask;
     }
 
-    private async Task LoadStreamsAsync()
+    private Task LoadStreamsAsync()
     {
         if (selectedGroup is null)
         {
-            return;
+            return Task.CompletedTask;
         }
-        isStreamsLoading = true;
-        try
+
+        return LoadAsync(async () =>
         {
             logStreams = await Service.ListLogStreamsAsync(selectedGroup.GroupName, cancellationToken: CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isStreamsLoading = false;
-        }
+        }, x => isStreamsLoading = x);
     }
 
     private Task OnStreamSelectedAsync(LogStreamInfo? stream)
@@ -98,25 +90,17 @@ public sealed partial class CloudWatchLogsPage
         return Task.CompletedTask;
     }
 
-    private async Task LoadEventsAsync()
+    private Task LoadEventsAsync()
     {
         if (selectedGroup is null || selectedStream is null)
         {
-            return;
+            return Task.CompletedTask;
         }
-        isEventsLoading = true;
-        try
+
+        return LoadAsync(async () =>
         {
             logEvents = await Service.GetLogEventsAsync(selectedGroup.GroupName, selectedStream.StreamName, cancellationToken: CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isEventsLoading = false;
-        }
+        }, x => isEventsLoading = x);
     }
 
     private Task RunInsightsQueryAsync()

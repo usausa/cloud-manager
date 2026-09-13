@@ -37,7 +37,7 @@ public sealed partial class ElasticIpPage
         await RunAsync("関連付け中...", async (_, cancellationToken) =>
         {
             await Service.AssociateElasticIpAsync(eip.AllocationId, instanceId, cancellationToken);
-            Snackbar.AddSuccess("Elastic IP を関連付けました");
+            Snackbar.AddSuccess("Elastic IP を関連付けました。");
             await LoadAsync();
         });
     }
@@ -52,7 +52,7 @@ public sealed partial class ElasticIpPage
         await RunAsync("関連付け解除中...", async (_, cancellationToken) =>
         {
             await Service.DisassociateElasticIpAsync(eip.AssociationId!, cancellationToken);
-            Snackbar.AddSuccess("関連付けを解除しました");
+            Snackbar.AddSuccess("関連付けを解除しました。");
             await LoadAsync();
         });
     }

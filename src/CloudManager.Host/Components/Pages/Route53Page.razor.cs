@@ -43,30 +43,22 @@ public sealed partial class Route53Page
         return Task.CompletedTask;
     }
 
-    private async Task LoadRecordsAsync()
+    private Task LoadRecordsAsync()
     {
         if (selectedZone is null)
         {
-            return;
+            return Task.CompletedTask;
         }
-        isRecordsLoading = true;
-        try
+
+        return LoadAsync(async () =>
         {
             recordSets = await Service.ListRecordSetsAsync(selectedZone.Id, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isRecordsLoading = false;
-        }
+        }, x => isRecordsLoading = x);
     }
 
     private async Task OpenUpsertDialogAsync()
     {
-        var dialog = await DialogService.ShowAsync<Route53RecordDialog>("レコード追加/更新");
+        var dialog = await DialogService.ShowAsync<Route53RecordDialog>("レコード追加/更新", new DialogParameters<Route53RecordDialog>(), Styles.MediumDialog);
         var result = await dialog.Result;
         if (result is null || result.Canceled || selectedZone is null)
         {
@@ -77,7 +69,7 @@ public sealed partial class Route53Page
         await RunAsync("保存中...", async (_, cancellationToken) =>
         {
             await Service.UpsertRecordAsync(selectedZone.Id, p.Name, p.Type, p.Ttl, p.Values, cancellationToken);
-            Snackbar.AddSuccess($"レコード保存完了: {p.Name}");
+            Snackbar.AddSuccess($"{p.Name} を保存しました。");
             await LoadRecordsAsync();
         });
     }
@@ -88,14 +80,7 @@ public sealed partial class Route53Page
         {
             return;
         }
-        var dialogParams = new DialogParameters<ConfirmDialog>
-        {
-            { x => x.Title, "レコード削除確認" },
-            { x => x.Message, $"レコード「{record.Name} ({record.Type})」を削除します。" }
-        };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("削除確認", dialogParams);
-        var result = await dialog.Result;
-        if (result is null || result.Canceled)
+        if (await DialogService.ShowOperationConfirm("レコード削除", $"レコード「{record.Name} ({record.Type})」を削除しますか？") is null)
         {
             return;
         }
@@ -109,7 +94,7 @@ public sealed partial class Route53Page
                 (int)(record.Ttl ?? 300),
                 record.Records,
                 cancellationToken);
-            Snackbar.AddSuccess($"レコード削除完了: {record.Name}");
+            Snackbar.AddSuccess($"{record.Name} を削除しました。");
             await LoadRecordsAsync();
         });
     }

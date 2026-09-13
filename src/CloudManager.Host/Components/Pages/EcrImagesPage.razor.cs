@@ -47,7 +47,7 @@ public sealed partial class EcrImagesPage
         await RunAsync("実行中...", async (_, cancellationToken) =>
         {
             await Service.DeleteImageAsync(Repository, image.Digest, cancellationToken);
-            Snackbar.AddSuccess($"イメージ削除完了: {image.Tag ?? image.Digest}");
+            Snackbar.AddSuccess($"{image.Tag ?? image.Digest} を削除しました。");
             await LoadAsync();
         });
     }

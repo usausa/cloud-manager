@@ -11,6 +11,15 @@ body {
     padding: 2px 8px;
 }
 
+th.mud-table-cell {
+    white-space: nowrap;
+}
+
+/* Tabs */
+.mud-tabs .mud-tab {
+    text-transform: none;
+}
+
 /* Service list */
 .service-item a.mud-link {
     display: flex;
@@ -53,6 +62,10 @@ body {
 /* Text */
 .pre-wrap {
     white-space: pre-wrap;
+}
+
+.no-wrap {
+    white-space: nowrap;
 }
 
 .break-all {

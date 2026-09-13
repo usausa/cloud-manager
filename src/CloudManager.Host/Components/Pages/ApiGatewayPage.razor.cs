@@ -43,25 +43,17 @@ public sealed partial class ApiGatewayPage
         return Task.CompletedTask;
     }
 
-    private async Task LoadStagesAsync()
+    private Task LoadStagesAsync()
     {
         if (selectedApi is null)
         {
-            return;
+            return Task.CompletedTask;
         }
-        isStagesLoading = true;
-        try
+
+        return LoadAsync(async () =>
         {
             stages = await Service.ListStagesAsync(selectedApi.Id, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isStagesLoading = false;
-        }
+        }, x => isStagesLoading = x);
     }
 
     private async Task DeployAsync(StageInfo stage)
@@ -86,7 +78,7 @@ public sealed partial class ApiGatewayPage
         {
             var deploymentId = await Service.CreateDeploymentAsync(
                 selectedApi.Id, stage.StageName, description, cancellationToken);
-            Snackbar.AddSuccess($"デプロイ完了: {stage.StageName} (ID: {deploymentId})");
+            Snackbar.AddSuccess($"{stage.StageName} をデプロイしました。(ID: {deploymentId})");
             await LoadStagesAsync();
         });
     }

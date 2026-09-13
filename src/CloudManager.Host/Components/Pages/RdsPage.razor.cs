@@ -36,50 +36,39 @@ public sealed partial class RdsPage
             instances = await Service.ListInstancesAsync(null, CancellationToken);
         });
 
-    private async Task LoadSnapshotsAsync()
-    {
-        isSnapLoading = true;
-        try
+    private Task LoadSnapshotsAsync() =>
+        LoadAsync(async () =>
         {
             snapshots = await Service.ListSnapshotsAsync(null, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isSnapLoading = false;
-        }
-    }
+        }, x => isSnapLoading = x);
 
     private async Task StartAsync(RdsInstanceInfo instance)
     {
-        var result = await DialogService.ShowOperationConfirm("RDS Start", $"DB インスタンス {instance.DbInstanceIdentifier} を起動しますか？");
+        var result = await DialogService.ShowOperationConfirm("起動", $"DB インスタンス {instance.DbInstanceIdentifier} を起動しますか？");
         if (result is null)
         {
             return;
         }
 
-        await RunAsync("実行中...", async (progress, cancellationToken) =>
+        await RunAsync("起動中...", async (progress, cancellationToken) =>
         {
             await Service.StartInstanceAsync(instance.DbInstanceIdentifier, wait: true, timeoutSeconds: 600, progress, cancellationToken);
-            Snackbar.AddSuccess($"Start 完了: {instance.DbInstanceIdentifier}");
+            Snackbar.AddSuccess($"{instance.DbInstanceIdentifier} を起動しました。");
         }, LoadAsync);
     }
 
     private async Task StopAsync(RdsInstanceInfo instance)
     {
-        var result = await DialogService.ShowOperationConfirm("RDS Stop", $"DB インスタンス {instance.DbInstanceIdentifier} を停止しますか？");
+        var result = await DialogService.ShowOperationConfirm("停止", $"DB インスタンス {instance.DbInstanceIdentifier} を停止しますか？");
         if (result is null)
         {
             return;
         }
 
-        await RunAsync("実行中...", async (progress, cancellationToken) =>
+        await RunAsync("停止中...", async (progress, cancellationToken) =>
         {
             await Service.StopInstanceAsync(instance.DbInstanceIdentifier, wait: true, timeoutSeconds: 600, progress, cancellationToken);
-            Snackbar.AddSuccess($"Stop 完了: {instance.DbInstanceIdentifier}");
+            Snackbar.AddSuccess($"{instance.DbInstanceIdentifier} を停止しました。");
         }, LoadAsync);
     }
 
@@ -98,10 +87,10 @@ public sealed partial class RdsPage
 
         var snapParams = (RdsSnapshotCreateParams)dialogResult.Data!;
 
-        await RunAsync("実行中...", async (progress, cancellationToken) =>
+        await RunAsync("スナップショット作成中...", async (progress, cancellationToken) =>
         {
             await Service.CreateSnapshotAsync(instance.DbInstanceIdentifier, snapParams.SnapshotId, wait: true, timeoutSeconds: 600, progress, cancellationToken);
-            Snackbar.AddSuccess($"スナップショット作成完了: {snapParams.SnapshotId}");
+            Snackbar.AddSuccess($"{snapParams.SnapshotId} を作成しました。");
         }, LoadAsync);
     }
 
@@ -120,32 +109,24 @@ public sealed partial class RdsPage
 
         var restoreParams = (RdsSnapshotRestoreParams)dialogResult.Data!;
 
-        await RunAsync("実行中...", async (progress, cancellationToken) =>
+        await RunAsync("復元中...", async (progress, cancellationToken) =>
         {
             await Service.RestoreSnapshotAsync(snapshot.SnapshotIdentifier, restoreParams.NewDbInstanceId, restoreParams.InstanceClass, wait: true, timeoutSeconds: 900, progress, cancellationToken);
-            Snackbar.AddSuccess($"復元完了: {restoreParams.NewDbInstanceId}");
+            Snackbar.AddSuccess($"{restoreParams.NewDbInstanceId} を復元しました。");
         }, LoadAsync);
     }
 
     private async Task DeleteSnapshotAsync(RdsSnapshotInfo snapshot)
     {
-        var parameters = new DialogParameters<ConfirmDialog>
-        {
-            { x => x.Title, "スナップショット削除" },
-            { x => x.Message, $"スナップショット {snapshot.SnapshotIdentifier} を削除しますか？" },
-            { x => x.RequireConfirmText, snapshot.SnapshotIdentifier }
-        };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("スナップショット削除確認", parameters);
-        var dialogResult = await dialog.Result;
-        if (dialogResult is null || dialogResult.Canceled)
+        if (await DialogService.ShowOperationConfirm("スナップショット削除", $"スナップショット {snapshot.SnapshotIdentifier} を削除しますか？", requireConfirmText: snapshot.SnapshotIdentifier) is null)
         {
             return;
         }
 
-        await RunAsync("実行中...", async (_, cancellationToken) =>
+        await RunAsync("削除中...", async (_, cancellationToken) =>
         {
             await Service.DeleteSnapshotAsync(snapshot.SnapshotIdentifier, cancellationToken);
-            Snackbar.AddSuccess($"スナップショット削除完了: {snapshot.SnapshotIdentifier}");
+            Snackbar.AddSuccess($"{snapshot.SnapshotIdentifier} を削除しました。");
             await LoadSnapshotsAsync();
         }, LoadAsync);
     }
@@ -167,63 +148,52 @@ public sealed partial class RdsPage
         _ => Color.Default
     };
 
-    private async Task LoadParamGroupsAsync()
-    {
-        try
+    private Task LoadParamGroupsAsync() =>
+        LoadAsync(async () =>
         {
             paramGroups = await ParamGroupService.ListParameterGroupsAsync(CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-    }
+        });
 
-    private async Task LoadClustersAsync()
-    {
-        try
+    private Task LoadClustersAsync() =>
+        LoadAsync(async () =>
         {
             clusters = await AuroraService.ListClustersAsync(CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-    }
+        });
 
     private async Task ShowParamsAsync(RdsParamGroupInfo group)
     {
         await DialogService.ShowAsync<RdsParamGroupDialog>("パラメータ", new DialogParameters<RdsParamGroupDialog>
         {
             { x => x.GroupName, group.Name }
-        });
+        },
+        Styles.LargeDialog);
     }
 
     private async Task FailoverAsync(RdsInstanceInfo instance)
     {
-        if (await DialogService.ShowOperationConfirm("Failover 確認", $"インスタンス {instance.DbInstanceIdentifier} を強制 Failover しますか？", requireConfirmText: instance.DbInstanceIdentifier) is null)
+        if (await DialogService.ShowOperationConfirm("フェイルオーバー", $"インスタンス {instance.DbInstanceIdentifier} を強制フェイルオーバーしますか？", requireConfirmText: instance.DbInstanceIdentifier) is null)
         {
             return;
         }
 
-        await RunAsync("Failover 実行中...", async (_, cancellationToken) =>
+        await RunAsync("フェイルオーバー中...", async (_, cancellationToken) =>
         {
             await Service.RebootForFailoverAsync(instance.DbInstanceIdentifier, cancellationToken);
-            Snackbar.AddSuccess($"Failover を開始しました: {instance.DbInstanceIdentifier}");
+            Snackbar.AddSuccess($"{instance.DbInstanceIdentifier} のフェイルオーバーを開始しました。");
         });
     }
 
     private async Task FailoverClusterAsync(AuroraClusterInfo cluster)
     {
-        if (await DialogService.ShowOperationConfirm("Aurora Failover 確認", $"Aurora クラスタ {cluster.ClusterId} を Failover しますか？", requireConfirmText: cluster.ClusterId) is null)
+        if (await DialogService.ShowOperationConfirm("フェイルオーバー", $"Aurora クラスタ {cluster.ClusterId} をフェイルオーバーしますか？", requireConfirmText: cluster.ClusterId) is null)
         {
             return;
         }
 
-        await RunAsync("Aurora Failover 中...", async (_, cancellationToken) =>
+        await RunAsync("フェイルオーバー中...", async (_, cancellationToken) =>
         {
             await AuroraService.FailoverClusterAsync(cluster.ClusterId, null, cancellationToken);
-            Snackbar.AddSuccess($"Aurora Failover を開始しました: {cluster.ClusterId}");
+            Snackbar.AddSuccess($"{cluster.ClusterId} のフェイルオーバーを開始しました。");
         });
     }
 
@@ -232,6 +202,7 @@ public sealed partial class RdsPage
         await DialogService.ShowAsync<RdsEventsDialog>("イベント", new DialogParameters<RdsEventsDialog>
         {
             { x => x.SourceIdentifier, instance.DbInstanceIdentifier }
-        });
+        },
+        Styles.LargeDialog);
     }
 }

@@ -29,8 +29,8 @@
         <MudTd>@context.DomainName</MudTd>
         <MudTd><MudChip T="string" Color="@CfStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
         <MudTd>@context.Origins</MudTd>
-        <MudTd>@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd")</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">@context.LastModified.ToLocalTime().ToString("yyyy-MM-dd")</MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="キャッシュ無効化">
                 <MudIconButton Icon="@Icons.Material.Filled.ClearAll" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => InvalidateAsync(context)" />

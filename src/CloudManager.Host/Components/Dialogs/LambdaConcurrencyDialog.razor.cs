@@ -36,7 +36,7 @@ public sealed partial class LambdaConcurrencyDialog
         try
         {
             await Service.SetReservedConcurrencyAsync(FunctionName, newValue);
-            Snackbar.AddSuccess("同時実行数を更新しました");
+            Snackbar.AddSuccess("同時実行数を更新しました。");
             MudDialog.Close();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

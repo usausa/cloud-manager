@@ -49,25 +49,17 @@ public sealed partial class CognitoPage
         return Task.CompletedTask;
     }
 
-    private async Task LoadUsersAsync()
+    private Task LoadUsersAsync()
     {
         if (selectedPool is null)
         {
-            return;
+            return Task.CompletedTask;
         }
-        isUsersLoading = true;
-        try
+
+        return LoadAsync(async () =>
         {
             users = await Service.ListUsersAsync(selectedPool.Id, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isUsersLoading = false;
-        }
+        }, x => isUsersLoading = x);
     }
 
     private async Task ResetPasswordAsync(CognitoUserInfo user)
@@ -81,10 +73,10 @@ public sealed partial class CognitoPage
             return;
         }
 
-        await RunAsync("実行中...", async (_, cancellationToken) =>
+        await RunAsync("パスワードリセット中...", async (_, cancellationToken) =>
         {
             await Service.AdminResetPasswordAsync(selectedPool.Id, user.Username, cancellationToken);
-            Snackbar.AddSuccess($"パスワードをリセットしました: {user.Username}");
+            Snackbar.AddSuccess($"{user.Username} のパスワードをリセットしました。");
         });
     }
 }

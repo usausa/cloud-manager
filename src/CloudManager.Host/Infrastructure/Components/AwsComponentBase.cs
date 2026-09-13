@@ -46,9 +46,13 @@ public abstract class AwsComponentBase : AppComponentBase
     }
 
     // Loads data, showing failures in the banner
-    protected async Task LoadAsync(Func<Task> load)
+    protected Task LoadAsync(Func<Task> load) =>
+        LoadAsync(load, x => IsLoading = x);
+
+    // Loads a detail list that has its own loading flag
+    protected async Task LoadAsync(Func<Task> load, Action<bool> setLoading)
     {
-        IsLoading = true;
+        setLoading(true);
         ErrorMessage = null;
         try
         {
@@ -60,7 +64,7 @@ public abstract class AwsComponentBase : AppComponentBase
         }
         finally
         {
-            IsLoading = false;
+            setLoading(false);
         }
     }
 

@@ -36,7 +36,7 @@ public sealed partial class S3VersionsDialog
         try
         {
             await Service.RestoreVersionAsync(BucketName, Key, v.VersionId);
-            Snackbar.AddSuccess($"バージョン {v.VersionId} を復元しました");
+            Snackbar.AddSuccess($"バージョン {v.VersionId} を復元しました。");
             versions = await Service.ListVersionsAsync(BucketName, Key, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

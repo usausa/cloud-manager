@@ -39,7 +39,7 @@ public sealed partial class SecretsManagerPage
                 { x => x.SecretValue, value.SecretString },
                 { x => x.VersionId, value.VersionId }
             };
-            await DialogService.ShowAsync<SecretValueDialog>("シークレット値", parameters);
+            await DialogService.ShowAsync<SecretValueDialog>("シークレット値", parameters, Styles.MediumDialog);
         });
 
     private async Task RotateAsync(SecretInfo secret)
@@ -59,7 +59,7 @@ public sealed partial class SecretsManagerPage
         await RunAsync("ローテーション中...", async (_, cancellationToken) =>
         {
             await Service.RotateSecretAsync(secret.Arn, cancellationToken);
-            Snackbar.AddSuccess($"ローテーション開始: {secret.Name}");
+            Snackbar.AddSuccess($"{secret.Name} のローテーションを開始しました。");
         });
     }
 }

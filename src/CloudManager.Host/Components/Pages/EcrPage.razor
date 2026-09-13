@@ -30,14 +30,14 @@
     <RowTemplate>
         <MudTd>@context.Name</MudTd>
         <MudTd>@context.Address</MudTd>
-        <MudTd>@(context.CreatedAt?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+        <MudTd Class="no-wrap">@(context.CreatedAt?.ToLocalTime().ToString("yyyy-MM-dd") ?? "-")</MudTd>
         <MudTd>
             <MudChip T="string" Size="Size.Small" Color="@(context.ImageScanOnPush ? Color.Success : Color.Default)">
                 @(context.ImageScanOnPush ? "有効" : "無効")
             </MudChip>
         </MudTd>
         <MudTd>@context.EncryptionType</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="イメージ一覧">
                 <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
                                Href="@($"ecr/{Uri.EscapeDataString(context.Name)}")" />

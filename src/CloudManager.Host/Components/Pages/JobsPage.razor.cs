@@ -14,8 +14,6 @@ using Smart.Mapper;
 
 public sealed partial class JobsPage
 {
-    private static readonly DialogOptions EditDialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true, CloseOnEscapeKey = true };
-
     private List<JobRow> rows = [];
 
     [Inject]
@@ -111,11 +109,11 @@ public sealed partial class JobsPage
             var status = await Manager.ExecuteNowAsync(job);
             if (status == JobExecutionStatus.Success)
             {
-                Snackbar.AddSuccess($"ジョブを実行しました: {job.Name}");
+                Snackbar.AddSuccess($"{job.Name} を実行しました。");
             }
             else
             {
-                Snackbar.AddWarning($"ジョブが失敗しました: {job.Name} (実行履歴を確認してください)");
+                Snackbar.AddWarning($"{job.Name} の実行が失敗しました。実行履歴を確認してください。");
             }
         }, LoadAsync);
     }
@@ -129,7 +127,7 @@ public sealed partial class JobsPage
                 { nameof(JobEditDialog.Title), title },
                 { nameof(JobEditDialog.Form), form }
             },
-            EditDialogOptions);
+            Styles.MediumDialog);
         var result = await reference.Result;
         return (result is { Canceled: false }) ? (JobForm)result.Data! : null;
     }

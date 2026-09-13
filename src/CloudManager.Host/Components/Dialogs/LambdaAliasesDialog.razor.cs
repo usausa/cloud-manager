@@ -33,7 +33,7 @@ public sealed partial class LambdaAliasesDialog
         try
         {
             await Service.DeleteAliasAsync(FunctionName, alias.Name);
-            Snackbar.AddSuccess($"エイリアス {alias.Name} を削除しました");
+            Snackbar.AddSuccess($"エイリアス {alias.Name} を削除しました。");
             aliases = await Service.ListAliasesAsync(FunctionName, CancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

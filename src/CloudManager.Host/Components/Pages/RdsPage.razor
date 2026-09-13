@@ -36,22 +36,22 @@
                 <MudTd>@context.DbInstanceClass</MudTd>
                 <MudTd>@(context.Endpoint ?? "-")</MudTd>
                 <MudTd>@(context.MultiAz ? "Yes" : "No")</MudTd>
-                <MudTd>
-                    <MudTooltip Text="Start">
+                <MudTd Class="no-wrap">
+                    <MudTooltip Text="起動">
                         <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
                                        Disabled="IsRunning" OnClick="() => StartAsync(context)" />
                     </MudTooltip>
-                    <MudTooltip Text="Stop">
+                    <MudTooltip Text="停止">
                         <MudIconButton Icon="@Icons.Material.Filled.Stop" Size="Size.Small"
                                        Disabled="IsRunning" OnClick="() => StopAsync(context)" />
                     </MudTooltip>
-                    <MudTooltip Text="Snapshot">
+                    <MudTooltip Text="スナップショット作成">
                         <MudIconButton Icon="@Icons.Material.Filled.CameraAlt" Size="Size.Small"
                                        Disabled="IsRunning" OnClick="() => CreateSnapshotAsync(context)" />
                     </MudTooltip>
                     @if (context.MultiAz)
                     {
-                        <MudTooltip Text="Failover">
+                        <MudTooltip Text="フェイルオーバー">
                             <MudIconButton Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Small"
                                            Disabled="IsRunning" OnClick="() => FailoverAsync(context)" Color="Color.Warning" />
                         </MudTooltip>
@@ -88,13 +88,13 @@
                 <MudTd><MudChip T="string" Color="@SnapStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
                 <MudTd>@context.Engine @context.EngineVersion</MudTd>
                 <MudTd>@context.AllocatedStorage</MudTd>
-                <MudTd>@(context.CreatedTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
-                <MudTd>
-                    <MudTooltip Text="Restore">
+                <MudTd Class="no-wrap">@(context.CreatedTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+                <MudTd Class="no-wrap">
+                    <MudTooltip Text="復元">
                         <MudIconButton Icon="@Icons.Material.Filled.RestorePage" Size="Size.Small"
                                        Disabled="IsRunning" OnClick="() => RestoreSnapshotAsync(context)" />
                     </MudTooltip>
-                    <MudTooltip Text="Delete">
+                    <MudTooltip Text="削除">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
                                        Disabled="IsRunning" OnClick="() => DeleteSnapshotAsync(context)" />
                     </MudTooltip>
@@ -120,7 +120,7 @@
                 <MudTd>@context.Name</MudTd>
                 <MudTd>@context.Family</MudTd>
                 <MudTd>@context.Description</MudTd>
-                <MudTd>
+                <MudTd Class="no-wrap">
                     <MudTooltip Text="パラメータ表示">
                         <MudIconButton Icon="@Icons.Material.Filled.List" Size="Size.Small"
                                        OnClick="() => ShowParamsAsync(context)" />
@@ -149,8 +149,8 @@
                 <MudTd>@context.Engine</MudTd>
                 <MudTd><MudChip T="string" Color="@RdsStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
                 <MudTd>@String.Join(", ", context.Members.Select(m => $"{m.Id}({m.Role})"))</MudTd>
-                <MudTd>
-                    <MudTooltip Text="Failover">
+                <MudTd Class="no-wrap">
+                    <MudTooltip Text="フェイルオーバー">
                         <MudIconButton Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Small" Color="Color.Warning"
                                        OnClick="() => FailoverClusterAsync(context)" Disabled="IsRunning" />
                     </MudTooltip>

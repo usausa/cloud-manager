@@ -54,7 +54,7 @@ public sealed partial class S3ObjectsPage
         {
             await using var stream = uploadParams.File.OpenReadStream(maxAllowedSize: 100 * 1024 * 1024, cancellationToken);
             await Service.UploadStreamAsync(BucketName, uploadParams.Key, stream, uploadParams.File.Size, progress, cancellationToken);
-            Snackbar.AddSuccess($"アップロード完了: {uploadParams.Key}");
+            Snackbar.AddSuccess($"{uploadParams.Key} をアップロードしました。");
             await LoadObjectsAsync();
         });
     }
@@ -73,7 +73,7 @@ public sealed partial class S3ObjectsPage
 
     private async Task DeleteObjectAsync(S3ObjectInfo obj)
     {
-        if (await DialogService.ShowOperationConfirm("削除確認", $"オブジェクト {obj.Key} を削除しますか？", requireConfirmText: obj.Key.Split('/').Last()) is null)
+        if (await DialogService.ShowOperationConfirm("削除", $"オブジェクト {obj.Key} を削除しますか？", requireConfirmText: obj.Key.Split('/').Last()) is null)
         {
             return;
         }
@@ -81,7 +81,7 @@ public sealed partial class S3ObjectsPage
         await RunAsync("削除中...", async (_, cancellationToken) =>
         {
             await Service.DeleteObjectAsync(BucketName, obj.Key, cancellationToken);
-            Snackbar.AddSuccess($"削除しました: {obj.Key}");
+            Snackbar.AddSuccess($"{obj.Key} を削除しました。");
             await LoadObjectsAsync();
         });
     }
@@ -92,7 +92,8 @@ public sealed partial class S3ObjectsPage
         {
             { x => x.BucketName, BucketName },
             { x => x.Key, obj.Key }
-        });
+        },
+        Styles.MediumDialog);
     }
 
     private async Task CopyMoveAsync(S3ObjectInfo obj)
@@ -118,7 +119,7 @@ public sealed partial class S3ObjectsPage
             {
                 await Service.CopyObjectAsync(BucketName, obj.Key, p.DstBucket, p.DstKey, cancellationToken);
             }
-            Snackbar.AddSuccess(p.Move ? "移動しました" : "コピーしました");
+            Snackbar.AddSuccess(p.Move ? "移動しました。" : "コピーしました。");
             await LoadObjectsAsync();
         });
     }
@@ -129,6 +130,7 @@ public sealed partial class S3ObjectsPage
         {
             { x => x.BucketName, BucketName },
             { x => x.ObjectInfo, obj }
-        });
+        },
+        Styles.LargeDialog);
     }
 }

@@ -26,7 +26,7 @@
                     <MudTd>@context.FunctionVersion</MudTd>
                     <MudTd>@(context.Description ?? "-")</MudTd>
                     <MudTd>@(context.AdditionalVersion is not null ? $"{context.AdditionalVersion} ({context.AdditionalWeight:P0})" : "-")</MudTd>
-                    <MudTd>
+                    <MudTd Class="no-wrap">
                         <MudTooltip Text="削除">
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
                                            OnClick="() => DeleteAsync(context)" Disabled="isDeleting" />

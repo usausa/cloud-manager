@@ -31,7 +31,7 @@
         <MudTd>@context.QueueName</MudTd>
         <MudTd>@context.ApproximateMessages</MudTd>
         <MudTd>@context.MessagesNotVisible</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="メッセージ送信">
                 <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => SendMessageAsync(context)" />

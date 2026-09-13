@@ -29,7 +29,7 @@ public sealed partial class LambdaPage
         {
             { x => x.FunctionName, function.FunctionName }
         };
-        var dialog = await DialogService.ShowAsync<LambdaInvokeDialog>("Lambda 実行", parameters);
+        var dialog = await DialogService.ShowAsync<LambdaInvokeDialog>("Lambda 実行", parameters, Styles.MediumDialog);
         var dialogResult = await dialog.Result;
         if (dialogResult is null || dialogResult.Canceled)
         {
@@ -48,7 +48,7 @@ public sealed partial class LambdaPage
                 { x => x.StatusCode, result.StatusCode },
                 { x => x.Payload, result.Payload }
             };
-            await DialogService.ShowAsync<LambdaResultDialog>("Lambda 実行結果", resultParams);
+            await DialogService.ShowAsync<LambdaResultDialog>("Lambda 実行結果", resultParams, Styles.LargeDialog);
         });
     }
 
@@ -60,7 +60,8 @@ public sealed partial class LambdaPage
         await DialogService.ShowAsync<LambdaEnvVarsDialog>("環境変数", new DialogParameters<LambdaEnvVarsDialog>
         {
             { x => x.FunctionName, fn.FunctionName }
-        });
+        },
+        Styles.MediumDialog);
     }
 
     private async Task ShowAliasesAsync(LambdaFunctionInfo fn)
@@ -68,7 +69,8 @@ public sealed partial class LambdaPage
         await DialogService.ShowAsync<LambdaAliasesDialog>("エイリアス", new DialogParameters<LambdaAliasesDialog>
         {
             { x => x.FunctionName, fn.FunctionName }
-        });
+        },
+        Styles.MediumDialog);
     }
 
     private async Task ShowConcurrencyAsync(LambdaFunctionInfo fn)

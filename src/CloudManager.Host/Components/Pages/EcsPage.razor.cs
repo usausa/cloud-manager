@@ -28,28 +28,19 @@ public sealed partial class EcsPage
             clusters = await Service.ListClustersAsync(CancellationToken);
         });
 
-    private async Task LoadServicesAsync(string? clusterName)
+    private Task LoadServicesAsync(string? clusterName)
     {
         selectedCluster = clusterName;
         services = [];
         if (String.IsNullOrEmpty(clusterName))
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        isSvcLoading = true;
-        try
+        return LoadAsync(async () =>
         {
             services = await Service.ListServicesAsync(clusterName, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isSvcLoading = false;
-        }
+        }, x => isSvcLoading = x);
     }
 
     private async Task UpdateDesiredCountAsync(EcsServiceInfo svc)
@@ -71,7 +62,7 @@ public sealed partial class EcsPage
         await RunAsync($"更新中: {svc.ServiceName}", async (_, cancellationToken) =>
         {
             await Service.UpdateServiceDesiredCountAsync(selectedCluster!, svc.ServiceName, p.DesiredCount, cancellationToken);
-            Snackbar.AddSuccess($"希望数更新完了: {svc.ServiceName} -> {p.DesiredCount}");
+            Snackbar.AddSuccess($"{svc.ServiceName} の希望タスク数を {p.DesiredCount} に更新しました。");
             await LoadServicesAsync(selectedCluster!);
         });
     }
@@ -93,7 +84,8 @@ public sealed partial class EcsPage
         {
             { x => x.ClusterName, selectedCluster },
             { x => x.ServiceName, service.ServiceName }
-        });
+        },
+        Styles.MediumDialog);
     }
 
     private async Task ForceRedeployAsync(EcsServiceInfo service)
@@ -102,7 +94,7 @@ public sealed partial class EcsPage
         {
             return;
         }
-        if (await DialogService.ShowOperationConfirm("強制再デプロイ確認", $"サービス {service.ServiceName} を強制再デプロイしますか？", requireConfirmText: service.ServiceName) is null)
+        if (await DialogService.ShowOperationConfirm("強制再デプロイ", $"サービス {service.ServiceName} を強制再デプロイしますか？", requireConfirmText: service.ServiceName) is null)
         {
             return;
         }
@@ -110,7 +102,7 @@ public sealed partial class EcsPage
         await RunAsync("再デプロイ中...", async (_, cancellationToken) =>
         {
             await Service.ForceRedeployAsync(selectedCluster, service.ServiceName, cancellationToken);
-            Snackbar.AddSuccess($"再デプロイを開始しました: {service.ServiceName}");
+            Snackbar.AddSuccess($"{service.ServiceName} の再デプロイを開始しました。");
         });
     }
 }

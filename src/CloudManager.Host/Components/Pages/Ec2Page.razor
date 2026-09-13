@@ -49,25 +49,25 @@
         <MudTd>@context.InstanceType</MudTd>
         <MudTd>@(context.PublicIp ?? "-")</MudTd>
         <MudTd>@(context.PrivateIp ?? "-")</MudTd>
-        <MudTd>@context.LaunchTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
-        <MudTd>
-            <MudTooltip Text="Start">
+        <MudTd Class="no-wrap">@context.LaunchTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd Class="no-wrap">
+            <MudTooltip Text="起動">
                 <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => StartAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="Stop">
+            <MudTooltip Text="停止">
                 <MudIconButton Icon="@Icons.Material.Filled.Stop" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => StopAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="Reboot">
-                <MudIconButton Icon="@Icons.Material.Filled.Refresh" Size="Size.Small"
+            <MudTooltip Text="再起動">
+                <MudIconButton Icon="@Icons.Material.Filled.RestartAlt" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => RebootAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="Terminate">
+            <MudTooltip Text="終了">
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
                                Disabled="IsRunning" OnClick="() => TerminateAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="SSM Run">
+            <MudTooltip Text="SSM コマンド実行">
                 <MudIconButton Icon="@Icons.Material.Filled.Terminal" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => SsmRunAsync(context)" />
             </MudTooltip>
@@ -81,7 +81,7 @@
 @if (ssmResult is not null)
 {
     <MudPaper Class="pa-2 mt-2">
-        <MudText Typo="Typo.subtitle2">SSM 結果：@ssmResult.Status</MudText>
+        <MudText Typo="Typo.subtitle2">SSM 結果: @ssmResult.Status</MudText>
         <MudExpansionPanels>
             <MudExpansionPanel Text="stdout">
                 <pre class="console-output">@ssmResult.StandardOutput</pre>

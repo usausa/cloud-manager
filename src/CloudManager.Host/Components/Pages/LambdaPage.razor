@@ -34,9 +34,9 @@
         <MudTd>@context.Runtime</MudTd>
         <MudTd>@context.CodeSize</MudTd>
         <MudTd>@context.State</MudTd>
-        <MudTd>@(context.LastModified.HasValue ? context.LastModified.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
-        <MudTd>
-            <MudTooltip Text="Invoke">
+        <MudTd Class="no-wrap">@(context.LastModified.HasValue ? context.LastModified.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
+        <MudTd Class="no-wrap">
+            <MudTooltip Text="実行">
                 <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => InvokeAsync(context)" />
             </MudTooltip>
@@ -52,7 +52,7 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Speed" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => ShowConcurrencyAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="DLQ">
+            <MudTooltip Text="DLQ 設定">
                 <MudIconButton Icon="@Icons.Material.Filled.ErrorOutline" Size="Size.Small"
                                Disabled="IsRunning" OnClick="() => ShowDlqAsync(context)" />
             </MudTooltip>

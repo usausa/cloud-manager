@@ -20,7 +20,7 @@
                     <MudTd>@context.Status</MudTd>
                     <MudTd>@context.LastStatus</MudTd>
                     <MudTd>@(String.IsNullOrEmpty(context.StartedBy) ? "-" : context.StartedBy)</MudTd>
-                    <MudTd>@(context.StartedAt.HasValue ? context.StartedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
+                    <MudTd Class="no-wrap">@(context.StartedAt.HasValue ? context.StartedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
                 </RowTemplate>
             </MudTable>
         }

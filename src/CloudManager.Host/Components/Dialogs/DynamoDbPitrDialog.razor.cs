@@ -36,7 +36,7 @@ public sealed partial class DynamoDbPitrDialog
         try
         {
             await Service.UpdatePitrAsync(TableName, enable);
-            Snackbar.AddSuccess("PITR を更新しました");
+            Snackbar.AddSuccess("PITR を更新しました。");
             MudDialog.Close();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

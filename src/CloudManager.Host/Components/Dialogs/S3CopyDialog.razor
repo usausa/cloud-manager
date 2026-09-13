@@ -9,7 +9,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">キャンセル</MudButton>
-        <MudButton Color="@(move ? Color.Warning : Color.Primary)" OnClick="Submit"
+        <MudButton Color="@(move ? Color.Warning : Color.Primary)" Variant="Variant.Filled" OnClick="Submit"
                    Disabled="@(!IsValid)">@(move ? "移動" : "コピー")</MudButton>
     </DialogActions>
 </MudDialog>

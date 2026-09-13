@@ -63,7 +63,7 @@
                 <MudTd>@context.RunningCount</MudTd>
                 <MudTd>@context.PendingCount</MudTd>
                 <MudTd>@context.TaskDefinition</MudTd>
-                <MudTd>
+                <MudTd Class="no-wrap">
                     <MudTooltip Text="希望数変更">
                         <MudIconButton Icon="@Icons.Material.Filled.Tune" Size="Size.Small"
                                        Disabled="IsRunning" OnClick="() => UpdateDesiredCountAsync(context)" />

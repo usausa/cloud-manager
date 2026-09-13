@@ -45,17 +45,16 @@ public sealed partial class VpcPage
     }
 
     // Load the details of the selected VPC
-    private async Task OnVpcSelectedAsync(VpcInfo? vpc)
+    private Task OnVpcSelectedAsync(VpcInfo? vpc)
     {
         selectedVpc = vpc;
         ClearDetail();
         if (vpc is null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        isDetailLoading = true;
-        try
+        return LoadAsync(async () =>
         {
             var detail = await Service.GetVpcDetailAsync(vpc.VpcId, CancellationToken);
             subnets = detail.Subnets;
@@ -63,14 +62,6 @@ public sealed partial class VpcPage
             routeTables = detail.RouteTables;
             internetGateways = detail.InternetGateways;
             natGateways = detail.NatGateways;
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            ErrorMessage = FormatError(ex);
-        }
-        finally
-        {
-            isDetailLoading = false;
-        }
+        }, x => isDetailLoading = x);
     }
 }

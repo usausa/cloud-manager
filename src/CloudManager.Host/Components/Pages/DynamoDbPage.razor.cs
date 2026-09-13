@@ -34,7 +34,8 @@ public sealed partial class DynamoDbPage
         await DialogService.ShowAsync<DynamoDbScanDialog>("Scan 結果", new DialogParameters<DynamoDbScanDialog>
         {
             { x => x.TableName, table.TableName }
-        });
+        },
+        Styles.LargeDialog);
     }
 
     private async Task ShowTtlAsync(DynamoDbTableInfo table)

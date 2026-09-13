@@ -32,14 +32,13 @@ public sealed partial class AcmPage
 
     private async Task ShowDetailAsync(AcmCertificateInfo cert)
     {
-        AcmCertificateDetail detail;
-        try
+        AcmCertificateDetail? detail = null;
+        await LoadAsync(async () =>
         {
             detail = await Service.GetCertificateAsync(cert.Arn, CancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        });
+        if (detail is null)
         {
-            ErrorMessage = FormatError(ex);
             return;
         }
 
@@ -47,6 +46,6 @@ public sealed partial class AcmPage
         {
             { x => x.Detail, detail }
         };
-        await DialogService.ShowAsync<AcmCertificateDetailDialog>(cert.DomainName, dialogParams);
+        await DialogService.ShowAsync<AcmCertificateDetailDialog>(cert.DomainName, dialogParams, Styles.MediumDialog);
     }
 }

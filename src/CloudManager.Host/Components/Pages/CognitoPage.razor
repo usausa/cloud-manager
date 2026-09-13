@@ -29,7 +29,7 @@
                         @context.Name
                     </MudText>
                 </MudTd>
-                <MudTd>@(context.CreationDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+                <MudTd Class="no-wrap">@(context.CreationDate?.ToLocalTime().ToString("yyyy-MM-dd") ?? "-")</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>
         </MudTable>
@@ -65,8 +65,8 @@
                         </MudChip>
                     </MudTd>
                     <MudTd>@(context.Email ?? "-")</MudTd>
-                    <MudTd>@(context.Created?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
-                    <MudTd>
+                    <MudTd Class="no-wrap">@(context.Created?.ToLocalTime().ToString("yyyy-MM-dd") ?? "-")</MudTd>
+                    <MudTd Class="no-wrap">
                         <MudTooltip Text="パスワードリセット">
                             <MudIconButton Icon="@Icons.Material.Filled.LockReset" Size="Size.Small"
                                            Color="Color.Warning" Disabled="IsRunning"

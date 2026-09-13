@@ -63,7 +63,7 @@
                                     @context.StreamName
                                 </MudText>
                             </MudTd>
-                            <MudTd>@(context.LastEvent?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-")</MudTd>
+                            <MudTd Class="no-wrap">@(context.LastEvent?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? "-")</MudTd>
                         </RowTemplate>
                         <PagerContent><MudTablePager /></PagerContent>
                     </MudTable>
@@ -130,7 +130,7 @@
                 <MudTh>メッセージ</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd>@context.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
+                <MudTd Class="no-wrap">@context.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
                 <MudTd>@context.Message</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>

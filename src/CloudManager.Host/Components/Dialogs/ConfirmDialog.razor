@@ -6,7 +6,7 @@
         <MudText>@Message</MudText>
         @if (ShowForce)
         {
-            <MudCheckBox @bind-Value="force" Label="強制実行 (--force)" Class="mt-2" />
+            <MudCheckBox @bind-Value="force" Label="強制的に実行する" Class="mt-2" />
         }
         @if (RequireConfirmText is not null)
         {

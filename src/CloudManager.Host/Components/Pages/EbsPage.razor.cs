@@ -42,7 +42,7 @@ public sealed partial class EbsPage
         await RunAsync("スナップショット作成中...", async (_, cancellationToken) =>
         {
             var id = await Service.CreateSnapshotAsync(volume.VolumeId, description, cancellationToken);
-            Snackbar.AddSuccess($"スナップショットを作成しました: {id}");
+            Snackbar.AddSuccess($"スナップショット {id} を作成しました。");
         });
     }
 
@@ -61,14 +61,14 @@ public sealed partial class EbsPage
         await RunAsync("アタッチ中...", async (_, cancellationToken) =>
         {
             await Service.AttachVolumeAsync(volume.VolumeId, p.InstanceId, p.Device, cancellationToken);
-            Snackbar.AddSuccess("ボリュームをアタッチしました");
+            Snackbar.AddSuccess("ボリュームをアタッチしました。");
             await LoadAsync();
         });
     }
 
     private async Task DetachAsync(EbsVolumeInfo volume)
     {
-        if (await DialogService.ShowOperationConfirm("デタッチ確認", $"ボリューム {volume.VolumeId} をデタッチしますか？", requireConfirmText: volume.VolumeId) is null)
+        if (await DialogService.ShowOperationConfirm("デタッチ", $"ボリューム {volume.VolumeId} をデタッチしますか？", requireConfirmText: volume.VolumeId) is null)
         {
             return;
         }
@@ -76,7 +76,7 @@ public sealed partial class EbsPage
         await RunAsync("デタッチ中...", async (_, cancellationToken) =>
         {
             await Service.DetachVolumeAsync(volume.VolumeId, false, cancellationToken);
-            Snackbar.AddSuccess("ボリュームをデタッチしました");
+            Snackbar.AddSuccess("ボリュームをデタッチしました。");
             await LoadAsync();
         });
     }

@@ -30,16 +30,16 @@
         <MudTd>@context.TableSizeBytes</MudTd>
         <MudTd>@context.BillingMode</MudTd>
         <MudTd>@context.GsiCount</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="Scan（上位100件）">
                 <MudIconButton Icon="@Icons.Material.Filled.TableRows" Size="Size.Small"
                                OnClick="() => ScanAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="TTL">
+            <MudTooltip Text="TTL 設定">
                 <MudIconButton Icon="@Icons.Material.Filled.Timer" Size="Size.Small"
                                OnClick="() => ShowTtlAsync(context)" />
             </MudTooltip>
-            <MudTooltip Text="PITR">
+            <MudTooltip Text="PITR 設定">
                 <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small"
                                OnClick="() => ShowPitrAsync(context)" />
             </MudTooltip>

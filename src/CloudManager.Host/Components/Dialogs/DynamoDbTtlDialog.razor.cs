@@ -40,7 +40,7 @@ public sealed partial class DynamoDbTtlDialog
         {
             var attr = enable ? attributeName : (ttlInfo?.AttributeName ?? "ttl");
             await Service.UpdateTtlAsync(TableName, enable, attr);
-            Snackbar.AddSuccess("TTL を更新しました");
+            Snackbar.AddSuccess("TTL を更新しました。");
             MudDialog.Close();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

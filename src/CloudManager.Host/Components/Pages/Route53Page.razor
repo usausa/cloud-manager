@@ -61,7 +61,7 @@
                     <MudTd>@context.Type</MudTd>
                     <MudTd>@(context.Ttl?.ToString() ?? "-")</MudTd>
                     <MudTd>@String.Join(", ", context.Records)</MudTd>
-                    <MudTd>
+                    <MudTd Class="no-wrap">
                         <MudTooltip Text="削除">
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
                                            Disabled="IsRunning" OnClick="() => DeleteRecordAsync(context)" />

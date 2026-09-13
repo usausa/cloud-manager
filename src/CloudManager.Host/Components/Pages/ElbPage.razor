@@ -40,7 +40,7 @@
             </MudChip>
         </MudTd>
         <MudTd>@context.VpcId</MudTd>
-        <MudTd>
+        <MudTd Class="no-wrap">
             <MudTooltip Text="ターゲットグループ">
                 <MudIconButton Icon="@Icons.Material.Filled.List" Size="Size.Small"
                                OnClick="() => ShowTargetGroupsAsync(context)" />
@@ -70,7 +70,7 @@
                 <MudTd>@context.Port</MudTd>
                 <MudTd>@context.TargetType</MudTd>
                 <MudTd>@(context.HealthCheckPath ?? "-")</MudTd>
-                <MudTd>
+                <MudTd Class="no-wrap">
                     <MudTooltip Text="ターゲットヘルス">
                         <MudIconButton Icon="@Icons.Material.Filled.MonitorHeart" Size="Size.Small"
                                        OnClick="() => ShowTargetHealthAsync(context)" />
