@@ -56,7 +56,7 @@ public sealed partial class S3PreviewDialog
 
         await LoadAsync(async () =>
         {
-            var bytes = await Service.DownloadBytesAsync(BucketName, ObjectInfo.Key, null, CancellationToken.None);
+            var bytes = await Service.DownloadBytesAsync(BucketName, ObjectInfo.Key, null, CancellationToken);
             if (previewType == "image")
             {
                 var mime = ext == ".png" ? "image/png" : ext == ".gif" ? "image/gif" : ext == ".webp" ? "image/webp" : "image/jpeg";

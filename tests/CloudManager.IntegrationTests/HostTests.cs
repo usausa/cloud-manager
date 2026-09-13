@@ -38,15 +38,62 @@ public sealed class HostTests : IClassFixture<TestApplicationFactory>
     }
 
     [Fact]
-    public async Task UnknownPageReturnsNotFound()
+    public async Task UnknownPageReturnsNotFoundPage()
     {
         // Arrange
         var client = factory.CreateClient();
 
         // Act
         var response = await client.GetAsync(new Uri("/unknown", UriKind.Relative), TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Contains("ページが見つかりません", content, StringComparison.Ordinal);
+    }
+
+    // API は HTML ではなく素の 404
+    [Fact]
+    public async Task UnknownApiReturnsPlainNotFound()
+    {
+        // Arrange
+        var client = factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync(new Uri("/api/unknown", UriKind.Relative), TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Empty(content);
+    }
+
+    [Fact]
+    public async Task S3DownloadWithoutKeyReturnsBadRequest()
+    {
+        // Arrange
+        var client = factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync(new Uri("/api/s3/download/bucket?profile=cloudmanager-test", UriKind.Relative), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    // 存在しないプロファイルは AWS へ接続せずに ProblemDetails で返す
+    [Fact]
+    public async Task S3DownloadWithUnknownProfileReturnsProblem()
+    {
+        // Arrange
+        var client = factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync(new Uri("/api/s3/download/bucket?key=file.txt&profile=cloudmanager-test&region=ap-northeast-1", UriKind.Relative), TestContext.Current.CancellationToken);
+        var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("cloudmanager-test", content, StringComparison.Ordinal);
     }
 }

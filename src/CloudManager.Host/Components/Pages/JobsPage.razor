@@ -36,15 +36,15 @@
         <MudTd>
             <MudStack Row="true" Spacing="1">
                 <MudTooltip Text="即時実行">
-                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
+                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small" aria-label="即時実行"
                                    Disabled="IsRunning" OnClick="() => RunNowAsync(context.Job)" />
                 </MudTooltip>
                 <MudTooltip Text="編集">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="編集"
                                    Disabled="IsRunning" OnClick="() => EditAsync(context.Job)" />
                 </MudTooltip>
                 <MudTooltip Text="削除">
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" aria-label="削除"
                                    Disabled="IsRunning" OnClick="() => DeleteAsync(context.Job)" />
                 </MudTooltip>
             </MudStack>
