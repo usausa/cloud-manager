@@ -1,0 +1,56 @@
+@page "/jobs"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - ジョブ</PageTitle>
+
+<ProgressOverlay Visible="IsRunning" Ratio="ProgressRatio" Message="@ProgressMessage" />
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">ジョブ</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Size="Size.Small"
+               Disabled="IsRunning" OnClick="AddAsync">追加</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               Disabled="IsRunning" OnClick="LoadAsync">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="JobRow" Items="rows" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading">
+    <HeaderContent>
+        <MudTh>名前</MudTh>
+        <MudTh>サービス</MudTh>
+        <MudTh>操作</MudTh>
+        <MudTh>Cron (TZ)</MudTh>
+        <MudTh>次回実行</MudTh>
+        <MudTh>有効</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Job.Name</MudTd>
+        <MudTd>@context.Job.ServiceType</MudTd>
+        <MudTd>@JobOperationCatalog.DisplayName(context.Job.Operation)</MudTd>
+        <MudTd>@context.Job.CronExpression (@context.Job.CronTimeZone)</MudTd>
+        <MudTd>@(context.NextExecution.HasValue ? context.NextExecution.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm") : "-")</MudTd>
+        <MudTd><MudCheckBox T="bool" Value="context.Job.IsEnabled" ReadOnly="true" Dense="true" /></MudTd>
+        <MudTd>
+            <MudStack Row="true" Spacing="1">
+                <MudTooltip Text="即時実行">
+                    <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"
+                                   Disabled="IsRunning" OnClick="() => RunNowAsync(context.Job)" />
+                </MudTooltip>
+                <MudTooltip Text="編集">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                                   Disabled="IsRunning" OnClick="() => EditAsync(context.Job)" />
+                </MudTooltip>
+                <MudTooltip Text="削除">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                                   Disabled="IsRunning" OnClick="() => DeleteAsync(context.Job)" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>ジョブがありません。</MudText>
+    </NoRecordsContent>
+</MudTable>

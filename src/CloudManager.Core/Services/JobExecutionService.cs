@@ -25,7 +25,8 @@ public sealed class JobExecutionService
         this.jobLogService = jobLogService;
     }
 
-    public async ValueTask ExecuteAsync(JobDefinition job, CancellationToken cancellationToken)
+    // 実行結果のステータス(JobExecutionStatus)を返す
+    public async ValueTask<string> ExecuteAsync(JobDefinition job, CancellationToken cancellationToken)
     {
         log.InfoJobStart(job.Id, job.Name, job.Operation);
         var logId = await jobLogService.StartAsync(job.Id, job.Name, cancellationToken);
@@ -62,6 +63,8 @@ public sealed class JobExecutionService
         // 停止中でも結果は残す
         await jobLogService.FinishAsync(logId, status, message, errorDetail, CancellationToken.None);
         await jobLogService.TrimAsync(job.Id, options.LogRetentionCountPerJob, CancellationToken.None);
+
+        return status;
     }
 
     private static async ValueTask<string?> DispatchAsync(AwsClientFactory factory, JobDefinition job, CancellationToken cancellationToken)

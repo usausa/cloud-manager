@@ -14,16 +14,19 @@
     <MudDrawer @bind-Open="drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
-    <MudMainContent Class="pa-2">
-        <ErrorBoundary @ref="errorBoundary">
-            <ChildContent>
-                @Body
-            </ChildContent>
-            <ErrorContent>
-                <MudAlert Severity="Severity.Error" Class="mb-4">エラーが発生しました。</MudAlert>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Recover">再試行</MudButton>
-            </ErrorContent>
-        </ErrorBoundary>
+    @* MudMainContent 自体に pa-* を付けると AppBar 分の上余白が打ち消されるため内側で余白を取る *@
+    <MudMainContent>
+        <div class="pa-2">
+            <ErrorBoundary @ref="errorBoundary">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    <MudAlert Severity="Severity.Error" Class="mb-4">エラーが発生しました。</MudAlert>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Recover">再試行</MudButton>
+                </ErrorContent>
+            </ErrorBoundary>
+        </div>
     </MudMainContent>
 </MudLayout>
 

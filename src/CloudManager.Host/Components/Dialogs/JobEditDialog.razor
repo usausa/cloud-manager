@@ -1,0 +1,68 @@
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" Model="Form">
+            <MudStack Spacing="3">
+                <MudTextField @bind-Value="Form.Name" For="@(() => Form.Name)" Validation="@Validator.ValidateValue" Label="ジョブ名" Immediate="true" />
+                <MudTextField @bind-Value="Form.Description" For="@(() => Form.Description)" Label="説明" />
+                <MudTextField @bind-Value="Form.ProfileName" For="@(() => Form.ProfileName)" Validation="@Validator.ValidateValue" Label="プロファイル" Immediate="true" />
+                <MudTextField @bind-Value="Form.RegionName" For="@(() => Form.RegionName)" Validation="@Validator.ValidateValue" Label="リージョン" Immediate="true" />
+                <MudSelect T="JobServiceType" Value="Form.ServiceType" ValueChanged="OnServiceTypeChanged" Label="サービス">
+                    @foreach (var serviceType in Enum.GetValues<JobServiceType>())
+                    {
+                        <MudSelectItem Value="serviceType">@serviceType</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudSelect T="JobOperation" @bind-Value="Form.Operation" For="@(() => Form.Operation)" Validation="@Validator.ValidateValue" Label="操作">
+                    @foreach (var operation in JobOperationCatalog.ForService(Form.ServiceType))
+                    {
+                        <MudSelectItem Value="operation">@JobOperationCatalog.DisplayName(operation)</MudSelectItem>
+                    }
+                </MudSelect>
+
+                @switch (Form.Operation)
+                {
+                    case JobOperation.Ec2Start:
+                    case JobOperation.Ec2Stop:
+                    case JobOperation.Ec2Reboot:
+                        <MudTextField @bind-Value="Form.InstanceId" For="@(() => Form.InstanceId)" Validation="@Validator.ValidateValue" Label="EC2 インスタンス ID" Immediate="true" />
+                        break;
+                    case JobOperation.RdsStart:
+                    case JobOperation.RdsStop:
+                        <MudTextField @bind-Value="Form.DbInstanceId" For="@(() => Form.DbInstanceId)" Validation="@Validator.ValidateValue" Label="RDS DB インスタンス ID" Immediate="true" />
+                        break;
+                    case JobOperation.EcsUpdateDesiredCount:
+                        <MudTextField @bind-Value="Form.Cluster" For="@(() => Form.Cluster)" Validation="@Validator.ValidateValue" Label="ECS クラスター名" Immediate="true" />
+                        <MudTextField @bind-Value="Form.ServiceName" For="@(() => Form.ServiceName)" Validation="@Validator.ValidateValue" Label="ECS サービス名" Immediate="true" />
+                        <MudNumericField @bind-Value="Form.DesiredCount" For="@(() => Form.DesiredCount)" Validation="@Validator.ValidateValue" Label="希望タスク数" Min="0" />
+                        break;
+                    case JobOperation.LambdaInvoke:
+                        <MudTextField @bind-Value="Form.FunctionName" For="@(() => Form.FunctionName)" Validation="@Validator.ValidateValue" Label="Lambda 関数名" Immediate="true" />
+                        <MudTextField @bind-Value="Form.Payload" For="@(() => Form.Payload)" Label="ペイロード (JSON)" Lines="3" />
+                        <MudSelect T="string" @bind-Value="Form.InvocationType" Label="実行タイプ">
+                            <MudSelectItem Value="@("Event")">Event (非同期)</MudSelectItem>
+                            <MudSelectItem Value="@("RequestResponse")">RequestResponse (同期)</MudSelectItem>
+                        </MudSelect>
+                        break;
+                    case JobOperation.CloudFrontInvalidate:
+                        <MudTextField @bind-Value="Form.DistributionId" For="@(() => Form.DistributionId)" Validation="@Validator.ValidateValue" Label="ディストリビューション ID" Immediate="true" />
+                        <MudTextField @bind-Value="Form.Paths" For="@(() => Form.Paths)" Validation="@Validator.ValidateValue" Label="パス (例: /*)" Immediate="true" />
+                        break;
+                }
+
+                <MudTextField @bind-Value="Form.CronExpression" For="@(() => Form.CronExpression)" Validation="@Validator.ValidateValue" Label="Cron 式 (例: 0 18 * * 1-5)" Immediate="true" />
+                <MudSelect T="JobCronTimeZone" @bind-Value="Form.CronTimeZone" Label="タイムゾーン">
+                    <MudSelectItem Value="JobCronTimeZone.Utc">UTC</MudSelectItem>
+                    <MudSelectItem Value="JobCronTimeZone.Local">ローカル</MudSelectItem>
+                </MudSelect>
+                <MudCheckBox @bind-Value="Form.IsEnabled" Label="有効" />
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="OnOkClick">保存</MudButton>
+        <MudButton Color="Color.Default" OnClick="OnCancelClick">キャンセル</MudButton>
+    </DialogActions>
+</MudDialog>

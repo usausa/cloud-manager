@@ -73,7 +73,7 @@ public sealed class JobManager
         return jobService.DeleteAsync(id, cancellationToken);
     }
 
-    public ValueTask ExecuteNowAsync(JobDefinition job, CancellationToken cancellationToken = default) =>
+    public ValueTask<string> ExecuteNowAsync(JobDefinition job, CancellationToken cancellationToken = default) =>
         jobExecutionService.ExecuteAsync(job, cancellationToken);
 
     public DateTimeOffset? GetNextExecutionTime(JobDefinition job)

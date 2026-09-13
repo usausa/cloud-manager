@@ -1,0 +1,45 @@
+@page "/jobs/history"
+@inherits AwsComponentBase
+
+<PageTitle>CloudManager - ジョブ実行履歴</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudText Typo="Typo.h5">ジョブ実行履歴</MudText>
+    <MudSpacer />
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Outlined" Size="Size.Small"
+               OnClick="LoadAsync">更新</MudButton>
+</MudStack>
+
+<ErrorBanner Message="@ErrorMessage" OnClear="() => ErrorMessage = null" />
+
+<MudTable T="JobExecutionLogEntity" Items="logs" Dense="true" Hover="true" Bordered="true" Striped="true" Loading="@IsLoading">
+    <HeaderContent>
+        <MudTh>ジョブ名</MudTh>
+        <MudTh>開始日時</MudTh>
+        <MudTh>終了日時</MudTh>
+        <MudTh>ステータス</MudTh>
+        <MudTh>メッセージ</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.JobName</MudTd>
+        <MudTd>@context.StartedAt.ToString("yyyy/MM/dd HH:mm:ss")</MudTd>
+        <MudTd>@(context.FinishedAt?.ToString("yyyy/MM/dd HH:mm:ss") ?? "-")</MudTd>
+        <MudTd>
+            <MudChip T="string" Color="@StatusColor(context.Status)" Size="Size.Small">@context.Status</MudChip>
+        </MudTd>
+        <MudTd>@(context.Message ?? "-")</MudTd>
+        <MudTd>
+            @if (context.ErrorDetail is not null)
+            {
+                <MudTooltip Text="エラー詳細">
+                    <MudIconButton Icon="@Icons.Material.Filled.Info" Size="Size.Small"
+                                   OnClick="() => ShowErrorAsync(context)" />
+                </MudTooltip>
+            }
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>実行履歴がありません。</MudText>
+    </NoRecordsContent>
+</MudTable>
