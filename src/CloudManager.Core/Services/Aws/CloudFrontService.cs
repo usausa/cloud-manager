@@ -56,7 +56,6 @@ public sealed class CloudFrontService
     public async ValueTask InvalidateCacheAsync(string distributionId, IReadOnlyList<string> paths, CancellationToken cancellationToken = default)
     {
         using var cloudFront = factory.CreateCloudFrontClient();
-#pragma warning disable IDE0028
         var request = new CreateInvalidationRequest
         {
             DistributionId = distributionId,
@@ -70,7 +69,6 @@ public sealed class CloudFrontService
                 }
             }
         };
-#pragma warning restore IDE0028
         await cloudFront.CreateInvalidationAsync(
             request,
             cancellationToken);

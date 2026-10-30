@@ -40,7 +40,6 @@ public sealed class EcsService
         var descResponse = await ecs.DescribeClustersAsync(
             new DescribeClustersRequest { Clusters = arns },
             cancellationToken);
-#pragma warning disable IDE0028
         return descResponse.Clusters
             .Select(c => new EcsClusterInfo(
                 c.ClusterArn,
@@ -49,7 +48,6 @@ public sealed class EcsService
                 c.ActiveServicesCount.GetValueOrDefault(),
                 c.RunningTasksCount.GetValueOrDefault()))
             .ToList();
-#pragma warning restore IDE0028
     }
 
     // Lists services in a cluster (paged)
@@ -86,7 +84,6 @@ public sealed class EcsService
             },
             cancellationToken);
 
-#pragma warning disable IDE0028
         return descResponse.Services
             .Select(s => new EcsServiceInfo(
                 s.ServiceName,
@@ -96,7 +93,6 @@ public sealed class EcsService
                 s.PendingCount.GetValueOrDefault(),
                 s.TaskDefinition))
             .ToList();
-#pragma warning restore IDE0028
     }
 
     // Runs an ECS task; FARGATE requires subnetId and securityGroupId
@@ -176,7 +172,6 @@ public sealed class EcsService
         }
 
         var descResponse = await ecs.DescribeTasksAsync(new DescribeTasksRequest { Cluster = clusterName, Tasks = arns }, cancellationToken);
-#pragma warning disable IDE0028
         return (descResponse.Tasks ?? []).Select(t => new EcsTaskInfo(
             t.TaskArn,
             t.TaskArn.Split('/').Last(),
@@ -184,7 +179,6 @@ public sealed class EcsService
             t.LastStatus ?? string.Empty,
             t.StartedBy ?? string.Empty,
             t.StartedAt == DateTime.MinValue ? null : t.StartedAt)).ToList();
-#pragma warning restore IDE0028
     }
 
     // Forces a new deployment of a service to pick up image updates

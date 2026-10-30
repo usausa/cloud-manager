@@ -85,7 +85,6 @@ public sealed class Route53Service
         CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateRoute53Client();
-#pragma warning disable IDE0028
         await client.ChangeResourceRecordSetsAsync(
             new ChangeResourceRecordSetsRequest
             {
@@ -109,7 +108,6 @@ public sealed class Route53Service
                 }
             },
             cancellationToken);
-#pragma warning restore IDE0028
     }
 
     public async ValueTask DeleteRecordAsync(
@@ -121,7 +119,6 @@ public sealed class Route53Service
         CancellationToken cancellationToken = default)
     {
         using var client = factory.CreateRoute53Client();
-#pragma warning disable IDE0028
         await client.ChangeResourceRecordSetsAsync(
             new ChangeResourceRecordSetsRequest
             {
@@ -145,6 +142,5 @@ public sealed class Route53Service
                 }
             },
             cancellationToken);
-#pragma warning restore IDE0028
     }
 }

@@ -67,11 +67,9 @@ public sealed class DynamoDbService
                 Limit = limit
             },
             cancellationToken);
-#pragma warning disable IDE0028
         return (response.Items ?? [])
             .Select(item => new DynamoDbItemInfo(item.ToDictionary(kv => kv.Key, kv => AttributeValueToString(kv.Value))))
             .ToList();
-#pragma warning restore IDE0028
     }
 
     // Gets the TTL setting

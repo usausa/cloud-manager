@@ -90,7 +90,6 @@ public sealed class SqsService
             },
             cancellationToken);
 
-#pragma warning disable IDE0028
         return (response.Messages ?? [])
             .Select(m => new SqsMessageInfo(
                 m.MessageId,
@@ -98,7 +97,6 @@ public sealed class SqsService
                 m.Body,
                 m.Attributes.GetValueOrDefault("ApproximateFirstReceiveTimestamp")))
             .ToList();
-#pragma warning restore IDE0028
     }
 
     public async ValueTask PurgeQueueAsync(Uri queueUrl, CancellationToken cancellationToken = default)

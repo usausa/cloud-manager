@@ -21,11 +21,9 @@ public sealed class S3Service
     {
         using var s3 = factory.CreateS3Client();
         var response = await s3.ListBucketsAsync(cancellationToken);
-#pragma warning disable IDE0028
         return response.Buckets
             .Select(b => new S3BucketInfo(b.BucketName, b.CreationDate.GetValueOrDefault()))
             .ToList();
-#pragma warning restore IDE0028
     }
 
     // Lists objects in a bucket (paged)
@@ -295,9 +293,7 @@ public sealed class S3Service
             }
         }
         while (true);
-#pragma warning disable IDE0028
         return result.OrderByDescending(v => v.LastModified).ToList();
-#pragma warning restore IDE0028
     }
 
     // Restores a version by copying it over the same key
@@ -345,7 +341,6 @@ public sealed class S3Service
         try
         {
             var response = await s3.GetLifecycleConfigurationAsync(bucketName, cancellationToken);
-#pragma warning disable IDE0028
             return response.Configuration.Rules
                 .Select(r => new S3LifecycleRuleInfo(
                     r.Id ?? string.Empty,
@@ -355,7 +350,6 @@ public sealed class S3Service
                     r.Expiration != null ? $"{r.Expiration.Days}d" : null,
                     r.NoncurrentVersionExpiration != null ? $"{r.NoncurrentVersionExpiration.NoncurrentDays}d" : null))
                 .ToList();
-#pragma warning restore IDE0028
         }
         catch (AmazonS3Exception ex) when (ex.ErrorCode == "NoSuchLifecycleConfiguration")
         {

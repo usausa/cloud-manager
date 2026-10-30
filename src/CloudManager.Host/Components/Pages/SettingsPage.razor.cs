@@ -9,13 +9,11 @@ using Microsoft.AspNetCore.Components;
 
 public sealed partial class SettingsPage
 {
-#pragma warning disable IDE0028
     private static readonly IReadOnlyList<string> Regions = RegionEndpoint.EnumerableAllRegions
         .Where(static x => x.PartitionName == "aws")
         .Select(static x => x.SystemName)
         .Order(StringComparer.Ordinal)
         .ToList();
-#pragma warning restore IDE0028
 
     private string selectedProfile = string.Empty;
 

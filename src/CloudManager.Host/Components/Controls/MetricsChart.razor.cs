@@ -38,7 +38,6 @@ public sealed partial class MetricsChart
             .Order()
             .ToList();
 
-#pragma warning disable IDE0028
         labels = timestamps
             .Select(static x => x.ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture))
             .ToArray();
@@ -54,6 +53,5 @@ public sealed partial class MetricsChart
                 };
             })
             .ToList();
-#pragma warning restore IDE0028
     }
 }

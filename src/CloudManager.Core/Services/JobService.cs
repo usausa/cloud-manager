@@ -27,9 +27,7 @@ public sealed partial class JobService
     public async ValueTask<List<JobDefinition>> QueryAllAsync(CancellationToken cancellationToken = default)
     {
         var entities = await jobAccessor.QueryAllAsync(cancellationToken);
-#pragma warning disable IDE0028
         return entities.Select(ToModel).ToList();
-#pragma warning restore IDE0028
     }
 
     public async ValueTask<JobDefinition?> QueryAsync(long id, CancellationToken cancellationToken = default)

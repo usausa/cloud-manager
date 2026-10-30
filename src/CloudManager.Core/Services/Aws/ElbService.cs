@@ -77,13 +77,11 @@ public sealed class ElbService
             TargetGroupArn = targetGroupArn
         },
         cancellationToken);
-#pragma warning disable IDE0028
         return (response.TargetHealthDescriptions ?? []).Select(t => new TargetHealthInfo(
             t.Target?.Id ?? string.Empty,
             t.Target?.Port.GetValueOrDefault() ?? 0,
             t.TargetHealth?.State?.Value ?? string.Empty,
             t.TargetHealth?.Reason?.Value,
             t.TargetHealth?.Description)).ToList();
-#pragma warning restore IDE0028
     }
 }

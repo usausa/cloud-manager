@@ -21,7 +21,6 @@ public sealed class VpcService
         var response = await ec2.DescribeVpcsAsync(
             new DescribeVpcsRequest(),
             cancellationToken);
-#pragma warning disable IDE0028
         return (response.Vpcs ?? [])
             .Select(v => new VpcInfo(
                 v.VpcId,
@@ -30,7 +29,6 @@ public sealed class VpcService
                 v.IsDefault.GetValueOrDefault(),
                 v.State.Value))
             .ToList();
-#pragma warning restore IDE0028
     }
 
     // Gets the details of a VPC

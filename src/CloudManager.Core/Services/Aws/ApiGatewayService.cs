@@ -40,13 +40,11 @@ public sealed class ApiGatewayService
     {
         using var client = factory.CreateApiGatewayClient();
         var response = await client.GetStagesAsync(new GetStagesRequest { RestApiId = restApiId }, cancellationToken);
-#pragma warning disable IDE0028
         return (response.Item ?? []).Select(s => new StageInfo(
             s.StageName ?? string.Empty,
             s.DeploymentId,
             s.LastUpdatedDate,
             s.TracingEnabled.GetValueOrDefault())).ToList();
-#pragma warning restore IDE0028
     }
 
     public async ValueTask<string> CreateDeploymentAsync(

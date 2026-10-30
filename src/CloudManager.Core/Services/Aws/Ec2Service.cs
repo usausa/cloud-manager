@@ -76,11 +76,9 @@ public sealed class Ec2Service
     public async ValueTask StartInstancesAsync(string[] ids, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
-#pragma warning disable IDE0028
         await ec2.StartInstancesAsync(
             new StartInstancesRequest { InstanceIds = ids.ToList() },
             cancellationToken);
-#pragma warning restore IDE0028
 
         if (!wait)
         {
@@ -94,11 +92,9 @@ public sealed class Ec2Service
     public async ValueTask StopInstancesAsync(string[] ids, bool force, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
-#pragma warning disable IDE0028
         await ec2.StopInstancesAsync(
             new StopInstancesRequest { InstanceIds = ids.ToList(), Force = force },
             cancellationToken);
-#pragma warning restore IDE0028
 
         if (!wait)
         {
@@ -112,22 +108,18 @@ public sealed class Ec2Service
     public async ValueTask RebootInstancesAsync(string[] ids, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
-#pragma warning disable IDE0028
         await ec2.RebootInstancesAsync(
             new RebootInstancesRequest { InstanceIds = ids.ToList() },
             cancellationToken);
-#pragma warning restore IDE0028
     }
 
     // Terminates instances, polling until terminated when wait is set
     public async ValueTask TerminateInstancesAsync(string[] ids, bool wait, int timeoutSeconds, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken = default)
     {
         using var ec2 = factory.CreateEc2Client();
-#pragma warning disable IDE0028
         await ec2.TerminateInstancesAsync(
             new TerminateInstancesRequest { InstanceIds = ids.ToList() },
             cancellationToken);
-#pragma warning restore IDE0028
 
         if (!wait)
         {
@@ -199,14 +191,12 @@ public sealed class Ec2Service
             cancellationToken.ThrowIfCancellationRequested();
             await Task.Delay(pollInterval, cancellationToken);
 
-#pragma warning disable IDE0028
             var response = await ec2.DescribeInstancesAsync(
                 new DescribeInstancesRequest
                 {
                     InstanceIds = ids.ToList()
                 },
                 cancellationToken);
-#pragma warning restore IDE0028
 
             var states = response.Reservations
                 .SelectMany(r => r.Instances)

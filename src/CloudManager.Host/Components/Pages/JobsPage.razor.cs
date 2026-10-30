@@ -31,9 +31,7 @@ public sealed partial class JobsPage
         LoadAsync(async () =>
         {
             var jobs = await JobService.QueryAllAsync(CancellationToken);
-#pragma warning disable IDE0028
             rows = jobs.Select(x => new JobRow(x, Manager.GetNextExecutionTime(x))).ToList();
-#pragma warning restore IDE0028
         });
 
     private async Task AddAsync()

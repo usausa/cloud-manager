@@ -49,7 +49,6 @@ public sealed class CloudWatchService
             },
             cancellationToken);
 
-#pragma warning disable IDE0028
         return response.Datapoints
             .OrderBy(d => d.Timestamp)
             .Select(d =>
@@ -64,7 +63,6 @@ public sealed class CloudWatchService
                 return new CloudWatchDataPoint(d.Timestamp ?? default, value, d.Unit ?? string.Empty);
             })
             .ToList();
-#pragma warning restore IDE0028
     }
 
     // Lists CloudWatch alarms

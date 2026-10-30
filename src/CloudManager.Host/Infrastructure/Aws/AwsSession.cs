@@ -40,9 +40,7 @@ public sealed class AwsSession
     {
         try
         {
-#pragma warning disable IDE0028
             return new CredentialProfileStoreChain().ListProfiles().Select(static x => x.Name).ToList();
-#pragma warning restore IDE0028
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
