@@ -49,7 +49,7 @@
         <MudTd>@context.InstanceType</MudTd>
         <MudTd>@(context.PublicIp ?? "-")</MudTd>
         <MudTd>@(context.PrivateIp ?? "-")</MudTd>
-        <MudTd Class="no-wrap">@context.LaunchTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd Class="no-wrap">@context.LaunchTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</MudTd>
         <MudTd Class="no-wrap">
             <MudTooltip Text="起動">
                 <MudIconButton Icon="@Icons.Material.Filled.PlayArrow" Size="Size.Small"

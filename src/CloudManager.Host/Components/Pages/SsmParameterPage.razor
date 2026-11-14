@@ -40,7 +40,7 @@
                 @context.Type
             </MudChip>
         </MudTd>
-        <MudTd Class="no-wrap">@(context.LastModified?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+        <MudTd Class="no-wrap">@(context.LastModified?.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "-")</MudTd>
         <MudTd>@context.Version</MudTd>
         <MudTd Class="no-wrap">
             <MudTooltip Text="値を表示">

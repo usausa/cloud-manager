@@ -31,7 +31,7 @@
         <MudTd>@context.Job.ServiceType</MudTd>
         <MudTd>@JobOperationCatalog.DisplayName(context.Job.Operation)</MudTd>
         <MudTd>@context.Job.CronExpression (@context.Job.CronTimeZone)</MudTd>
-        <MudTd Class="no-wrap">@(context.NextExecution.HasValue ? context.NextExecution.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")</MudTd>
+        <MudTd Class="no-wrap">@(context.NextExecution.HasValue ? context.NextExecution.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) : "-")</MudTd>
         <MudTd><MudCheckBox T="bool" Value="context.Job.IsEnabled" ReadOnly="true" Dense="true" /></MudTd>
         <MudTd Class="no-wrap">
             <MudStack Row="true" Spacing="1">

@@ -35,7 +35,7 @@
                     </MudText>
                 </MudTd>
                 <MudTd>@(context.RetentionDays.HasValue ? context.RetentionDays.ToString() : "無制限")</MudTd>
-                <MudTd>@((context.StoredBytes / 1024.0 / 1024.0).ToString("F2"))</MudTd>
+                <MudTd>@((context.StoredBytes / 1024.0 / 1024.0).ToString("F2", CultureInfo.InvariantCulture))</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>
         </MudTable>
@@ -63,7 +63,7 @@
                                     @context.StreamName
                                 </MudText>
                             </MudTd>
-                            <MudTd Class="no-wrap">@(context.LastEvent?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? "-")</MudTd>
+                            <MudTd Class="no-wrap">@(context.LastEvent?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) ?? "-")</MudTd>
                         </RowTemplate>
                         <PagerContent><MudTablePager /></PagerContent>
                     </MudTable>
@@ -130,7 +130,7 @@
                 <MudTh>メッセージ</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd Class="no-wrap">@context.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
+                <MudTd Class="no-wrap">@context.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)</MudTd>
                 <MudTd>@context.Message</MudTd>
             </RowTemplate>
             <PagerContent><MudTablePager /></PagerContent>

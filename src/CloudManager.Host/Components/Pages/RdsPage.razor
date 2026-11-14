@@ -88,7 +88,7 @@
                 <MudTd><MudChip T="string" Color="@SnapStateColor(context.Status)" Size="Size.Small">@context.Status</MudChip></MudTd>
                 <MudTd>@context.Engine @context.EngineVersion</MudTd>
                 <MudTd>@context.AllocatedStorage</MudTd>
-                <MudTd Class="no-wrap">@(context.CreatedTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudTd>
+                <MudTd Class="no-wrap">@(context.CreatedTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "-")</MudTd>
                 <MudTd Class="no-wrap">
                     <MudTooltip Text="復元">
                         <MudIconButton Icon="@Icons.Material.Filled.RestorePage" Size="Size.Small"

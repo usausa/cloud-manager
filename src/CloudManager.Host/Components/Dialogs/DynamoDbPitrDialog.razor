@@ -10,8 +10,8 @@
                 <MudText>現在の状態: @(pitrInfo.Enabled ? "有効" : "無効")</MudText>
                 @if (pitrInfo.Enabled)
                 {
-                    <MudText>最古の復元ポイント: @(pitrInfo.EarliestRestoreDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudText>
-                    <MudText>最新の復元ポイント: @(pitrInfo.LatestRestoreDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</MudText>
+                    <MudText>最古の復元ポイント: @(pitrInfo.EarliestRestoreDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "-")</MudText>
+                    <MudText>最新の復元ポイント: @(pitrInfo.LatestRestoreDate?.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "-")</MudText>
                 }
                 <MudSwitch @bind-Value="enable" Label="PITR を有効にする" Color="Color.Primary" />
             </MudStack>

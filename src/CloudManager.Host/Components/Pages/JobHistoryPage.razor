@@ -23,8 +23,8 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>@context.JobName</MudTd>
-        <MudTd Class="no-wrap">@context.StartedAt.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
-        <MudTd Class="no-wrap">@(context.FinishedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-")</MudTd>
+        <MudTd Class="no-wrap">@context.StartedAt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)</MudTd>
+        <MudTd Class="no-wrap">@(context.FinishedAt?.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) ?? "-")</MudTd>
         <MudTd>
             <MudChip T="string" Color="@StatusColor(context.Status)" Size="Size.Small">@context.Status</MudChip>
         </MudTd>

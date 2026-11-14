@@ -40,7 +40,7 @@
         </MudTd>
         <MudTd>@context.AvailabilityZone</MudTd>
         <MudTd>@(context.AttachedInstanceId ?? "-")</MudTd>
-        <MudTd Class="no-wrap">@context.CreateTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd Class="no-wrap">@context.CreateTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</MudTd>
         <MudTd Class="no-wrap">
             <MudTooltip Text="スナップショット作成">
                 <MudIconButton Icon="@Icons.Material.Filled.Camera" Size="Size.Small"
