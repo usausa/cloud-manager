@@ -21,7 +21,7 @@
             @if (ec2Result is not null)
             {
                 <MudAlert Severity="Severity.Info" Class="mt-2" Dense="true">
-                    @ec2Result.Description - 時間単価: $@ec2Result.HourlyUsd.ToString("F4") USD / @(ec2Result.Hours)時間合計: $@ec2Result.MonthlyUsd.ToString("F2") USD
+                    @ec2Result.Description - 時間単価: $@ec2Result.HourlyUsd.ToString("F4", CultureInfo.InvariantCulture) USD / @(ec2Result.Hours)時間合計: $@ec2Result.MonthlyUsd.ToString("F2", CultureInfo.InvariantCulture) USD
                 </MudAlert>
             }
         </MudPaper>
@@ -39,7 +39,7 @@
             @if (rdsResult is not null)
             {
                 <MudAlert Severity="Severity.Info" Class="mt-2" Dense="true">
-                    @rdsResult.Description - 時間単価: $@rdsResult.HourlyUsd.ToString("F4") USD / @(rdsResult.Hours)時間合計: $@rdsResult.MonthlyUsd.ToString("F2") USD
+                    @rdsResult.Description - 時間単価: $@rdsResult.HourlyUsd.ToString("F4", CultureInfo.InvariantCulture) USD / @(rdsResult.Hours)時間合計: $@rdsResult.MonthlyUsd.ToString("F2", CultureInfo.InvariantCulture) USD
                 </MudAlert>
             }
         </MudPaper>

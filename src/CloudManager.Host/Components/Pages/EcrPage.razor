@@ -30,7 +30,7 @@
     <RowTemplate>
         <MudTd>@context.Name</MudTd>
         <MudTd>@context.Address</MudTd>
-        <MudTd Class="no-wrap">@(context.CreatedAt?.ToLocalTime().ToString("yyyy-MM-dd") ?? "-")</MudTd>
+        <MudTd Class="no-wrap">@(context.CreatedAt?.ToLocalTime().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "-")</MudTd>
         <MudTd>
             <MudChip T="string" Size="Size.Small" Color="@(context.ImageScanOnPush ? Color.Success : Color.Default)">
                 @(context.ImageScanOnPush ? "有効" : "無効")

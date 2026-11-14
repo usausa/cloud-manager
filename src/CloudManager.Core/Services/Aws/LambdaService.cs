@@ -84,7 +84,7 @@ public sealed class LambdaService
         var response = await lambda.GetFunctionConfigurationAsync(new GetFunctionConfigurationRequest { FunctionName = functionName }, cancellationToken);
         return response.Environment?.Variables?
             .Select(kv => new LambdaEnvVarInfo(kv.Key, kv.Value))
-            .OrderBy(e => e.Key)
+            .OrderBy(e => e.Key, StringComparer.Ordinal)
             .ToList() ?? [];
     }
 
