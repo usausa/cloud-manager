@@ -20,7 +20,8 @@ public sealed partial class RdsParamGroupDialog
     private string search = string.Empty;
 
     private IEnumerable<RdsParameterInfo> Filtered =>
-        String.IsNullOrWhiteSpace(search) ? parameters
+        String.IsNullOrWhiteSpace(search)
+            ? parameters
             : parameters.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
 
     protected override Task OnInitializedAsync() =>

@@ -70,7 +70,7 @@ public sealed partial class SnsPage
 
     private static string ShortArn(string arn)
     {
-        var lastColon = arn.LastIndexOf(':');
+        var lastColon = arn.LastIndexOf(':', StringComparison.Ordinal);
         return lastColon >= 0 ? arn[(lastColon + 1)..] : arn;
     }
 }
