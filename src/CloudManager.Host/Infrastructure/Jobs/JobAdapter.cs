@@ -2,7 +2,7 @@ namespace CloudManager.Host.Infrastructure.Jobs;
 
 using Mofucat.JobScheduler;
 
-// UTC cron job that reloads its definition from the database at execution time
+// Cron job that reloads its definition from the database at execution time
 public sealed class JobAdapter : ISchedulerJob
 {
     private readonly long jobId;

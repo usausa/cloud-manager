@@ -88,30 +88,19 @@ public sealed class JobManager
             return null;
         }
 
-        if (job.CronTimeZone == JobCronTimeZone.Local)
-        {
-            // Local cron jobs are triggered every minute, so calculate the next run here
-            var localNow = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, TimeZoneInfo.Local);
-            return CronExpression.Parse(job.CronExpression).GetNextOccurrence(localNow);
-        }
-
         return scheduler.FindJob(JobName(job.Id))?.NextExecutionTime;
     }
 
     private void Register(JobDefinition job)
     {
         var adapter = new JobAdapter(job.Id, jobService, jobExecutionService);
-        switch (job.CronTimeZone)
+        var timeZone = job.CronTimeZone switch
         {
-            case JobCronTimeZone.Utc:
-                scheduler.AddJob(job.CronExpression, adapter, JobName(job.Id));
-                break;
-            case JobCronTimeZone.Local:
-                scheduler.AddJob(LocalJobAdapter.TriggerCronExpression, new LocalJobAdapter(adapter, job.CronExpression), JobName(job.Id));
-                break;
-            default:
-                throw new InvalidOperationException($"Unsupported cron time zone. timeZone=[{job.CronTimeZone}]");
-        }
+            JobCronTimeZone.Utc => TimeZoneInfo.Utc,
+            JobCronTimeZone.Local => TimeZoneInfo.Local,
+            _ => throw new InvalidOperationException($"Unsupported cron time zone. timeZone=[{job.CronTimeZone}]")
+        };
+        scheduler.AddJob(job.CronExpression, adapter, JobName(job.Id), timeZone: timeZone);
     }
 
     private static string JobName(long id) => $"job-{id}";

@@ -53,16 +53,5 @@ public sealed class JobFormValidator : AbstractValidator<JobForm>
         return result.IsValid ? [] : result.Errors.Select(static e => e.ErrorMessage);
     };
 
-    private static bool BeValidCron(string expression)
-    {
-        try
-        {
-            _ = CronExpression.Parse(expression);
-            return true;
-        }
-        catch (Exception ex) when (ex is FormatException or ArgumentException)
-        {
-            return false;
-        }
-    }
+    private static bool BeValidCron(string expression) => CronExpression.TryParse(expression, out _);
 }
